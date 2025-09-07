@@ -138,6 +138,13 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Círculos decorativos de fondo */}
+      <div className="absolute w-72 h-72 -top-20 -left-20 rounded-full bg-indigo-200 opacity-30"></div>
+      <div className="absolute w-48 h-48 top-1/3 -right-24 rounded-full bg-indigo-300 opacity-30"></div>
+      <div className="absolute w-96 h-96 bottom-0 right-0 translate-y-1/2 translate-x-1/2 rounded-full bg-indigo-100 opacity-40"></div>
+      <div className="absolute w-40 h-40 bottom-10 left-10 rounded-full bg-indigo-200 opacity-30"></div> 
+
+      
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 relative z-10">
         {/* Stepper visual para mostrar el progreso del registro */}
         <div className="flex justify-center mb-8">
