@@ -3,45 +3,60 @@ import { useNavigate } from "@tanstack/react-router";
 import { Mail, Lock } from "react-feather";
 
 export default function Login() {
+  // Estados para los campos del formulario y mensajes
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); 
   const navigate = useNavigate();
 
+  /**
+   * Maneja el envío del formulario de login.
+   * Envía los datos al backend y gestiona la autenticación.
+   */
   const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError("");
+    e.preventDefault();
+    setError("");
 
-  try {
-    const res = await fetch("https://localhost:7044/Users/Login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
+    try {
+      // Realiza la petición al endpoint de login
+      const res = await fetch("https://localhost:7044/Users/Login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!res.ok) throw new Error("Invalid credentials");
+      // Si las credenciales son incorrectas
+      if (res.status === 401) {
+        setError("Invalid email or password");
+        return;
+      }
 
-    const data = await res.json();
+      // Si hay otro error en el servidor
+      if (!res.ok) {
+        throw new Error("Server error");
+      }
 
-    // Guardamos el token en localStorage
-    localStorage.setItem("authToken", data.token);
-    localStorage.setItem("loggedUser", JSON.stringify(data));
+      // Si el login es exitoso, guarda el token y usuario en localStorage
+      const data = await res.json();
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("loggedUser", JSON.stringify(data));
 
-    navigate({ to: "/HomePage" });
-  } catch (err) {
-    console.error("Login error:", err);
-    setError("Server connection error");
-  }
-};
+      // Redirige al usuario a la página principal
+      navigate({ to: "/HomePage" });
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Server connection error");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Decorative circles */}
+      {/* Círculos decorativos de fondo */}
       <div className="absolute w-72 h-72 -top-20 -left-20 rounded-full bg-indigo-200 opacity-30"></div>
       <div className="absolute w-48 h-48 top-1/3 -right-24 rounded-full bg-indigo-300 opacity-30"></div>
       <div className="absolute w-96 h-96 bottom-0 right-0 translate-y-1/2 translate-x-1/2 rounded-full bg-indigo-100 opacity-40"></div>
 
-      {/* Card */}
+      {/* Tarjeta de login */}
       <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl p-8 z-10">
         <div className="flex justify-center mb-8">
           <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center">
@@ -54,8 +69,9 @@ export default function Login() {
           <p className="text-gray-500">Sign in to your account to continue</p>
         </div>
 
+        {/* Formulario de login */}
         <form className="space-y-6" onSubmit={handleLogin}>
-          {/* Email */}
+          {/* Campo Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email address
@@ -75,7 +91,7 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Password */}
+          {/* Campo Password */}
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="block text-sm font-medium text-gray-700">
@@ -103,14 +119,14 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Error message */}
+          {/* Mensaje de error si ocurre */}
           {error && (
             <p className="text-red-500 text-sm font-medium text-center">
               {error}
             </p>
           )}
 
-          {/* Button */}
+          {/* Botón de login */}
           <div>
             <button
               type="submit"
@@ -121,6 +137,7 @@ export default function Login() {
           </div>
         </form>
 
+        {/* Enlace para ir al registro si no tienes cuenta */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
             Don&apos;t have an account?{" "}

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { useNavigate } from "@tanstack/react-router";
+import LogoutButton from "./LogoutButton";
 
 interface CartItem {
   id: number;
@@ -15,36 +17,24 @@ interface HeaderProps {
 }
 
 export default function Header({ cartCount, cartItems, total }: HeaderProps) {
-  // Estado para controlar si el carrito (dropdown) está abierto o cerrado
   const [isCartOpen, setIsCartOpen] = useState(false);
-
-  // Referencia al contenedor del carrito en el DOM
-  // Se usa para detectar clics fuera de este contenedor
   const cartRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
-  /**
-   * useEffect → se ejecuta cuando cambia `isCartOpen`.
-   * Si el carrito está abierto, agrega un listener global para detectar clics fuera.
-   * Si el usuario hace clic fuera, se cierra automáticamente.
-   * Al desmontar o cerrar carrito, se limpia el listener.
-   */
+  // 👇 revisa si el usuario está logueado
+  const isLoggedIn = !!localStorage.getItem("authToken");
+
   useEffect(() => {
-    // Función que maneja el clic fuera del carrito
     function handleClickOutside(e: MouseEvent) {
-      if (!cartRef.current) return; // si la referencia aún no existe, salir
+      if (!cartRef.current) return;
       if (!cartRef.current.contains(e.target as Node)) {
-        // si el clic no fue dentro del carrito, cerrarlo
         setIsCartOpen(false);
       }
     }
 
-    // Activar el listener solo cuando el carrito esté abierto
     if (isCartOpen) document.addEventListener("mousedown", handleClickOutside);
-
-    // Cleanup → quitar el listener al cerrar el carrito o desmontar el componente
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isCartOpen]);
-
 
   return (
     <header className="bg-white shadow-sm">
@@ -72,9 +62,9 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
             </h1>
           </div>
 
-          {/* Carrito + Sign In */}
+          {/* Carrito + Auth */}
           <div className="flex items-center space-x-4">
-            {/* Contenedor relativo para anclar el dropdown */}
+            {/* Carrito */}
             <div className="relative" ref={cartRef}>
               <button
                 className="relative p-2 text-gray-600 hover:text-indigo-600"
@@ -91,7 +81,7 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
                 )}
               </button>
 
-              {/* Dropdown del carrito */}
+              {/* Dropdown */}
               {isCartOpen && (
                 <div
                   className="absolute right-0 top-full mt-2 w-96 bg-white border border-gray-200 rounded-lg shadow-sm p-4 z-20"
@@ -101,7 +91,6 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
                     <p className="text-gray-500 text-center">Your cart is empty</p>
                   ) : (
                     <div className="flex flex-col gap-4">
-                      {/* Lista */}
                       <ul className="divide-y divide-gray-200 max-h-60 overflow-y-auto">
                         {cartItems.map((item) => (
                           <li
@@ -124,7 +113,6 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
                         ))}
                       </ul>
 
-                      {/* Total */}
                       <div className="flex justify-between items-center">
                         <span className="text-base font-semibold text-gray-900">
                           Total
@@ -134,7 +122,6 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
                         </span>
                       </div>
 
-                      {/* Confirm Purchase */}
                       <button
                         className="w-full px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200"
                         onClick={() => {
@@ -150,10 +137,17 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
               )}
             </div>
 
-            {/* Sign In */}
-            <button className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200">
-              Sign In
-            </button>
+            {/* 👇 Auth: Sign In / Logout */}
+            {isLoggedIn ? (
+              <LogoutButton />
+            ) : (
+              <button
+                onClick={() => navigate({ to: "/Login" })}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200"
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </div>
       </div>
