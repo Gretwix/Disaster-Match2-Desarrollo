@@ -92,32 +92,37 @@ export default function Login() {
           </div>
 
           {/* Campo Password */}
-          <div>
-            <div className="flex justify-between items-center mb-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <a
-                href="#"
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-              >
-                Forgot password?
-              </a>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="text-gray-400 w-5 h-5" />
-              </div>
-              <input
-                type="password"
-                required
-                className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full pl-10 py-3 rounded-md transition duration-150"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
+<div>
+  <div className="flex justify-between items-center mb-1">
+    <label className="block text-sm font-medium text-gray-700">
+      Password
+    </label>
+    <a
+      href="/forgot-password"
+      onClick={(e) => {
+        e.preventDefault();
+        navigate({ to: "/ForgotPassword" });
+      }}
+      className="text-sm font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
+    >
+      Forgot password?
+    </a>
+  </div>
+  <div className="relative">
+    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <Lock className="text-gray-400 w-5 h-5" />
+    </div>
+    <input
+      type="password"
+      required
+      className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full pl-10 py-3 rounded-md transition duration-150"
+      placeholder="••••••••"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+  </div>
+</div>
+
 
           {/* Mensaje de error si ocurre */}
           {error && (
