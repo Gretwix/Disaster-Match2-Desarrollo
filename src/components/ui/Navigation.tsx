@@ -27,7 +27,7 @@ export default function Navigation() {
       {loggedUser && (
         <>
           {loggedUser.role === "admin" && (
-            <Link to="/adminUsers" className="text-lime-400 hover:underline">
+            <Link to="/AdminUsers" className="text-lime-400 hover:underline">
               Admin Users
             </Link>
           )}

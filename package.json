@@ -15,6 +15,7 @@
     "@tanstack/react-router": "^1.131.35",
     "@tanstack/react-router-devtools": "^1.131.35",
     "feather-icons": "^4.29.2",
+    "lucide-react": "^0.542.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-feather": "^2.0.10",

@@ -21,7 +21,7 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
   const cartRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // 👇 revisa si el usuario está logueado
+  // revisa si el usuario está logueado
   const isLoggedIn = !!localStorage.getItem("authToken");
 
   useEffect(() => {
@@ -137,7 +137,7 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
               )}
             </div>
 
-            {/* 👇 Auth: Sign In / Logout */}
+            {/* Sign In / Logout */}
             {isLoggedIn ? (
               <LogoutButton />
             ) : (
