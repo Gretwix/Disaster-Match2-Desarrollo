@@ -14,6 +14,7 @@ import { Route as ResetPasswordRouteImport } from './routes/ResetPassword'
 import { Route as RegisterRouteImport } from './routes/Register'
 import { Route as ProfileRouteImport } from './routes/Profile'
 import { Route as LoginRouteImport } from './routes/Login'
+import { Route as LandingPageRouteImport } from './routes/LandingPage'
 import { Route as HomePageRouteImport } from './routes/HomePage'
 import { Route as ForgotPasswordRouteImport } from './routes/ForgotPassword'
 import { Route as AdminUsersRouteImport } from './routes/AdminUsers'
@@ -44,6 +45,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/Login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandingPageRoute = LandingPageRouteImport.update({
+  id: '/LandingPage',
+  path: '/LandingPage',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HomePageRoute = HomePageRouteImport.update({
   id: '/HomePage',
   path: '/HomePage',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/AdminUsers': typeof AdminUsersRoute
   '/ForgotPassword': typeof ForgotPasswordRoute
   '/HomePage': typeof HomePageRoute
+  '/LandingPage': typeof LandingPageRoute
   '/Login': typeof LoginRoute
   '/Profile': typeof ProfileRoute
   '/Register': typeof RegisterRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/AdminUsers': typeof AdminUsersRoute
   '/ForgotPassword': typeof ForgotPasswordRoute
   '/HomePage': typeof HomePageRoute
+  '/LandingPage': typeof LandingPageRoute
   '/Login': typeof LoginRoute
   '/Profile': typeof ProfileRoute
   '/Register': typeof RegisterRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/AdminUsers': typeof AdminUsersRoute
   '/ForgotPassword': typeof ForgotPasswordRoute
   '/HomePage': typeof HomePageRoute
+  '/LandingPage': typeof LandingPageRoute
   '/Login': typeof LoginRoute
   '/Profile': typeof ProfileRoute
   '/Register': typeof RegisterRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/AdminUsers'
     | '/ForgotPassword'
     | '/HomePage'
+    | '/LandingPage'
     | '/Login'
     | '/Profile'
     | '/Register'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/AdminUsers'
     | '/ForgotPassword'
     | '/HomePage'
+    | '/LandingPage'
     | '/Login'
     | '/Profile'
     | '/Register'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/AdminUsers'
     | '/ForgotPassword'
     | '/HomePage'
+    | '/LandingPage'
     | '/Login'
     | '/Profile'
     | '/Register'
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   AdminUsersRoute: typeof AdminUsersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HomePageRoute: typeof HomePageRoute
+  LandingPageRoute: typeof LandingPageRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/LandingPage': {
+      id: '/LandingPage'
+      path: '/LandingPage'
+      fullPath: '/LandingPage'
+      preLoaderRoute: typeof LandingPageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/HomePage': {
       id: '/HomePage'
       path: '/HomePage'
@@ -220,6 +240,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminUsersRoute: AdminUsersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HomePageRoute: HomePageRoute,
+  LandingPageRoute: LandingPageRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
