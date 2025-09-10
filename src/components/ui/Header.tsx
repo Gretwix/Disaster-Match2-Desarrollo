@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
-import { useNavigate } from "@tanstack/react-router";
-import LogoutButton from "./LogoutButton";
 
 interface CartItem {
   id: number;
@@ -19,10 +17,8 @@ interface HeaderProps {
 export default function Header({ cartCount, cartItems, total }: HeaderProps) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const cartRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
 
-  // revisa si el usuario está logueado
-  const isLoggedIn = !!localStorage.getItem("authToken");
+  
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -37,37 +33,14 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
   }, [isCartOpen]);
 
   return (
-    <header className="bg-white shadow-sm">
+    <header>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex justify-between items-center">
-          {/* Logo + Nombre */}
-          <div className="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8 text-indigo-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <h1 className="ml-2 text-xl font-semibold text-gray-800">
-              911 Incident Reports
-            </h1>
-          </div>
-
-          {/* Carrito + Auth */}
+        <div className="flex items-center justify-end">
+          {/* Carrito */}
           <div className="flex items-center space-x-4">
-            {/* Carrito */}
             <div className="relative" ref={cartRef}>
               <button
-                className="relative p-2 text-gray-600 hover:text-indigo-600"
+                className="relative flex items-center justify-center bg-indigo-400 rounded-full p-2 hover:bg-indigo-700 transition"
                 onClick={() => setIsCartOpen((v) => !v)}
                 aria-haspopup="menu"
                 aria-expanded={isCartOpen}
@@ -137,17 +110,7 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
               )}
             </div>
 
-            {/* Sign In / Logout */}
-            {isLoggedIn ? (
-              <LogoutButton />
-            ) : (
-              <button
-                onClick={() => navigate({ to: "/Login" })}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200"
-              >
-                Sign In
-              </button>
-            )}
+           
           </div>
         </div>
       </div>
