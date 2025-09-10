@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import AdminUsers from "../components/ui/pages/adminUsers";
+import AdminUsers from "../components/ui/pages/AdminUsers";
 
 // No pases '/AdminUsers' como argumento
 export const Route = createFileRoute('/AdminUsers')({

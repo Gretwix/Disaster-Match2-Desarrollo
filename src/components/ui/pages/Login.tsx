@@ -36,13 +36,16 @@ export default function Login() {
         throw new Error("Server error");
       }
 
-      // Si el login es exitoso, guarda el token y usuario en localStorage
-      const data = await res.json();
-      localStorage.setItem("authToken", data.token);
-      localStorage.setItem("loggedUser", JSON.stringify(data));
+  // Si el login es exitoso, guarda el token y usuario en localStorage
+  const data = await res.json();
+  // Asignar rol según el ID
+  const userId = data.ID ?? data.id;
+  data.role = userId === 2 ? "admin" : "user";
+  localStorage.setItem("authToken", data.token);
+  localStorage.setItem("loggedUser", JSON.stringify(data));
 
-      // Redirige al usuario a la página principal
-      navigate({ to: "/HomePage" });
+  // Redirige al usuario a la página principal
+  navigate({ to: "/HomePage" });
     } catch (err) {
       console.error("Login error:", err);
       setError("Server connection error");
