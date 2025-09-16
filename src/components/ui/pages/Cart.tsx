@@ -1,17 +1,27 @@
-import { useState } from "react";
 
-export default function ConfirmPurchasePage() {
-  const initialCartItems = [
-    { id: 1, title: "Robo en una tienda de ropa", location: "Los Ángeles, CA", date: "2025-09-01", price: 120 },
-    { id: 2, title: "Incendio en casa residencial", location: "Houston, TX", date: "2025-09-02", price: 80 },
-  ];
+import { useEffect, useState } from "react";
 
-  const [cartItems, setCartItems] = useState(initialCartItems);
+type CartItem = {
+  id: number;
+  title: string;
+  price: number;
+  quantity: number;
+};
 
-  const total = cartItems.reduce((acc, item) => acc + item.price, 0);
+export default function CartPage() {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  const handleRemoveItem = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
+  useEffect(() => {
+    const stored = localStorage.getItem("cart");
+    setCartItems(stored ? JSON.parse(stored) : []);
+  }, []);
+
+  const total = cartItems.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
+
+  const handleRemoveItem = (id: number) => {
+    const updated = cartItems.filter(item => item.id !== id);
+    setCartItems(updated);
+    localStorage.setItem("cart", JSON.stringify(updated));
   };
 
   return (
@@ -22,26 +32,27 @@ export default function ConfirmPurchasePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Lista de incidentes */}
         <div className="lg:col-span-2 space-y-4">
-          {cartItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white shadow-sm rounded-lg p-4 flex justify-between items-center border border-gray-200"
-            >
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">{item.title}</h2>
-                <p className="text-sm text-gray-500">
-                  {item.location} • {item.date}
-                </p>
-              </div>
-              <span className="text-indigo-600 font-semibold">${item.price.toFixed(2)}</span>
-              <button
-                onClick={() => handleRemoveItem(item.id)}
-                className="text-red-600 hover:text-red-800 font-semibold cursor-none"
+          {cartItems.length === 0 ? (
+            <p className="text-gray-500">El carrito está vacío.</p>
+          ) : (
+            cartItems.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white shadow-sm rounded-lg p-4 flex justify-between items-center border border-gray-200"
               >
-                Eliminar
-              </button>
-            </div>
-          ))}
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">{item.title}</h2>
+                </div>
+                <span className="text-indigo-600 font-semibold">${item.price.toFixed(2)}</span>
+                <button
+                  onClick={() => handleRemoveItem(item.id)}
+                  className="text-red-600 hover:text-red-800 font-semibold cursor-pointer"
+                >
+                  Eliminar
+                </button>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Resumen de compra */}
@@ -65,6 +76,7 @@ export default function ConfirmPurchasePage() {
           <button
             className="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition cursor-pointer"
             onClick={() => alert("✅ Purchase Confirmed!")}
+            disabled={cartItems.length === 0}
           >
             Confirm Purchase
           </button>

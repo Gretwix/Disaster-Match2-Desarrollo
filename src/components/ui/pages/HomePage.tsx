@@ -28,7 +28,10 @@ type CartItem = {
 
 export default function HomePage() {
   // Estados
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    const stored = localStorage.getItem("cart");
+    return stored ? JSON.parse(stored) : [];
+  });
   const [filter, setFilter] = useState<string>("all");
   const [search, setSearch] = useState<string>("");
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -73,6 +76,11 @@ export default function HomePage() {
   const removeFromCart = (id: number) => {
     setCart((prev) => prev.filter((i) => i.id !== id));
   };
+
+  // Sincronizar carrito con localStorage
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
   // Filtros + búsqueda
   const filteredLeads = useMemo(() => {
