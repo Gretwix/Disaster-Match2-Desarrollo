@@ -36,7 +36,7 @@ export default function ConfirmPurchasePage() {
               <span className="text-indigo-600 font-semibold">${item.price.toFixed(2)}</span>
               <button
                 onClick={() => handleRemoveItem(item.id)}
-                className="text-red-600 hover:text-red-800 font-semibold"
+                className="text-red-600 hover:text-red-800 font-semibold cursor-none"
               >
                 Eliminar
               </button>
@@ -63,7 +63,7 @@ export default function ConfirmPurchasePage() {
           </div>
 
           <button
-            className="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition"
+            className="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition cursor-pointer"
             onClick={() => alert("✅ Purchase Confirmed!")}
           >
             Confirm Purchase
