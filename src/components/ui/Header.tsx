@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import {  useNavigate } from "@tanstack/react-router";
 
 interface CartItem {
   id: number;
@@ -15,6 +16,7 @@ interface HeaderProps {
 }
 
 export default function Header({ cartCount, cartItems, total }: HeaderProps) {
+  const navigate = useNavigate();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const cartRef = useRef<HTMLDivElement>(null);
 
@@ -100,9 +102,10 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
                         onClick={() => {
                           alert(`✅ Purchase confirmed for $${total.toFixed(2)}`);
                           setIsCartOpen(false);
+                          navigate({ to: "/Cart" });
                         }}
                       >
-                        Confirm Purchase
+                        Go to Cart
                       </button>
                     </div>
                   )}
