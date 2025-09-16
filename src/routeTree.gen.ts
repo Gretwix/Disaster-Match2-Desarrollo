@@ -19,6 +19,7 @@ import { Route as HomePageRouteImport } from './routes/HomePage'
 import { Route as ForgotPasswordRouteImport } from './routes/ForgotPassword'
 import { Route as CartRouteImport } from './routes/Cart'
 import { Route as AdminUsersRouteImport } from './routes/AdminUsers'
+import { Route as AdminReportsRouteImport } from './routes/AdminReports'
 import { Route as IndexRouteImport } from './routes/index'
 
 const AboutRoute = AboutRouteImport.update({
@@ -71,6 +72,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/AdminUsers',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/AdminReports',
+  path: '/AdminReports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -79,6 +85,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/AdminReports': typeof AdminReportsRoute
   '/AdminUsers': typeof AdminUsersRoute
   '/Cart': typeof CartRoute
   '/ForgotPassword': typeof ForgotPasswordRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/AdminReports': typeof AdminReportsRoute
   '/AdminUsers': typeof AdminUsersRoute
   '/Cart': typeof CartRoute
   '/ForgotPassword': typeof ForgotPasswordRoute
@@ -106,6 +114,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/AdminReports': typeof AdminReportsRoute
   '/AdminUsers': typeof AdminUsersRoute
   '/Cart': typeof CartRoute
   '/ForgotPassword': typeof ForgotPasswordRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/AdminReports'
     | '/AdminUsers'
     | '/Cart'
     | '/ForgotPassword'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/AdminReports'
     | '/AdminUsers'
     | '/Cart'
     | '/ForgotPassword'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/AdminReports'
     | '/AdminUsers'
     | '/Cart'
     | '/ForgotPassword'
@@ -161,6 +173,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminReportsRoute: typeof AdminReportsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   CartRoute: typeof CartRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/AdminReports': {
+      id: '/AdminReports'
+      path: '/AdminReports'
+      fullPath: '/AdminReports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -257,6 +277,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminReportsRoute: AdminReportsRoute,
   AdminUsersRoute: AdminUsersRoute,
   CartRoute: CartRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
