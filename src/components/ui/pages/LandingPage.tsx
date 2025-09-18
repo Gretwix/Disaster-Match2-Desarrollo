@@ -1,11 +1,13 @@
 import { useNavigate } from "@tanstack/react-router";
 import { FaFilter, FaDatabase, FaClock } from "react-icons/fa";
-
+import Footer from "../Footer";
 export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen">
+  <div className="min-h-screen grid grid-rows-[1fr_auto] bg-gray-50">
+    {/* Contenido principal */}
+    <main>
       {/* Hero Section */}
       <section className="bg-gray-50 text-center py-20 px-6">
         <h1 className="text-3xl md:text-4xl font-bold mb-4">
@@ -120,6 +122,11 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </main>
+
+    {/* Footer siempre al final */}
+    <Footer />
+  </div>
+);
+
 }

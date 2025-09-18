@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Header from "../Header";
 import IncidentCard from "../IncidentCard";
 import Pagination from "../Pagination";
+import Footer from "../Footer";
 
 // URL base de tu API (ajusta el puerto al que corre tu backend en VS 2022)
 const API_URL = "https://localhost:7044/Leads/List";
@@ -114,134 +115,134 @@ export default function HomePage() {
   const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
 
   // Render
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Header cartCount={cartCount} cartItems={cart} total={total} />
+ return (
+  <div className="bg-gray-50 flex flex-col min-h-screen">
+    <Header cartCount={cartCount} cartItems={cart} total={total} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-31">
-        {/* Título */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-            Available Incident Reports
-          </h2>
-          <p className="text-gray-600">
-            Browse and select incident reports to purchase for your contracting
-            needs.
-          </p>
-        </div>
-
-        {/* Filtros */}
-        <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="w-full md:w-1/2">
-              <input
-                type="text"
-                placeholder="Search by location..."
-                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
-              />
-            </div>
-            <div className="w-full md:w-1/2">
-              <select
-                className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                value={filter}
-                onChange={(e) => {
-                  setFilter(e.target.value);
-                  setPage(1);
-                }}
-              >
-                <option value="all">All Incident Types</option>
-                <option value="robbery">Robbery</option>
-                <option value="fire">Fire</option>
-                <option value="crime">Crime</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
+    <main className="flex-grow">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Contenedor con altura mínima: viewport - header - footer */}
+        <div className="flex flex-col min-h-[calc(100vh-56px-88px)]">
+          {/* Título */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+              Available Incident Reports
+            </h2>
+            <p className="text-gray-600">
+              Browse and select incident reports to purchase for your contracting needs.
+            </p>
           </div>
-        </div>
 
-        {/* Grid */}
-        {loading ? (
-          <p className="text-center text-gray-500">Loading incidents...</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {paginatedLeads.map((lead) => {
-              const price = getPrice(lead);
-              const isChecked = cart.some((i) => i.id === lead.id);
-              return (
-                <IncidentCard
-                  key={lead.id}
-                  id={lead.id}
-                  type={
-                    (lead.event_type?.toUpperCase() as
-                      | "ROBBERY"
-                      | "FIRE"
-                      | "CRIME"
-                      | "OTHER") || "OTHER"
-                  }
-                  title={lead.details}
-                  location={`${lead.city}, ${lead.lead_state}`}
-                  date={lead.lead_date}
-                  price={price} 
-                  verified={!!lead.home_owner_email && !!lead.home_owner_phone}
-                  checked={isChecked}
-                  onAddToCart={() => addToCart(lead)}
-                  onRemoveFromCart={() => removeFromCart(lead.id)}
+          {/* Filtros */}
+          <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="w-full md:w-1/2">
+                <input
+                  type="text"
+                  placeholder="Search by location..."
+                  className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  value={search}
+                  onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                 />
-              );
-            })}
-          </div>
-        )}
-
-        {/* Paginación */}
-        <Pagination
-          currentPage={page}
-          totalItems={filteredLeads.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={setPage}
-        />
-
-        {/* Barra inferior */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-100 md:bg-transparent border-t md:border-0 z-10 mt-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-6 py-4 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <span className="text-gray-700 font-medium">
-                  {cart.length} incidents selected
-                </span>
               </div>
-              <div className="flex items-center gap-6">
-                <span className="text-lg font-semibold text-gray-900">
-                  Total: ${total.toFixed(2)}
-                </span>
-                <button
-                  type="button"
-                  className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={cart.length === 0}
-                  onClick={() => {
-                    const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
-                    if (!loggedUser?.username) {
-                      alert("No user logged in");
-                      return;
-                    }
-                    const key = `purchasedIncidents_${loggedUser.username}`;
-                    const prev = JSON.parse(localStorage.getItem(key) || "[]");
-                    const updated = [...prev, ...cart.filter(c => !prev.some((p: any) => p.id === c.id))];
-                    localStorage.setItem(key, JSON.stringify(updated));
-                    alert(`Proceeding to checkout: $${total.toFixed(2)}`);
-                  }}
+              <div className="w-full md:w-1/2">
+                <select
+                  className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  value={filter}
+                  onChange={(e) => { setFilter(e.target.value); setPage(1); }}
                 >
-                  Proceed to Checkout
-                </button>
+                  <option value="all">All Incident Types</option>
+                  <option value="robbery">Robbery</option>
+                  <option value="fire">Fire</option>
+                  <option value="crime">Crime</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
             </div>
           </div>
-        </div>
-      </main>
+
+          {/* Grid */}
+          {loading ? (
+            <p className="text-center text-gray-500">Loading incidents...</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {paginatedLeads.map((lead) => {
+                const price = getPrice(lead);
+                const isChecked = cart.some((i) => i.id === lead.id);
+                return (
+                  <IncidentCard
+                    key={lead.id}
+                    id={lead.id}
+                    type={(lead.event_type?.toUpperCase() as "ROBBERY" | "FIRE" | "CRIME" | "OTHER") || "OTHER"}
+                    title={lead.details}
+                    location={`${lead.city}, ${lead.lead_state}`}
+                    date={lead.lead_date}
+                    price={price}
+                    verified={!!lead.home_owner_email && !!lead.home_owner_phone}
+                    checked={isChecked}
+                    onAddToCart={() => addToCart(lead)}
+                    onRemoveFromCart={() => removeFromCart(lead.id)}
+                  />
+                );
+              })}
+            </div>
+          )}
+
+          {/* Paginación */}
+          <Pagination
+            currentPage={page}
+            totalItems={filteredLeads.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setPage}
+          />
+{/* Barra inferior al fondo del contenido */}
+<div className="mt-auto">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-6 py-4 flex justify-between items-center">
+      <div className="flex items-center gap-2">
+        <span className="text-gray-700 font-medium">
+          {cart.length} incidents selected
+        </span>
+      </div>
+      <div className="flex items-center gap-6">
+        <span className="text-lg font-semibold text-gray-900">
+          Total: ${total.toFixed(2)}
+        </span>
+        <button
+          type="button"
+          className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={cart.length === 0}
+          onClick={() => {
+            const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
+            if (!loggedUser?.username) {
+              alert("No user logged in");
+              return;
+            }
+            const key = `purchasedIncidents_${loggedUser.username}`;
+            const prev = JSON.parse(localStorage.getItem(key) || "[]");
+            const updated = [
+              ...prev,
+              ...cart.filter((c) => !prev.some((p: any) => p.id === c.id)),
+            ];
+            localStorage.setItem(key, JSON.stringify(updated));
+            alert(`Proceeding to checkout: $${total.toFixed(2)}`);
+          }}
+        >
+          Proceed to Checkout
+        </button>
+      </div>
     </div>
-  );
+  </div>
+</div>
+
+
+        </div>{/* end: min-h calc wrapper */}
+      </div>{/* end: max-w wrapper */}
+    </main>
+
+    <Footer />
+  </div>
+);
+
+  
 }
