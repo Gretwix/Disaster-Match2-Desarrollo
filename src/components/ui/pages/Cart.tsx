@@ -80,7 +80,7 @@ export default function CartPage() {
             onClick={() => {
               const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "null");
               if (!loggedUser || !loggedUser.username) {
-                navigate({ to: "/Register" });
+                navigate({ to: "/Login" });
               } else {
                 navigate({ to: "/PaymentForm" });
               }
