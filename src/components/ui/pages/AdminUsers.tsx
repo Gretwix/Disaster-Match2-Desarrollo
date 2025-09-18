@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Home, User, Users, Settings, Trash } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Home, User, Users, BarChart, Trash } from "lucide-react";
 
 type UserRecord = {
   id: number;
@@ -38,28 +39,34 @@ export default function AdminUsers() {
   }, []);
 
   const handleDelete = async (id: number) => {
-  if (!confirm("¿Seguro que quieres eliminar este usuario?")) return;
+    if (!confirm("¿Seguro que quieres eliminar este usuario?")) return;
 
-  try {
-    const res = await fetch(`https://localhost:7044/Users/Delete?pID=${id}`, {
-      method: "DELETE",
-    });
+    try {
+      const res = await fetch(`https://localhost:7044/Users/Delete?pID=${id}`, {
+        method: "DELETE",
+      });
 
-    if (res.ok) {
-      setUsers((prev) => prev.filter((user) => user.id !== id));
-      alert("Usuario eliminado correctamente.");
-    } else {
-      const errorText = await res.text();
-      console.error("Error eliminando:", errorText);
-      alert("Error al eliminar usuario.");
+      if (res.ok) {
+        setUsers((prev) => prev.filter((user) => user.id !== id));
+        alert("Usuario eliminado correctamente.");
+      } else {
+        const errorText = await res.text();
+        console.error("Error eliminando:", errorText);
+        alert("Error al eliminar usuario.");
+      }
+    } catch (err) {
+      console.error("Error en la petición:", err);
+      alert("Error al conectar con el servidor.");
     }
-  } catch (err) {
-    console.error("Error en la petición:", err);
-    alert("Error al conectar con el servidor.");
-  }
-};
+  };
 
 
+const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
+
+if (loggedUser?.role !== "admin") {
+  return <p className="text-center mt-10 text-red-500">Access denied</p>;
+}
+ 
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
@@ -68,22 +75,45 @@ export default function AdminUsers() {
             {/* Sidebar */}
             <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50/60 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
-                <a href="#" className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition">
+                <Link
+                  to="/"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                >
                   <Home className="h-5 w-5" />
                   <span className="font-medium">Dashboard</span>
-                </a>
-                <a href="#" className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition">
+                </Link>
+
+                <Link
+                  to="/Profile"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                >
                   <User className="h-5 w-5" />
                   <span className="font-medium">Profile</span>
-                </a>
-                <a href="#" aria-current="page" className="flex items-center gap-3 rounded-xl px-3 py-2 bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200">
+                </Link>
+
+                <Link
+                  to="/AdminUsers"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                  activeProps={{
+                    className:
+                      "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                  }}
+                >
                   <Users className="h-5 w-5" />
                   <span className="font-medium">Users</span>
-                </a>
-                <a href="#" className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition">
-                  <Settings className="h-5 w-5" />
-                  <span className="font-medium">Settings</span>
-                </a>
+                </Link>
+
+                <Link
+                  to="/AdminReports"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                  activeProps={{
+                    className:
+                      "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                  }}
+                >
+                  <BarChart className="h-5 w-5" />
+                  <span className="font-medium">Reports</span>
+                </Link>
               </nav>
             </aside>
 
@@ -109,10 +139,17 @@ export default function AdminUsers() {
                       </thead>
                       <tbody className="bg-white rounded-xl overflow-hidden">
                         {users.map((u, idx) => (
-                          <tr key={u.id ?? idx} className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                          <tr
+                            key={u.id ?? idx}
+                            className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                          >
                             <td className="px-4 py-3 text-gray-900">{u.id}</td>
-                            <td className="px-4 py-3 text-gray-900">{u.username}</td>
-                            <td className="px-4 py-3 text-gray-900">{u.email}</td>
+                            <td className="px-4 py-3 text-gray-900">
+                              {u.username}
+                            </td>
+                            <td className="px-4 py-3 text-gray-900">
+                              {u.email}
+                            </td>
                             <td className="px-4 py-3">
                               <button
                                 onClick={() => handleDelete(u.id)}
@@ -136,4 +173,3 @@ export default function AdminUsers() {
     </div>
   );
 }
-
