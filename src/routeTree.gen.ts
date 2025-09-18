@@ -13,6 +13,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ResetPasswordRouteImport } from './routes/ResetPassword'
 import { Route as RegisterRouteImport } from './routes/Register'
 import { Route as ProfileRouteImport } from './routes/Profile'
+import { Route as PaymentFormRouteImport } from './routes/PaymentForm'
 import { Route as LoginRouteImport } from './routes/Login'
 import { Route as LandingPageRouteImport } from './routes/LandingPage'
 import { Route as HomePageRouteImport } from './routes/HomePage'
@@ -40,6 +41,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/Profile',
   path: '/Profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentFormRoute = PaymentFormRouteImport.update({
+  id: '/PaymentForm',
+  path: '/PaymentForm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/HomePage': typeof HomePageRoute
   '/LandingPage': typeof LandingPageRoute
   '/Login': typeof LoginRoute
+  '/PaymentForm': typeof PaymentFormRoute
   '/Profile': typeof ProfileRoute
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/HomePage': typeof HomePageRoute
   '/LandingPage': typeof LandingPageRoute
   '/Login': typeof LoginRoute
+  '/PaymentForm': typeof PaymentFormRoute
   '/Profile': typeof ProfileRoute
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/HomePage': typeof HomePageRoute
   '/LandingPage': typeof LandingPageRoute
   '/Login': typeof LoginRoute
+  '/PaymentForm': typeof PaymentFormRoute
   '/Profile': typeof ProfileRoute
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/HomePage'
     | '/LandingPage'
     | '/Login'
+    | '/PaymentForm'
     | '/Profile'
     | '/Register'
     | '/ResetPassword'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/HomePage'
     | '/LandingPage'
     | '/Login'
+    | '/PaymentForm'
     | '/Profile'
     | '/Register'
     | '/ResetPassword'
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/HomePage'
     | '/LandingPage'
     | '/Login'
+    | '/PaymentForm'
     | '/Profile'
     | '/Register'
     | '/ResetPassword'
@@ -180,6 +192,7 @@ export interface RootRouteChildren {
   HomePageRoute: typeof HomePageRoute
   LandingPageRoute: typeof LandingPageRoute
   LoginRoute: typeof LoginRoute
+  PaymentFormRoute: typeof PaymentFormRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -214,6 +227,13 @@ declare module '@tanstack/react-router' {
       path: '/Profile'
       fullPath: '/Profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/PaymentForm': {
+      id: '/PaymentForm'
+      path: '/PaymentForm'
+      fullPath: '/PaymentForm'
+      preLoaderRoute: typeof PaymentFormRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/Login': {
@@ -284,6 +304,7 @@ const rootRouteChildren: RootRouteChildren = {
   HomePageRoute: HomePageRoute,
   LandingPageRoute: LandingPageRoute,
   LoginRoute: LoginRoute,
+  PaymentFormRoute: PaymentFormRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,

@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 
 type CartItem = {
   id: number;
@@ -10,6 +11,7 @@ type CartItem = {
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const stored = localStorage.getItem("cart");
@@ -75,7 +77,14 @@ export default function CartPage() {
 
           <button
             className="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition cursor-pointer"
-            onClick={() => alert("✅ Purchase Confirmed!")}
+            onClick={() => {
+              const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "null");
+              if (!loggedUser || !loggedUser.username) {
+                navigate({ to: "/Register" });
+              } else {
+                navigate({ to: "/PaymentForm" });
+              }
+            }}
             disabled={cartItems.length === 0}
           >
             Confirm Purchase
