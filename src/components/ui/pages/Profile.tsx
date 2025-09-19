@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Home, User, Users, BarChart } from "lucide-react";
+import { getLoggedUser, purchasedIncidentsKey } from "../../../utils/storage";
+import { formatCurrency } from "../../../utils/format";
 
 type User = {
   ID: number;
@@ -20,15 +22,14 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<User | null>(null);
-
-  const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
+  const loggedUser = getLoggedUser();
 
   const fetchUser = async () => {
     try {
       const res = await fetch(`${API_URL}/List`);
       const data = await res.json();
       if (Array.isArray(data)) {
-        const u = data.find((u: any) => u.username === loggedUser.username);
+        const u = data.find((u: any) => u.username === loggedUser?.username);
         if (u) {
           const userData: User = {
             ID: u.ID ?? u.id,
@@ -88,8 +89,7 @@ const Profile = () => {
         body: JSON.stringify(payload),
       });
 
-      const message = await res.text();
-      console.log("Respuesta backend:", message);
+      await res.text();
 
       setUser(formData);
       setIsEditing(false);
@@ -99,10 +99,10 @@ const Profile = () => {
   };
 
   // Obtener incidentes comprados
-  const [purchasedIncidents, setPurchasedIncidents] = useState([]);
+  const [purchasedIncidents, setPurchasedIncidents] = useState<any[]>([]);
   useEffect(() => {
     if (!loggedUser?.username) return;
-    const key = `purchasedIncidents_${loggedUser.username}`;
+    const key = purchasedIncidentsKey(loggedUser.username);
     const stored = localStorage.getItem(key);
     if (stored) setPurchasedIncidents(JSON.parse(stored));
     else setPurchasedIncidents([]);
@@ -270,8 +270,7 @@ const Profile = () => {
                             key={item.id}
                             className="p-2 rounded-md hover:bg-gray-100 transition duration-200"
                           >
-                            <span className="font-medium">{item.title}</span> — $
-                            {item.price}
+                            <span className="font-medium">{item.title}</span> — {formatCurrency(item.price)}
                           </li>
                         ))}
                       </ul>

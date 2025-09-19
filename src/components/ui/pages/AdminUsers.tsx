@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Home, User, Users, BarChart, Trash } from "lucide-react";
+import { getLoggedUser } from "../../../utils/storage";
 
 type UserRecord = {
   id: number;
@@ -19,7 +20,6 @@ export default function AdminUsers() {
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
-        console.log("Usuarios desde API:", data);
 
         const mapped: UserRecord[] = data.map((u: any) => ({
           id: u.ID ?? u.id,
@@ -50,8 +50,7 @@ export default function AdminUsers() {
         setUsers((prev) => prev.filter((user) => user.id !== id));
         alert("Usuario eliminado correctamente.");
       } else {
-        const errorText = await res.text();
-        console.error("Error eliminando:", errorText);
+        await res.text();
         alert("Error al eliminar usuario.");
       }
     } catch (err) {
@@ -61,7 +60,7 @@ export default function AdminUsers() {
   };
 
 
-const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
+const loggedUser = getLoggedUser();
 
 if (loggedUser?.role !== "admin") {
   return <p className="text-center mt-10 text-red-500">Access denied</p>;

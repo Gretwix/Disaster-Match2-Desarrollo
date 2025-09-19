@@ -9,13 +9,6 @@ export default function PaymentForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({
-      cardNumber,
-      cardHolder,
-      expiryDate,
-      cvv,
-      cardType,
-    });
     alert("Forma de pago registrada correctamente ✅");
   };
 

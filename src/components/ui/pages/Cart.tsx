@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 type CartItem = {
@@ -10,29 +10,51 @@ type CartItem = {
 };
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  // Storage keys
+  const CART_KEY = "cart";
+  const LOGGED_USER_KEY = "loggedUser";
+
+  // Helpers
+  const safeParseJSON = <T,>(value: string | null, fallback: T): T => {
+    try {
+      const parsed = value ? JSON.parse(value) : null;
+      return (parsed as T) ?? fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    const storedCart = safeParseJSON<CartItem[] | null>(localStorage.getItem(CART_KEY), null);
+    return Array.isArray(storedCart) ? storedCart : [];
+  });
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const stored = localStorage.getItem("cart");
-    setCartItems(stored ? JSON.parse(stored) : []);
-  }, []);
+  const saveCart = (items: CartItem[]) => {
+    setCartItems(items);
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
+  };
 
-  const total = cartItems.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
+  const getLoggedUser = () => safeParseJSON<any>(localStorage.getItem(LOGGED_USER_KEY), null);
+
+  const total = useMemo(
+    () => cartItems.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0),
+    [cartItems]
+  );
 
   const handleRemoveItem = (id: number) => {
-    const updated = cartItems.filter(item => item.id !== id);
-    setCartItems(updated);
-    localStorage.setItem("cart", JSON.stringify(updated));
+    const updatedCart = cartItems.filter((item) => item.id !== id);
+    saveCart(updatedCart);
   };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
-      {/* Título */}
       <h1 className="text-2xl font-bold text-gray-900 mb-8">Confirm Purchase</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Lista de incidentes */}
         <div className="lg:col-span-2 space-y-4">
           {cartItems.length === 0 ? (
             <p className="text-gray-500">El carrito está vacío.</p>
@@ -45,9 +67,10 @@ export default function CartPage() {
                 <div>
                   <h2 className="text-lg font-semibold text-gray-800">{item.title}</h2>
                 </div>
-                <span className="text-indigo-600 font-semibold">${item.price.toFixed(2)}</span>
+                <span className="text-indigo-600 font-semibold">{formatCurrency(item.price)}</span>
                 <button
                   onClick={() => handleRemoveItem(item.id)}
+                  type="button"
                   className="text-red-600 hover:text-red-800 font-semibold cursor-pointer"
                 >
                   Eliminar
@@ -57,7 +80,6 @@ export default function CartPage() {
           )}
         </div>
 
-        {/* Resumen de compra */}
         <div className="bg-white shadow-md rounded-lg p-6 border border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
 
@@ -65,26 +87,27 @@ export default function CartPage() {
             {cartItems.map((item) => (
               <li key={item.id} className="flex justify-between py-2 text-sm text-gray-700">
                 <span>{item.title}</span>
-                <span className="text-gray-900">${item.price.toFixed(2)}</span>
+                <span className="text-gray-900">{formatCurrency(item.price)}</span>
               </li>
             ))}
           </ul>
 
           <div className="flex justify-between font-semibold text-gray-900 text-base mb-6">
             <span>Total</span>
-            <span className="text-indigo-600">${total.toFixed(2)}</span>
+            <span className="text-indigo-600">{formatCurrency(total)}</span>
           </div>
 
           <button
             className="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition cursor-pointer"
             onClick={() => {
-              const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "null");
+              const loggedUser = getLoggedUser();
               if (!loggedUser || !loggedUser.username) {
                 navigate({ to: "/Login" });
               } else {
                 navigate({ to: "/PaymentForm" });
               }
             }}
+            type="button"
             disabled={cartItems.length === 0}
           >
             Confirm Purchase

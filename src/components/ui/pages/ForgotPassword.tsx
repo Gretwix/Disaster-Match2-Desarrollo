@@ -31,7 +31,6 @@ export default function ForgotPassword() {
 
       // Procesa la respuesta del backend
       const data = await res.json();
-      console.log("ForgotPassword response:", data);
 
       // Muestra mensaje genérico para evitar revelar si el email existe
       setMessage(

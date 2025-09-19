@@ -1,9 +1,10 @@
 import { Home, User, Users, BarChart } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { getLoggedUser } from "../../../utils/storage";
 
 export default function AdminReports() {
 
-const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
+const loggedUser = getLoggedUser();
 
 if (loggedUser?.role !== "admin") {
   return <p className="text-center mt-10 text-red-500">Access denied</p>;

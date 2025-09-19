@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
-import {  useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { formatCurrency } from "../../utils/format";
 
 interface CartItem {
   id: number;
@@ -77,12 +78,12 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
                                 {item.title}
                               </p>
                               <p className="text-xs text-gray-500">
-                                ${item.price}
+                                {formatCurrency(item.price)}
                                 {item.quantity > 1 ? `  •  x${item.quantity}` : null}
                               </p>
                             </div>
                             <span className="text-sm font-semibold text-gray-700">
-                              ${(item.price * item.quantity).toFixed(2)}
+                              {formatCurrency(item.price * item.quantity)}
                             </span>
                           </li>
                         ))}
@@ -93,17 +94,18 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
                           Total
                         </span>
                         <span className="text-base font-semibold text-indigo-600">
-                          ${total.toFixed(2)}
+                          {formatCurrency(total)}
                         </span>
                       </div>
 
                       <button
                         className="w-full px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200"
                         onClick={() => {
-                          alert(`✅ Purchase confirmed for $${total.toFixed(2)}`);
+                          alert(`✅ Purchase confirmed for ${formatCurrency(total)}`);
                           setIsCartOpen(false);
                           navigate({ to: "/Cart" });
                         }}
+                        type="button"
                       >
                         Go to Cart
                       </button>

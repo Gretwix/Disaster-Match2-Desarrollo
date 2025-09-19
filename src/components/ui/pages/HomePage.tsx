@@ -3,6 +3,8 @@ import Header from "../Header";
 import IncidentCard from "../IncidentCard";
 import Pagination from "../Pagination";
 import Footer from "../Footer";
+import { getLoggedUser, purchasedIncidentsKey } from "../../../utils/storage";
+import { formatCurrency } from "../../../utils/format";
 
 // URL base de tu API (ajusta el puerto al que corre tu backend en VS 2022)
 const API_URL = "https://localhost:7044/Leads/List";
@@ -30,8 +32,12 @@ type CartItem = {
 export default function HomePage() {
   // Estados
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const stored = localStorage.getItem("cart");
-    return stored ? JSON.parse(stored) : [];
+    try {
+      const stored = localStorage.getItem("cart");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
   });
   const [filter, setFilter] = useState<string>("all");
   const [search, setSearch] = useState<string>("");
@@ -206,26 +212,26 @@ export default function HomePage() {
       </div>
       <div className="flex items-center gap-6">
         <span className="text-lg font-semibold text-gray-900">
-          Total: ${total.toFixed(2)}
+          Total: {formatCurrency(total)}
         </span>
         <button
           type="button"
           className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={cart.length === 0}
           onClick={() => {
-            const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
-            if (!loggedUser?.username) {
+            const user = getLoggedUser();
+            if (!user?.username) {
               alert("No user logged in");
               return;
             }
-            const key = `purchasedIncidents_${loggedUser.username}`;
+            const key = purchasedIncidentsKey(user.username);
             const prev = JSON.parse(localStorage.getItem(key) || "[]");
             const updated = [
               ...prev,
               ...cart.filter((c) => !prev.some((p: any) => p.id === c.id)),
             ];
             localStorage.setItem(key, JSON.stringify(updated));
-            alert(`Proceeding to checkout: $${total.toFixed(2)}`);
+            alert(`Proceeding to checkout: ${formatCurrency(total)}`);
           }}
         >
           Proceed to Checkout
