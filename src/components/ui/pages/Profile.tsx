@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Home, User, Users, BarChart } from "lucide-react";
-import { getLoggedUser, purchasedIncidentsKey } from "../../../utils/storage";
+import { getLoggedUser } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
 
 type User = {
@@ -98,15 +98,36 @@ const Profile = () => {
     }
   };
 
-  // Obtener incidentes comprados
+  // Obtener incidentes comprados desde la base de datos
   const [purchasedIncidents, setPurchasedIncidents] = useState<any[]>([]);
   useEffect(() => {
-    if (!loggedUser?.username) return;
-    const key = purchasedIncidentsKey(loggedUser.username);
-    const stored = localStorage.getItem(key);
-    if (stored) setPurchasedIncidents(JSON.parse(stored));
-    else setPurchasedIncidents([]);
-  }, [loggedUser?.username]);
+    const fetchPurchased = async () => {
+      if (!loggedUser?.id) return setPurchasedIncidents([]);
+      try {
+        const res = await fetch("https://localhost:7044/Purchase/List");
+        const purchases = await res.json();
+        // Filtrar compras del usuario actual
+        const userPurchases = purchases.filter((p: any) => p.user_id === loggedUser.id);
+        // Extraer todos los leads comprados
+        let allLeads: any[] = [];
+        for (const purchase of userPurchases) {
+          if (purchase.leads && Array.isArray(purchase.leads)) {
+            allLeads = allLeads.concat(
+              purchase.leads.map((l: any) => ({
+                id: l.lead_id,
+                title: l.lead?.full_address || l.lead_id,
+                price: purchase.amount, // O puedes usar l.lead.price si existe
+              }))
+            );
+          }
+        }
+        setPurchasedIncidents(allLeads);
+      } catch {
+        setPurchasedIncidents([]);
+      }
+    };
+    fetchPurchased();
+  }, [loggedUser?.id]);
 
   if (loading) return <p className="text-center mt-10">Loading profile...</p>;
 
