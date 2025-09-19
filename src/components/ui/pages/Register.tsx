@@ -339,19 +339,18 @@ export default function Register() {
               {/* Phone Field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone <span className="text-red-500">*</span>
+                  Phone
                 </label>
-                <div className="relative">
+                <div>
                   <input
                     type="tel"
                     className={`bg-gray-50 border ${
                       phoneError
-                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500 pr-10'
+                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                         : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'
                     } block w-full px-3 py-3 rounded-md`}
-                    placeholder="e.g., 12345678"
+                    placeholder="12345678"
                     value={phone}
-                    required
                     inputMode="numeric"
                     onChange={(e) => {
                       const value = e.target.value;
@@ -368,40 +367,13 @@ export default function Register() {
                     }}
                     onBlur={() => {
                       // Validation on blur
-                      if (!phone) {
-                        setPhoneError('Phone number is required');
-                      } else if (phone.length < 8 || phone.length > 15) {
+                      if (phone && (phone.length < 8 || phone.length > 15)) {
                         setPhoneError('Phone number must be between 8 and 15 digits');
                       } else {
                         setPhoneError('');
                       }
                     }}
                   />
-                  {phoneError ? (
-                    <svg
-                      className="absolute right-3 top-3.5 h-5 w-5 text-red-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  ) : phone ? (
-                    <svg
-                      className="absolute right-3 top-3.5 h-5 w-5 text-green-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  ) : null}
                 </div>
                 {phoneError ? (
                   <p className="mt-1 text-sm text-red-600">{phoneError}</p>
