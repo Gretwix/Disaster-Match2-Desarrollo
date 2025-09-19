@@ -1,14 +1,22 @@
 import { Home, User, Users, BarChart } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { getLoggedUser } from "../../../utils/storage";
 
 export default function AdminReports() {
+  const loggedUser = getLoggedUser();
+  const [totalUsers, setTotalUsers] = useState<number | null>(null);
 
-const loggedUser = getLoggedUser();
+  useEffect(() => {
+    fetch("https://localhost:7044/Users/TotalUsers") 
+      .then((res) => res.json())
+      .then((data) => setTotalUsers(data.totalUsers))
+      .catch((err) => console.error("Error fetching total users:", err));
+  }, []);
 
-if (loggedUser?.role !== "admin") {
-  return <p className="text-center mt-10 text-red-500">Access denied</p>;
-}
+  if (loggedUser?.role !== "admin") {
+    return <p className="text-center mt-10 text-red-500">Access denied</p>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -18,42 +26,24 @@ if (loggedUser?.role !== "admin") {
             {/* Sidebar */}
             <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50/60 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
-                <Link
-                  to="/"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                >
+                <Link to="/" className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition">
                   <Home className="h-5 w-5" />
                   <span className="font-medium">Dashboard</span>
                 </Link>
 
-                <Link
-                  to="/Profile"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                >
+                <Link to="/Profile" className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition">
                   <User className="h-5 w-5" />
                   <span className="font-medium">Profile</span>
                 </Link>
 
-                <Link
-                  to="/AdminUsers"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                  activeProps={{
-                    className:
-                      "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
-                  }}
-                >
+                <Link to="/AdminUsers" className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition" 
+                  activeProps={{ className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200" }}>
                   <Users className="h-5 w-5" />
                   <span className="font-medium">Users</span>
                 </Link>
 
-                <Link
-                  to="/AdminReports"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                  activeProps={{
-                    className:
-                      "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
-                  }}
-                >
+                <Link to="/AdminReports" className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition" 
+                  activeProps={{ className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200" }}>
                   <BarChart className="h-5 w-5" />
                   <span className="font-medium">Reports</span>
                 </Link>
@@ -62,44 +52,34 @@ if (loggedUser?.role !== "admin") {
 
             {/* Main content */}
             <section className="p-6 md:p-8">
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Reports Overview
-              </h1>
+              <h1 className="text-2xl font-semibold text-gray-900">Reports Overview</h1>
 
               {/* Tarjetas de estadísticas */}
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    Total Users
-                  </h2>
-                  <p className="mt-2 text-3xl font-bold text-indigo-600">120</p>
+                  <h2 className="text-lg font-semibold text-gray-800">Total Users</h2>
+                  <p className="mt-2 text-3xl font-bold text-indigo-600">
+                    {totalUsers !== null ? totalUsers : "Loading..."}
+                  </p>
                   <p className="text-sm text-gray-500">Registered users</p>
                 </div>
 
                 <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    Purchases
-                  </h2>
+                  <h2 className="text-lg font-semibold text-gray-800">Purchases</h2>
                   <p className="mt-2 text-3xl font-bold text-indigo-600">45</p>
                   <p className="text-sm text-gray-500">Completed orders</p>
                 </div>
 
                 <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    Revenue
-                  </h2>
-                  <p className="mt-2 text-3xl font-bold text-green-600">
-                    $3,200
-                  </p>
+                  <h2 className="text-lg font-semibold text-gray-800">Revenue</h2>
+                  <p className="mt-2 text-3xl font-bold text-green-600">$3,200</p>
                   <p className="text-sm text-gray-500">Total earnings</p>
                 </div>
               </div>
 
               {/* Tabla / detalle */}
               <div className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
-                <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                  Recent Activity
-                </h2>
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h2>
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-left text-sm">
                     <thead>
@@ -113,9 +93,7 @@ if (loggedUser?.role !== "admin") {
                     <tbody className="bg-white rounded-xl overflow-hidden">
                       <tr className="bg-white">
                         <td className="px-4 py-3 text-gray-900">2025-09-10</td>
-                        <td className="px-4 py-3 text-gray-900">
-                          New Registration
-                        </td>
+                        <td className="px-4 py-3 text-gray-900">New Registration</td>
                         <td className="px-4 py-3 text-gray-900">jeikol21</td>
                         <td className="px-4 py-3 text-gray-900">-</td>
                       </tr>
