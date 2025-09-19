@@ -5,13 +5,25 @@ import { getLoggedUser } from "../../../utils/storage";
 
 export default function AdminReports() {
   const loggedUser = getLoggedUser();
-  const [totalUsers, setTotalUsers] = useState<number | null>(null);
 
+  // Estados para estadísticas
+  const [totalUsers, setTotalUsers] = useState<number | null>(null);
+  const [history, setHistory] = useState<any[]>([]);
+
+  // Fetch total de usuarios
   useEffect(() => {
-    fetch("https://localhost:7044/Users/TotalUsers") 
+    fetch("https://localhost:7044/Users/TotalUsers")
       .then((res) => res.json())
       .then((data) => setTotalUsers(data.totalUsers))
       .catch((err) => console.error("Error fetching total users:", err));
+  }, []);
+
+  // Fetch historial de usuarios
+  useEffect(() => {
+    fetch("https://localhost:7044/Users/History")
+      .then((res) => res.json())
+      .then((data) => setHistory(data))
+      .catch((err) => console.error("Error fetching history:", err));
   }, []);
 
   if (loggedUser?.role !== "admin") {
@@ -36,14 +48,20 @@ export default function AdminReports() {
                   <span className="font-medium">Profile</span>
                 </Link>
 
-                <Link to="/AdminUsers" className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition" 
-                  activeProps={{ className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200" }}>
+                <Link
+                  to="/AdminUsers"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                  activeProps={{ className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200" }}
+                >
                   <Users className="h-5 w-5" />
                   <span className="font-medium">Users</span>
                 </Link>
 
-                <Link to="/AdminReports" className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition" 
-                  activeProps={{ className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200" }}>
+                <Link
+                  to="/AdminReports"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                  activeProps={{ className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200" }}
+                >
                   <BarChart className="h-5 w-5" />
                   <span className="font-medium">Reports</span>
                 </Link>
@@ -77,7 +95,7 @@ export default function AdminReports() {
                 </div>
               </div>
 
-              {/* Tabla / detalle */}
+              {/* Tabla de historial */}
               <div className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
                 <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h2>
                 <div className="overflow-x-auto">
@@ -91,24 +109,24 @@ export default function AdminReports() {
                       </tr>
                     </thead>
                     <tbody className="bg-white rounded-xl overflow-hidden">
-                      <tr className="bg-white">
-                        <td className="px-4 py-3 text-gray-900">2025-09-10</td>
-                        <td className="px-4 py-3 text-gray-900">New Registration</td>
-                        <td className="px-4 py-3 text-gray-900">jeikol21</td>
-                        <td className="px-4 py-3 text-gray-900">-</td>
-                      </tr>
-                      <tr className="bg-gray-50">
-                        <td className="px-4 py-3 text-gray-900">2025-09-11</td>
-                        <td className="px-4 py-3 text-gray-900">Purchase</td>
-                        <td className="px-4 py-3 text-gray-900">andrey</td>
-                        <td className="px-4 py-3 text-green-600">$120</td>
-                      </tr>
-                      <tr className="bg-white">
-                        <td className="px-4 py-3 text-gray-900">2025-09-12</td>
-                        <td className="px-4 py-3 text-gray-900">Purchase</td>
-                        <td className="px-4 py-3 text-gray-900">mari21</td>
-                        <td className="px-4 py-3 text-green-600">$80</td>
-                      </tr>
+                      {history.length > 0 ? (
+                        history.map((item, index) => (
+                          <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                            <td className="px-4 py-3 text-gray-900">
+                              {new Date(item.date).toLocaleDateString()}
+                            </td>
+                            <td className="px-4 py-3 text-gray-900">{item.event}</td>
+                            <td className="px-4 py-3 text-gray-900">{item.user}</td>
+                            <td className="px-4 py-3 text-gray-900">{item.amount}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={4} className="px-4 py-3 text-center text-gray-500">
+                            No activity yet
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
