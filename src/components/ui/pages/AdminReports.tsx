@@ -9,6 +9,8 @@ export default function AdminReports() {
   // Estados para estadísticas
   const [totalUsers, setTotalUsers] = useState<number | null>(null);
   const [history, setHistory] = useState<any[]>([]);
+  const [totalSales, setTotalSales] = useState<number | null>(null);
+  const [totalRevenue, setTotalRevenue] = useState<number | null>(null);
 
   // Fetch total de usuarios
   useEffect(() => {
@@ -18,12 +20,23 @@ export default function AdminReports() {
       .catch((err) => console.error("Error fetching total users:", err));
   }, []);
 
-  // Fetch historial de usuarios
+  // Fetch historial (usuarios + compras)
   useEffect(() => {
     fetch("https://localhost:7044/Users/History")
       .then((res) => res.json())
       .then((data) => setHistory(data))
       .catch((err) => console.error("Error fetching history:", err));
+  }, []);
+
+  // Fetch estadísticas de ventas
+  useEffect(() => {
+    fetch("https://localhost:7044/Purchase/Stats")
+      .then((res) => res.json())
+      .then((data) => {
+        setTotalSales(data.totalSales);
+        setTotalRevenue(data.totalRevenue);
+      })
+      .catch((err) => console.error("Error fetching stats:", err));
   }, []);
 
   if (loggedUser?.role !== "admin") {
@@ -84,13 +97,17 @@ export default function AdminReports() {
 
                 <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
                   <h2 className="text-lg font-semibold text-gray-800">Purchases</h2>
-                  <p className="mt-2 text-3xl font-bold text-indigo-600">45</p>
+                  <p className="mt-2 text-3xl font-bold text-indigo-600">
+                    {totalSales !== null ? totalSales : "Loading..."}
+                  </p>
                   <p className="text-sm text-gray-500">Completed orders</p>
                 </div>
 
                 <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
                   <h2 className="text-lg font-semibold text-gray-800">Revenue</h2>
-                  <p className="mt-2 text-3xl font-bold text-green-600">$3,200</p>
+                  <p className="mt-2 text-3xl font-bold text-green-600">
+                    {totalRevenue !== null ? `$${totalRevenue.toFixed(2)}` : "Loading..."}
+                  </p>
                   <p className="text-sm text-gray-500">Total earnings</p>
                 </div>
               </div>
@@ -117,7 +134,7 @@ export default function AdminReports() {
                             </td>
                             <td className="px-4 py-3 text-gray-900">{item.event}</td>
                             <td className="px-4 py-3 text-gray-900">{item.user}</td>
-                            <td className="px-4 py-3 text-gray-900">{item.amount}</td>
+                            <td className={`px-4 py-3 ${ item.event === "Purchase" ? "text-green-600 font-semibold" : "text-gray-900" }`}>{item.amount}</td>
                           </tr>
                         ))
                       ) : (
