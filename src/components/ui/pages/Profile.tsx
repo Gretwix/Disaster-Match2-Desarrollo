@@ -212,47 +212,71 @@ const Profile = () => {
                   </div>
 
                   {!isEditing ? (
-                    <div className="space-y-3 text-gray-700">
-                      <p>
-                        <strong>Username:</strong> {user.username}
-                      </p>
-                      <p>
-                        <strong>Email:</strong> {user.email}
-                      </p>
-                      <p>
-                        <strong>Phone:</strong> {user.phone}
-                      </p>
-                      <p>
-                        <strong>Company:</strong> {user.company}
-                      </p>
-                    </div>
-                  ) : (
-                    <form className="grid gap-4">
-                      {[
-                        { name: "f_name", label: "First Name" },
-                        { name: "l_name", label: "Last Name" },
-                        { name: "username", label: "Username" },
-                        { name: "email", label: "Email" },
-                        { name: "phone", label: "Phone" },
-                        { name: "company", label: "Company" },
-                      ].map((field) => (
-                        <label
-                          key={field.name}
-                          className="flex flex-col text-sm font-medium"
-                        >
-                          {field.label}
-                          <input
-                            name={field.name}
-                            value={(formData as any)?.[field.name] || ""}
-                            onChange={handleChange}
-                            className="mt-1 border rounded-lg px-3 py-2 shadow-sm 
-                                       focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 
-                                       transition duration-200"
-                          />
-                        </label>
-                      ))}
-                    </form>
-                  )}
+  <div className="space-y-3 text-gray-700">
+    <p>
+      <strong>Username:</strong> {user.username}
+    </p>
+    <p>
+      <strong>Email:</strong> {user.email}
+    </p>
+    <p>
+      <strong>Phone:</strong> {user.phone}
+    </p>
+    <p>
+      <strong>Company:</strong> {user.company}
+    </p>
+  </div>
+) : (
+  <form className="grid gap-4">
+    {[
+      { name: "f_name", label: "First Name" },
+      { name: "l_name", label: "Last Name" },
+      // 👇 Username solo lectura
+      { name: "username", label: "Username", readOnly: true },
+      { name: "email", label: "Email" },
+      { name: "phone", label: "Phone" },
+      { name: "company", label: "Company" },
+    ].map((field) => (
+      <label
+        key={field.name}
+        className="flex flex-col text-sm font-medium"
+      >
+        {field.label}
+        <input
+          name={field.name}
+          value={(formData as any)?.[field.name] || ""}
+          onChange={handleChange}
+          readOnly={field.readOnly || false}
+          className={`mt-1 border rounded-lg px-3 py-2 shadow-sm transition duration-200
+            ${field.readOnly 
+              ? "bg-gray-100 text-gray-500 cursor-not-allowed" 
+              : "focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+            }`}
+        />
+      </label>
+    ))}
+
+    {/* 👇 Nuevo campo para cambiar contraseña */}
+    <label className="flex flex-col text-sm font-medium">
+      New Password
+      <input
+        type="password"
+        name="user_password"
+        placeholder="Enter new password (optional)"
+        value={
+          formData?.user_password && formData.user_password !== "*******"
+            ? formData.user_password
+            : ""
+        }
+        onChange={handleChange}
+        className="mt-1 border rounded-lg px-3 py-2 shadow-sm 
+                   focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 
+                   transition duration-200"
+      />
+    </label>
+  </form>
+)}
+
 
                   {/* Lista de incidentes comprados */}
                   <div className="mt-8">
