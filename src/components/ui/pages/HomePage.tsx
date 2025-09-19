@@ -6,6 +6,7 @@ import Pagination from "../Pagination";
 import Footer from "../Footer";
 import { getLoggedUser, purchasedIncidentsKey } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
+import { useNavigate } from "@tanstack/react-router";
 
 // URL base de tu API (ajusta el puerto al que corre tu backend en VS 2022)
 const API_URL = "https://localhost:7044/Leads/List";
@@ -31,6 +32,7 @@ type CartItem = {
 };
 
 export default function HomePage() {
+  const navigate = useNavigate();
   // Estados
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
@@ -45,24 +47,43 @@ export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [purchasedLeadIds, setPurchasedLeadIds] = useState<number[]>([]);
 
   // Constantes
   const itemsPerPage = 9;
 
-  // Cargar datos del backend
+  // Cargar datos del backend y compras del usuario
   useEffect(() => {
-    const fetchLeads = async () => {
+    const fetchLeadsAndPurchases = async () => {
       try {
-        const res = await fetch(API_URL);
-        const data: Lead[] = await res.json();
-        setLeads(data);
-      } catch (error) {
-        console.error("Error al cargar leads:", error);
+        // Cargar leads
+        const resLeads = await fetch(API_URL);
+        const dataLeads: Lead[] = await resLeads.json();
+        setLeads(dataLeads);
+
+        // Cargar compras
+        const user = getLoggedUser();
+        if (user && user.id) {
+          const resPurchases = await fetch("https://localhost:7044/Purchase/List");
+          const purchases = await resPurchases.json();
+          // Filtrar compras del usuario actual
+          const userPurchases = purchases.filter((p: any) => p.user_id === user.id);
+          // Obtener todos los IDs de leads comprados por el usuario
+          let allLeadIds: number[] = [];
+          for (const purchase of userPurchases) {
+            if (purchase.leads && Array.isArray(purchase.leads)) {
+              allLeadIds = allLeadIds.concat(purchase.leads.map((l: any) => l.lead_id));
+            }
+          }
+          setPurchasedLeadIds(allLeadIds);
+        } else {
+          setPurchasedLeadIds([]);
+        }
       } finally {
         setLoading(false);
       }
     };
-    fetchLeads();
+    fetchLeadsAndPurchases();
   }, []);
 
   // Precio según verificado
@@ -90,7 +111,7 @@ export default function HomePage() {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  // Filtros + búsqueda
+  // Filtros + búsqueda + ocultar leads comprados
   const filteredLeads = useMemo(() => {
     const s = search.trim().toLowerCase();
     return leads.filter((lead) => {
@@ -101,9 +122,10 @@ export default function HomePage() {
         s === "" ||
         lead.city.toLowerCase().includes(s) ||
         lead.full_address.toLowerCase().includes(s);
-      return matchesFilter && matchesSearch;
+      const notPurchased = !purchasedLeadIds.includes(lead.id);
+      return matchesFilter && matchesSearch && notPurchased;
     });
-  }, [filter, search, leads]);
+  }, [filter, search, leads, purchasedLeadIds]);
 
   // Totales
   const cartCount = useMemo(
@@ -136,23 +158,23 @@ export default function HomePage() {
               <h2 className="text-2xl font-semibold text-gray-800 mb-2">
                 Available Incident Reports
               </h2>
-              <p className="text-gray-600 flex items-center gap-2">
-                Browse and select incident reports to purchase for your contracting needs.
+              <div className="text-gray-600 flex items-center gap-2">
+                <span>Browse and select incident reports to purchase for your contracting needs.</span>
                 {/* Tooltip de aclaración */}
                 <div className="relative group">
                   <InformationCircleIcon className="w-5 h-5 text-gray-500 cursor-pointer" />
                   <div className="absolute left-6 top-0 hidden group-hover:block w-72 bg-white border border-gray-300 rounded-lg shadow-lg p-3 text-sm text-gray-700 z-10">
-                    <p className="mb-1">
-  <span className="font-semibold text-green-600">Verified ($200):</span>{" "}
-  Includes full address, phone number and email.
-</p>
-<p>
-  <span className="font-semibold text-yellow-600">Incomplete ($100):</span>{" "}
-  Missing one or more key data such as phone, email or address.
-</p>
+                    <div className="mb-1">
+                      <span className="font-semibold text-green-600">Verified ($200):</span>{" "}
+                      Includes full address, phone number and email.
+                    </div>
+                    <div>
+                      <span className="font-semibold text-yellow-600">Incomplete ($100):</span>{" "}
+                      Missing one or more key data such as phone, email or address.
+                    </div>
                   </div>
                 </div>
-              </p>
+              </div>
             </div>
 
             {/* Filtros */}
@@ -248,7 +270,7 @@ export default function HomePage() {
                           ...cart.filter((c) => !prev.some((p: any) => p.id === c.id)),
                         ];
                         localStorage.setItem(key, JSON.stringify(updated));
-                        alert(`Proceeding to checkout: ${formatCurrency(total)}`);
+                        navigate({ to: "/Cart" });
                       }}
                     >
                       Proceed to Checkout

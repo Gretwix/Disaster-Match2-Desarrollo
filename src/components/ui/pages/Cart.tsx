@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 type CartItem = {
@@ -7,6 +7,13 @@ type CartItem = {
   title: string;
   price: number;
   quantity: number;
+};
+
+type PaymentMethod = {
+  cardType: string;
+  cardNumber: string;
+  cardHolder: string;
+  expiryDate: string;
 };
 
 export default function CartPage() {
@@ -32,6 +39,7 @@ export default function CartPage() {
     return Array.isArray(storedCart) ? storedCart : [];
   });
   const navigate = useNavigate();
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
   const saveCart = (items: CartItem[]) => {
     setCartItems(items);
@@ -39,6 +47,18 @@ export default function CartPage() {
   };
 
   const getLoggedUser = () => safeParseJSON<any>(localStorage.getItem(LOGGED_USER_KEY), null);
+
+  // Cargar métodos de pago del usuario logueado
+  useEffect(() => {
+    const user = getLoggedUser();
+    if (user && user.username) {
+      const key = `paymentMethods_${user.username}`;
+      const stored = localStorage.getItem(key);
+      setPaymentMethods(stored ? JSON.parse(stored) : []);
+    } else {
+      setPaymentMethods([]);
+    }
+  }, []);
 
   const total = useMemo(
     () => cartItems.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0),
@@ -97,27 +117,77 @@ export default function CartPage() {
             <span className="text-indigo-600">{formatCurrency(total)}</span>
           </div>
 
+          {/* Métodos de pago guardados */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Payment Form</label>
+            {paymentMethods.length === 0 ? (
+              <div className="text-gray-500 text-sm mb-2">You don't have any saved payment methods</div>
+            ) : (
+              <select className="w-full border rounded-xl p-3 mb-2">
+                {paymentMethods.map((pm, idx) => (
+                  <option key={idx} value={pm.cardNumber}>
+                    {pm.cardType.toUpperCase()} •••• {pm.cardNumber.slice(-4)} - {pm.cardHolder} (exp: {pm.expiryDate})
+                  </option>
+                ))}
+              </select>
+            )}
+            <button
+              className="text-indigo-600 hover:underline text-sm"
+              type="button"
+              onClick={() => navigate({ to: "/PaymentForm" })}
+            >
+              Add new payment method
+            </button>
+          </div>
+
           <button
-            className="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition cursor-pointer"
-            onClick={() => {
-              const loggedUser = getLoggedUser();
-              if (!loggedUser || !loggedUser.username) {
-                // Guardar el carrito actual en localStorage antes de redirigir
-                localStorage.setItem('pendingCart', JSON.stringify(cartItems));
-                // Redirigir al login con la ruta de retorno
-                navigate({ 
-                  to: "/Login", 
-                  search: { redirect: "/PaymentForm" } 
-                });
-              } else {
-                navigate({ to: "/PaymentForm" });
-              }
-            }}
-            type="button"
-            disabled={cartItems.length === 0}
-          >
-            Confirm Purchase
-          </button>
+  className="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition cursor-pointer"
+  onClick={async () => {
+    const loggedUser = getLoggedUser();
+    if (!loggedUser || !loggedUser.username) {
+      localStorage.setItem('pendingCart', JSON.stringify(cartItems));
+      navigate({ 
+        to: "/Login", 
+        search: { redirect: "/PaymentForm" } 
+      });
+    } else {
+      try {
+        // Construir query string con los leadIds
+        const leadIds = cartItems.map(item => item.id);
+        const query = leadIds.map(id => `leadIds=${id}`).join('&');
+        // Construir el objeto purchase solo con los campos requeridos
+        const purchase = {
+          user_id: loggedUser.id,
+          amount: total
+        };
+        const response = await fetch(`https://localhost:7044/Purchase/Create?${query}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(purchase)
+        });
+
+        if (!response.ok) throw new Error("Error al crear la compra");
+
+        const data = await response.json();
+        console.log("Compra creada:", data);
+
+        // Limpiar carrito y redirigir
+        localStorage.removeItem("cart");
+        navigate({ to: "/Profile" });
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo crear la compra");
+      }
+    }
+  }}
+  type="button"
+  disabled={cartItems.length === 0}
+>
+  Confirm Purchase
+</button>
+
+
+
         </div>
       </div>
     </div>

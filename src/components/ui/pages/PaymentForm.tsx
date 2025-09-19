@@ -1,21 +1,47 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 
-export default function PaymentForm() {
+function PaymentForm() {
   const [cardNumber, setCardNumber] = useState("");
   const [cardHolder, setCardHolder] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
   const [cardType, setCardType] = useState("visa");
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Obtener usuario logueado
+    const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "null");
+    if (!loggedUser || !loggedUser.username) {
+      alert("Debes iniciar sesión para guardar una forma de pago.");
+      navigate({ to: "/Login" });
+      return;
+    }
+    // Construir objeto de forma de pago (sin guardar CVV por seguridad)
+    const paymentMethod = {
+      cardType,
+      cardNumber,
+      cardHolder,
+      expiryDate
+    };
+    // Guardar en localStorage bajo la clave "paymentMethods_<username>"
+    const key = `paymentMethods_${loggedUser.username}`;
+    const prev = JSON.parse(localStorage.getItem(key) || "[]");
+    // Evitar duplicados por número de tarjeta
+    const updated = [
+      ...prev.filter((pm: any) => pm.cardNumber !== cardNumber),
+      paymentMethod
+    ];
+    localStorage.setItem(key, JSON.stringify(updated));
     alert("Forma de pago registrada correctamente ✅");
+    navigate({ to: "/Cart" });
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-2xl mx-auto p-6">
-        <h1 className="text-2xl font-semibold mb-6">Agregar forma de pago</h1>
+        <h1 className="text-2xl font-semibold mb-6">Add payment method</h1>
 
         <form
           onSubmit={handleSubmit}
@@ -24,7 +50,7 @@ export default function PaymentForm() {
           {/* Tipo de tarjeta */}
           <div>
             <label className="block mb-2 text-sm font-medium text-gray-700">
-              Tipo de tarjeta
+              Card Type
             </label>
             <select
               value={cardType}
@@ -40,7 +66,7 @@ export default function PaymentForm() {
           {/* Número de tarjeta */}
           <div>
             <label className="block mb-2 text-sm font-medium text-gray-700">
-              Número de tarjeta
+              Card Number
             </label>
             <input
               type="text"
@@ -56,7 +82,7 @@ export default function PaymentForm() {
           {/* Nombre del titular */}
           <div>
             <label className="block mb-2 text-sm font-medium text-gray-700">
-              Nombre del titular
+              Name of the owner
             </label>
             <input
               type="text"
@@ -72,7 +98,7 @@ export default function PaymentForm() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-700">
-                Fecha de expiración
+                Expiry Date
               </label>
               <input
                 type="text"
@@ -104,10 +130,12 @@ export default function PaymentForm() {
             type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
           >
-            Guardar forma de pago
+            Confirm Payment Method
           </button>
         </form>
       </main>
     </div>
   );
 }
+
+export default PaymentForm;
