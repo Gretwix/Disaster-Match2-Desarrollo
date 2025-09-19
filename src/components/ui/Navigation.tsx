@@ -20,7 +20,7 @@ export default function Navigation() {
 
   return (
     <nav className="relative flex items-center justify-between bg-gray-900/95 backdrop-blur-md px-6 py-3 shadow-md">
-      {/* Izquierda: Logo empresa (decorativo) - Más pequeño */}
+      {/* Izquierda: Logo empresa */}
       <img
         src="/logo apollo.png"
         alt=""
@@ -29,7 +29,7 @@ export default function Navigation() {
         className="h-4 md:h-6 lg:h-8 w-auto opacity-90"
       />
 
-      {/* Centro: Logo Disaster Match (botón) - Absolutamente centrado */}
+      {/* Centro: Logo Disaster Match (botón) - centrado */}
       <div className="absolute left-1/2 transform -translate-x-1/2">
         <Link to="/" className="flex items-center" aria-label="Go to Landing Page">
           <img

@@ -8,6 +8,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); 
   const navigate = useNavigate();
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectTo = searchParams.get('redirect') || '/HomePage';
 
   /**
    * Maneja el envío del formulario de login.
@@ -44,8 +46,16 @@ export default function Login() {
   localStorage.setItem("authToken", data.token);
   localStorage.setItem("loggedUser", JSON.stringify(data));
 
-  // Redirige al usuario a la página principal
-  navigate({ to: "/HomePage" });
+  // Verificar si hay un carrito pendiente
+  const pendingCart = localStorage.getItem('pendingCart');
+  if (pendingCart) {
+    // Si hay un carrito pendiente, lo restauramos
+    localStorage.setItem('cart', pendingCart);
+    localStorage.removeItem('pendingCart');
+  }
+
+  // Redirigir a la ruta especificada o a la página principal
+  navigate({ to: redirectTo });
     } catch (err) {
       console.error("Login error:", err);
       setError("Server connection error");

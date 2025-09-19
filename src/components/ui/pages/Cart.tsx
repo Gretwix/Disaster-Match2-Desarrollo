@@ -102,7 +102,13 @@ export default function CartPage() {
             onClick={() => {
               const loggedUser = getLoggedUser();
               if (!loggedUser || !loggedUser.username) {
-                navigate({ to: "/Login" });
+                // Guardar el carrito actual en localStorage antes de redirigir
+                localStorage.setItem('pendingCart', JSON.stringify(cartItems));
+                // Redirigir al login con la ruta de retorno
+                navigate({ 
+                  to: "/Login", 
+                  search: { redirect: "/PaymentForm" } 
+                });
               } else {
                 navigate({ to: "/PaymentForm" });
               }
