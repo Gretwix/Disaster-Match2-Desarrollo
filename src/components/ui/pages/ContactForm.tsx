@@ -1,0 +1,151 @@
+import { useRef, useState } from "react";
+import { Mail, User, MessageSquare, ArrowLeft } from "react-feather";
+import { useNavigate } from "@tanstack/react-router";
+
+export default function ContactForm() {
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus(null);
+
+    const formData = new FormData(e.currentTarget);
+
+    const data = {
+      Name: String(formData.get("name") || ""),
+      Email: String(formData.get("email") || ""),
+      Message: String(formData.get("message") || ""),
+    };
+
+    try {
+      const res = await fetch("https://localhost:7044/Contact/Send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        setStatus("❌ Error: " + text);
+        return;
+      }
+
+      const result = await res.json();
+      setStatus(result.message);
+
+      if (formRef.current) {
+        formRef.current.reset();
+      }
+
+      //  Redirigir al landing page después de 1 segundo
+      setTimeout(() => {
+        navigate({ to: "/" }); 
+      }, 2000);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setStatus(" Server not available");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute w-72 h-72 -top-20 -left-20 rounded-full bg-indigo-200 opacity-30"></div>
+      <div className="absolute w-48 h-48 top-1/3 -right-24 rounded-full bg-indigo-300 opacity-30"></div>
+      <div className="absolute w-96 h-96 bottom-0 right-0 translate-y-1/2 translate-x-1/2 rounded-full bg-indigo-100 opacity-40"></div>
+
+      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl p-8 z-10">
+        {/* Botón volver */}
+        <button
+          onClick={() => navigate({ to: "/" })}
+          className="flex items-center text-indigo-600 hover:text-indigo-800 mb-4"
+        >
+          <ArrowLeft className="w-5 h-5 mr-1" />
+          
+        </button>
+
+        <div className="flex justify-center mb-6">
+          <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center">
+            <MessageSquare className="text-indigo-600 w-8 h-8" />
+          </div>
+        </div>
+
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Contact Us</h1>
+          <p className="text-gray-500">Send us a message and we will reply soon</p>
+        </div>
+
+        {/* Formulario */}
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Your Name
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                name="name"
+                required
+                className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full pl-10 py-3 rounded-md transition"
+                placeholder="John Doe"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Your Email
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+              <input
+                type="email"
+                name="email"
+                required
+                className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full pl-10 py-3 rounded-md transition"
+                placeholder="you@example.com"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Your Message
+            </label>
+            <textarea
+              name="message"
+              rows={4}
+              required
+              className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full px-3 py-3 rounded-md transition"
+              placeholder="Write your message..."
+            ></textarea>
+          </div>
+
+          {status && (
+            <p
+              className={`text-sm font-medium text-center ${
+                status.startsWith("❌") ? "text-red-500" : "text-green-600"
+              }`}
+            >
+              {status}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 px-4 rounded-md text-white font-medium shadow-sm bg-gradient-to-r from-indigo-600 to-indigo-800 hover:scale-[1.02] hover:shadow-lg transition-all duration-200 disabled:opacity-50"
+          >
+            {loading ? "Sending..." : "Send Message"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}

@@ -39,7 +39,7 @@ export default function Footer() {
           <h3 className="text-white font-semibold mb-2">Contact</h3>
           <ul className="space-y-1 text-sm">
             <li>
-              <Link to="/" className="hover:text-white transition">
+              <Link to="/ContactForm" className="hover:text-white transition">
                 Contact Form
               </Link>
             </li>
