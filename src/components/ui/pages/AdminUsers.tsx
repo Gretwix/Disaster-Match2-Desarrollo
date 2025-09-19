@@ -140,7 +140,7 @@ export default function AdminUsers() {
                   className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
                 >
                   <Home className="h-5 w-5" />
-                  <span className="font-medium">Dashboard</span>
+                  <span className="font-medium">DisasterMatch</span>
                 </Link>
 
                 <Link

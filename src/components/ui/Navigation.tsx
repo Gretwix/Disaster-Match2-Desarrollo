@@ -49,7 +49,7 @@ export default function Navigation() {
                 to="/AdminUsers"
                 className="text-gray-300 hover:text-lime-400 transition-colors duration-200"
               >
-                Admin Users
+                AdminUsers
               </Link>
             )}
 
@@ -57,7 +57,7 @@ export default function Navigation() {
               to="/HomePage"
               className="text-gray-300 hover:text-lime-400 transition-colors duration-200"
             >
-              Home
+              DisasterMatch
             </Link>
 
             <Link
