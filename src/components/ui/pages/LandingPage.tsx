@@ -28,7 +28,7 @@ export default function LandingPage() {
             onClick={() => navigate({ to: "/Login" })}
             className="px-6 py-3 border border-indigo-600 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition"
           >
-            See example
+            Register
           </button>
         </div>
       </section>
@@ -124,7 +124,7 @@ export default function LandingPage() {
       </section>
     </main>
 
-    {/* Footer siempre al final */}
+   
     <Footer />
   </div>
 );
