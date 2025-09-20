@@ -1,6 +1,6 @@
-
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import CustomModal from "../CustomModal"; 
 
 type CartItem = {
   id: number;
@@ -41,6 +41,11 @@ export default function CartPage() {
   const navigate = useNavigate();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
+  // 👇 estados para modales
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+
   const saveCart = (items: CartItem[]) => {
     setCartItems(items);
     localStorage.setItem(CART_KEY, JSON.stringify(items));
@@ -77,7 +82,7 @@ export default function CartPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
           {cartItems.length === 0 ? (
-            <p className="text-gray-500">El carrito está vacío.</p>
+            <p className="text-gray-500">Your cart is empty.</p>
           ) : (
             cartItems.map((item) => (
               <div
@@ -93,7 +98,7 @@ export default function CartPage() {
                   type="button"
                   className="text-red-600 hover:text-red-800 font-semibold cursor-pointer"
                 >
-                  Eliminar
+                  Remove
                 </button>
               </div>
             ))
@@ -117,7 +122,7 @@ export default function CartPage() {
             <span className="text-indigo-600">{formatCurrency(total)}</span>
           </div>
 
-          {/* Métodos de pago guardados */}
+          {/* Saved payment methods */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">Payment Form</label>
             {paymentMethods.length === 0 ? (
@@ -141,69 +146,90 @@ export default function CartPage() {
           </div>
 
           <button
-  className="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition cursor-pointer"
-  onClick={async () => {
-    const loggedUser = getLoggedUser();
-    if (!loggedUser || !loggedUser.username) {
-      localStorage.setItem('pendingCart', JSON.stringify(cartItems));
-      navigate({ 
-        to: "/Login", 
-        search: { redirect: "/PaymentForm" } 
-      });
-    } else {
-      try {
-  // Construir query string con los leadIds (?leadIds=6&leadIds=7)
-  const leadIds = cartItems.map(item => item.id);
-  const query = leadIds.map((id) => `leadIds=${id}`).join("&");
-        // Enviar solo los campos requeridos por el backend en el body
-        const userId = (loggedUser as any)?.id ?? (loggedUser as any)?.ID ?? 0;
-        const purchase = {
-          user_id: userId,
-          amount: total,
-        };
+            className="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition cursor-pointer"
+            onClick={async () => {
+              const loggedUser = getLoggedUser();
+              if (!loggedUser || !loggedUser.username) {
+                localStorage.setItem("pendingCart", JSON.stringify(cartItems));
+                navigate({
+                  to: "/Login",
+                  search: { redirect: "/PaymentForm" },
+                });
+              } else {
+                try {
+                  const leadIds = cartItems.map((item) => item.id);
+                  const query = leadIds.map((id) => `leadIds=${id}`).join("&");
 
-        const token = localStorage.getItem("authToken");
-        const response = await fetch(`https://localhost:7044/Purchase/Create?${query}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify(purchase),
-        });
+                  const userId = (loggedUser as any)?.id ?? (loggedUser as any)?.ID ?? 0;
+                  const purchase = {
+                    user_id: userId,
+                    amount: total,
+                  };
 
-        if (!response.ok) {
-          const errorText = await response.text().catch(() => "");
-          console.error("Error al crear la compra", response.status, errorText);
-          throw new Error(errorText || `Error al crear la compra (${response.status})`);
-        }
+                  const token = localStorage.getItem("authToken");
+                  const response = await fetch(`https://localhost:7044/Purchase/Create?${query}`, {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                    body: JSON.stringify(purchase),
+                  });
 
-  const ct = response.headers.get("content-type") || "";
-  const data = ct.includes("application/json") ? await response.json() : await response.text().catch(() => undefined);
-        console.log("Compra creada:", data);
+                  if (!response.ok) {
+                    const errorText = await response.text().catch(() => "");
+                    throw new Error(errorText || `Error creating purchase (${response.status})`);
+                  }
 
-        // Limpiar carrito y redirigir
-        localStorage.removeItem("cart");
-        navigate({ to: "/Profile" });
-        alert("Purchase completed successfully. A confirmation email has been sent to you ");
+                  const ct = response.headers.get("content-type") || "";
+                  const data = ct.includes("application/json")
+                    ? await response.json()
+                    : await response.text().catch(() => undefined);
+                  console.log("Purchase created:", data);
 
-      } catch (error) {
-        console.error(error);
-        alert(error instanceof Error ? error.message : "No se pudo crear la compra");
-      }
-    }
-  }}
-  type="button"
-  disabled={cartItems.length === 0}
->
-  Confirm Purchase
-</button>
+                   // Clear cart
+  localStorage.removeItem("cart");
+
+ 
+  setModalTitle("Purchase Successful");
+  setModalMessage(
+    "Your purchase was completed successfully. A confirmation email has been sent to you "
+  );
+  setModalOpen(true);
 
 
+  setTimeout(() => {
+    navigate({ to: "/Profile" });
+  }, 7000);
+} catch (error) {
+  console.error(error);
 
+  setModalTitle("Error");
+  setModalMessage(
+    error instanceof Error
+      ? error.message
+      : "The purchase could not be completed"
+  );
+  setModalOpen(true);
+}
+              }
+            }}
+            type="button"
+            disabled={cartItems.length === 0}
+          >
+            Confirm Purchase
+          </button>
         </div>
       </div>
+
+      {/* Modal global */}
+      <CustomModal
+        isOpen={modalOpen}
+        title={modalTitle}
+        message={modalMessage}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 }
