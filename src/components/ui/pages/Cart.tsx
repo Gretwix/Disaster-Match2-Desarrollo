@@ -186,6 +186,8 @@ export default function CartPage() {
         // Limpiar carrito y redirigir
         localStorage.removeItem("cart");
         navigate({ to: "/Profile" });
+        alert("Purchase completed successfully. A confirmation email has been sent to you ");
+
       } catch (error) {
         console.error(error);
         alert(error instanceof Error ? error.message : "No se pudo crear la compra");
