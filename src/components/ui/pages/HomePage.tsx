@@ -61,24 +61,19 @@ export default function HomePage() {
         const dataLeads: Lead[] = await resLeads.json();
         setLeads(dataLeads);
 
-        // Cargar compras
-        const user = getLoggedUser();
-        if (user && user.id) {
-          const resPurchases = await fetch("https://localhost:7044/Purchase/List");
-          const purchases = await resPurchases.json();
-          // Filtrar compras del usuario actual
-          const userPurchases = purchases.filter((p: any) => p.user_id === user.id);
-          // Obtener todos los IDs de leads comprados por el usuario
-          let allLeadIds: number[] = [];
-          for (const purchase of userPurchases) {
-            if (purchase.leads && Array.isArray(purchase.leads)) {
-              allLeadIds = allLeadIds.concat(purchase.leads.map((l: any) => l.lead_id));
-            }
+        // Cargar compras (global) y ocultar todos los leads ya comprados
+        const resPurchases = await fetch("https://localhost:7044/Purchase/List");
+        const purchases = await resPurchases.json();
+        let allLeadIds: number[] = [];
+        for (const purchase of purchases) {
+          if (purchase.leads && Array.isArray(purchase.leads)) {
+            allLeadIds = allLeadIds.concat(
+              purchase.leads.map((l: any) => l.lead_id ?? l.leadId)
+            );
           }
-          setPurchasedLeadIds(allLeadIds);
-        } else {
-          setPurchasedLeadIds([]);
         }
+        // Quitar duplicados
+        setPurchasedLeadIds(Array.from(new Set(allLeadIds.filter((id) => typeof id === "number"))));
       } finally {
         setLoading(false);
       }

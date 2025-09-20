@@ -152,23 +152,35 @@ export default function CartPage() {
       });
     } else {
       try {
-        // Construir query string con los leadIds
-        const leadIds = cartItems.map(item => item.id);
-        const query = leadIds.map(id => `leadIds=${id}`).join('&');
-        // Construir el objeto purchase solo con los campos requeridos
+  // Construir query string con los leadIds (?leadIds=6&leadIds=7)
+  const leadIds = cartItems.map(item => item.id);
+  const query = leadIds.map((id) => `leadIds=${id}`).join("&");
+        // Enviar solo los campos requeridos por el backend en el body
+        const userId = (loggedUser as any)?.id ?? (loggedUser as any)?.ID ?? 0;
         const purchase = {
-          user_id: loggedUser.id,
-          amount: total
+          user_id: userId,
+          amount: total,
         };
+
+        const token = localStorage.getItem("authToken");
         const response = await fetch(`https://localhost:7044/Purchase/Create?${query}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(purchase)
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(purchase),
         });
 
-        if (!response.ok) throw new Error("Error al crear la compra");
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => "");
+          console.error("Error al crear la compra", response.status, errorText);
+          throw new Error(errorText || `Error al crear la compra (${response.status})`);
+        }
 
-        const data = await response.json();
+  const ct = response.headers.get("content-type") || "";
+  const data = ct.includes("application/json") ? await response.json() : await response.text().catch(() => undefined);
         console.log("Compra creada:", data);
 
         // Limpiar carrito y redirigir
@@ -176,7 +188,7 @@ export default function CartPage() {
         navigate({ to: "/Profile" });
       } catch (error) {
         console.error(error);
-        alert("No se pudo crear la compra");
+        alert(error instanceof Error ? error.message : "No se pudo crear la compra");
       }
     }
   }}
