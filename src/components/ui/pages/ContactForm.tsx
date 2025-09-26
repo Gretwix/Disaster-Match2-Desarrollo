@@ -1,17 +1,17 @@
 import { useRef, useState } from "react";
 import { Mail, User, MessageSquare, ArrowLeft } from "react-feather";
 import { useNavigate } from "@tanstack/react-router";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 
 export default function ContactForm() {
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setStatus(null);
 
     const formData = new FormData(e.currentTarget);
 
@@ -30,24 +30,29 @@ export default function ContactForm() {
 
       if (!res.ok) {
         const text = await res.text();
-        setStatus("❌ Error: " + text);
+        toast.error(" Error: " + text);
         return;
       }
 
       const result = await res.json();
-      setStatus(result.message);
+      toast.success(result.message || "Message sent successfully!");
 
       if (formRef.current) {
         formRef.current.reset();
       }
 
-      //  Redirigir al landing page después de 1 segundo
-      setTimeout(() => {
-        navigate({ to: "/" }); 
-      }, 2000);
+      // Confirmación elegante antes de redirigir
+      Swal.fire({
+        icon: "success",
+        title: "Message Sent!",
+        text: "We will get back to you soon.",
+        confirmButtonColor: "#4f46e5",
+      }).then(() => {
+        navigate({ to: "/" });
+      });
     } catch (err) {
       console.error("Fetch error:", err);
-      setStatus(" Server not available");
+      toast.error("Server not available");
     } finally {
       setLoading(false);
     }
@@ -66,7 +71,6 @@ export default function ContactForm() {
           className="flex items-center text-indigo-600 hover:text-indigo-800 mb-4"
         >
           <ArrowLeft className="w-5 h-5 mr-1" />
-          
         </button>
 
         <div className="flex justify-center mb-6">
@@ -126,16 +130,6 @@ export default function ContactForm() {
               placeholder="Write your message..."
             ></textarea>
           </div>
-
-          {status && (
-            <p
-              className={`text-sm font-medium text-center ${
-                status.startsWith("❌") ? "text-red-500" : "text-green-600"
-              }`}
-            >
-              {status}
-            </p>
-          )}
 
           <button
             type="submit"

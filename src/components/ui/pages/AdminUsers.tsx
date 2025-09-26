@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Home, User, Users, BarChart, Trash, Edit } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
+import Swal from "sweetalert2";
+import toast, { Toaster } from "react-hot-toast";
 
 type UserRecord = {
   id: number;
@@ -41,6 +44,7 @@ export default function AdminUsers() {
       setUsers(mapped);
     } catch (err) {
       console.error("Error cargando usuarios:", err);
+      toast.error("Error al cargar usuarios");
     } finally {
       setLoading(false);
     }
@@ -51,7 +55,17 @@ export default function AdminUsers() {
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (!confirm("¿Seguro que quieres eliminar este usuario?")) return;
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "No podrás revertir esta acción",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#e3342f",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       const res = await fetch(`${API_URL}/Delete?pID=${id}`, {
@@ -60,13 +74,13 @@ export default function AdminUsers() {
 
       if (res.ok) {
         setUsers((prev) => prev.filter((user) => user.id !== id));
-        alert("Usuario eliminado correctamente ✅");
+        toast.success("Usuario eliminado correctamente");
       } else {
-        alert("Error al eliminar usuario ❌");
+        toast.error("Error al eliminar usuario");
       }
     } catch (err) {
       console.error("Error en la petición:", err);
-      alert("Error al conectar con el servidor ❌");
+      toast.error("Error al conectar con el servidor");
     }
   };
 
@@ -108,15 +122,15 @@ export default function AdminUsers() {
           prev.map((u) => (u.id === formData.id ? { ...formData } : u))
         );
         setIsEditing(null);
-        alert("Usuario actualizado ✅");
+        toast.success("Usuario actualizado correctamente");
       } else {
         const errorText = await res.text();
         console.error("Error al actualizar:", errorText);
-        alert("Error al actualizar usuario ❌");
+        toast.error("Error al actualizar usuario");
       }
     } catch (err) {
       console.error("Error al guardar:", err);
-      alert("Server connection error ❌");
+      toast.error("Error al conectar con el servidor");
     }
   };
 
@@ -128,11 +142,11 @@ export default function AdminUsers() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
         <div className="rounded-2xl bg-white shadow-sm border border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
-            
-            {/* Sidebar con mismo diseño de Profile */}
+            {/* Sidebar */}
             <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50/60 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
                 <Link
@@ -146,29 +160,30 @@ export default function AdminUsers() {
                   to="/Profile"
                   className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
                   activeProps={{
-                    className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                    className:
+                      "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
                   }}
                 >
                   <User className="h-5 w-5" />
                   <span className="font-medium">Profile</span>
                 </Link>
-
                 <Link
                   to="/AdminUsers"
                   className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
                   activeProps={{
-                    className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                    className:
+                      "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
                   }}
                 >
                   <Users className="h-5 w-5" />
                   <span className="font-medium">Users</span>
                 </Link>
-
                 <Link
                   to="/AdminReports"
                   className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
                   activeProps={{
-                    className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                    className:
+                      "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
                   }}
                 >
                   <BarChart className="h-5 w-5" />
@@ -187,7 +202,6 @@ export default function AdminUsers() {
                 {loading ? (
                   <p className="text-gray-500 text-center">Loading users...</p>
                 ) : !isEditing ? (
-                  // Tabla
                   <table className="min-w-full text-left text-sm">
                     <thead>
                       <tr className="text-gray-700">

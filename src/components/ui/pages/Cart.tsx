@@ -1,6 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import CustomModal from "../CustomModal"; 
+import Swal from "sweetalert2";
+import toast, { Toaster } from "react-hot-toast";
 
 type CartItem = {
   id: number;
@@ -20,7 +23,6 @@ export default function CartPage() {
   const CART_KEY = "cart";
   const LOGGED_USER_KEY = "loggedUser";
 
-  // Helpers
   const safeParseJSON = <T,>(value: string | null, fallback: T): T => {
     try {
       const parsed = value ? JSON.parse(value) : null;
@@ -31,28 +33,30 @@ export default function CartPage() {
   };
 
   const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(value);
 
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-    const storedCart = safeParseJSON<CartItem[] | null>(localStorage.getItem(CART_KEY), null);
+    const storedCart = safeParseJSON<CartItem[] | null>(
+      localStorage.getItem(CART_KEY),
+      null
+    );
     return Array.isArray(storedCart) ? storedCart : [];
   });
+
   const navigate = useNavigate();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-
-  // 👇 estados para modales
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalTitle, setModalTitle] = useState("");
-  const [modalMessage, setModalMessage] = useState("");
 
   const saveCart = (items: CartItem[]) => {
     setCartItems(items);
     localStorage.setItem(CART_KEY, JSON.stringify(items));
   };
 
-  const getLoggedUser = () => safeParseJSON<any>(localStorage.getItem(LOGGED_USER_KEY), null);
+  const getLoggedUser = () =>
+    safeParseJSON<any>(localStorage.getItem(LOGGED_USER_KEY), null);
 
-  // Cargar métodos de pago del usuario logueado
   useEffect(() => {
     const user = getLoggedUser();
     if (user && user.username) {
@@ -65,18 +69,27 @@ export default function CartPage() {
   }, []);
 
   const total = useMemo(
-    () => cartItems.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0),
+    () =>
+      cartItems.reduce(
+        (acc, item) => acc + item.price * (item.quantity || 1),
+        0
+      ),
     [cartItems]
   );
 
   const handleRemoveItem = (id: number) => {
     const updatedCart = cartItems.filter((item) => item.id !== id);
     saveCart(updatedCart);
+    toast.success("Item removed from cart");
   };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Confirm Purchase</h1>
+      <Toaster position="top-right" />
+
+      <h1 className="text-2xl font-bold text-gray-900 mb-8">
+        Confirm Purchase
+      </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
@@ -89,9 +102,13 @@ export default function CartPage() {
                 className="bg-white shadow-sm rounded-lg p-4 flex justify-between items-center border border-gray-200"
               >
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-800">{item.title}</h2>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {item.title}
+                  </h2>
                 </div>
-                <span className="text-indigo-600 font-semibold">{formatCurrency(item.price)}</span>
+                <span className="text-indigo-600 font-semibold">
+                  {formatCurrency(item.price)}
+                </span>
                 <button
                   onClick={() => handleRemoveItem(item.id)}
                   type="button"
@@ -105,13 +122,20 @@ export default function CartPage() {
         </div>
 
         <div className="bg-white shadow-md rounded-lg p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Order Summary
+          </h2>
 
           <ul className="divide-y divide-gray-200 mb-4">
             {cartItems.map((item) => (
-              <li key={item.id} className="flex justify-between py-2 text-sm text-gray-700">
+              <li
+                key={item.id}
+                className="flex justify-between py-2 text-sm text-gray-700"
+              >
                 <span>{item.title}</span>
-                <span className="text-gray-900">{formatCurrency(item.price)}</span>
+                <span className="text-gray-900">
+                  {formatCurrency(item.price)}
+                </span>
               </li>
             ))}
           </ul>
@@ -121,16 +145,20 @@ export default function CartPage() {
             <span className="text-indigo-600">{formatCurrency(total)}</span>
           </div>
 
-          {/* Saved payment methods */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Payment Form</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Payment Form
+            </label>
             {paymentMethods.length === 0 ? (
-              <div className="text-gray-500 text-sm mb-2">You don't have any saved payment methods</div>
+              <div className="text-gray-500 text-sm mb-2">
+                You don't have any saved payment methods
+              </div>
             ) : (
               <select className="w-full border rounded-xl p-3 mb-2">
                 {paymentMethods.map((pm, idx) => (
                   <option key={idx} value={pm.cardNumber}>
-                    {pm.cardType.toUpperCase()} •••• {pm.cardNumber.slice(-4)} - {pm.cardHolder} (exp: {pm.expiryDate})
+                    {pm.cardType.toUpperCase()} •••• {pm.cardNumber.slice(-4)} -{" "}
+                    {pm.cardHolder} (exp: {pm.expiryDate})
                   </option>
                 ))}
               </select>
@@ -154,19 +182,33 @@ export default function CartPage() {
                   to: "/Login",
                   search: { redirect: "/PaymentForm" },
                 });
-              } else {
-                try {
-                  const leadIds = cartItems.map((item) => item.id);
-                  const query = leadIds.map((id) => `leadIds=${id}`).join("&");
+                return;
+              }
 
-                  const userId = (loggedUser as any)?.id ?? (loggedUser as any)?.ID ?? 0;
-                  const purchase = {
-                    user_id: userId,
-                    amount: total,
-                  };
+              const result = await Swal.fire({
+                title: "Confirm Purchase?",
+                text: `Total: ${formatCurrency(total)}`,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#4f46e5",
+                cancelButtonColor: "#d1d5db",
+                confirmButtonText: "Yes, purchase",
+              });
 
-                  const token = localStorage.getItem("authToken");
-                  const response = await fetch(`https://localhost:7044/Purchase/Create?${query}`, {
+              if (!result.isConfirmed) return;
+
+              try {
+                const leadIds = cartItems.map((item) => item.id);
+                const query = leadIds.map((id) => `leadIds=${id}`).join("&");
+                const userId =
+                  (loggedUser as any)?.id ?? (loggedUser as any)?.ID ?? 0;
+
+                const purchase = { user_id: userId, amount: total };
+                const token = localStorage.getItem("authToken");
+
+                const response = await fetch(
+                  `https://localhost:7044/Purchase/Create?${query}`,
+                  {
                     method: "PUT",
                     headers: {
                       "Content-Type": "application/json",
@@ -174,44 +216,24 @@ export default function CartPage() {
                       ...(token ? { Authorization: `Bearer ${token}` } : {}),
                     },
                     body: JSON.stringify(purchase),
-                  });
-
-                  if (!response.ok) {
-                    const errorText = await response.text().catch(() => "");
-                    throw new Error(errorText || `Error creating purchase (${response.status})`);
                   }
+                );
 
-                  const ct = response.headers.get("content-type") || "";
-                  const data = ct.includes("application/json")
-                    ? await response.json()
-                    : await response.text().catch(() => undefined);
-                  console.log("Purchase created:", data);
+                if (!response.ok) {
+                  throw new Error(
+                    `Error creating purchase (${response.status})`
+                  );
+                }
 
-                   // Clear cart
-  localStorage.removeItem("cart");
-
- 
-  setModalTitle("Purchase Successful");
-  setModalMessage(
-    "Your purchase was completed successfully. A confirmation email has been sent to you "
-  );
-  setModalOpen(true);
-
-
-  setTimeout(() => {
-    navigate({ to: "/Profile" });
-  }, 7000);
-} catch (error) {
-  console.error(error);
-
-  setModalTitle("Error");
-  setModalMessage(
-    error instanceof Error
-      ? error.message
-      : "The purchase could not be completed"
-  );
-  setModalOpen(true);
-}
+                saveCart([]); // limpia carrito
+                toast.success("Purchase completed successfully!");
+                navigate({ to: "/Profile" });
+              } catch (err) {
+                toast.error(
+                  err instanceof Error
+                    ? err.message
+                    : "The purchase could not be completed"
+                );
               }
             }}
             type="button"
@@ -221,14 +243,6 @@ export default function CartPage() {
           </button>
         </div>
       </div>
-
-      {/* Modal global */}
-      <CustomModal
-        isOpen={modalOpen}
-        title={modalTitle}
-        message={modalMessage}
-        onClose={() => setModalOpen(false)}
-      />
     </div>
   );
 }

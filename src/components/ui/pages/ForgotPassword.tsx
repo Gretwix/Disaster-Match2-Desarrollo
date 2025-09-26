@@ -1,56 +1,51 @@
 import { useState } from "react";
 import { useNavigate, Link } from "@tanstack/react-router";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 
-/**
- * Componente para solicitar el restablecimiento de contraseña.
- * El usuario ingresa su email y, si existe, recibirá un enlace para cambiar la contraseña.
- */
 export default function ForgotPassword() {
-  // Estado para el email ingresado por el usuario
   const [email, setEmail] = useState("");
-  // Estado para mostrar mensajes de éxito o error
-  const [message, setMessage] = useState("");
-  // Hook para navegar entre rutas
   const navigate = useNavigate();
 
-  /**
-   * Maneja el envío del formulario.
-   * Envía el email al backend para solicitar el enlace de restablecimiento.
-   * Si el backend responde con un token, navega automáticamente a la pantalla de cambio de contraseña.
-   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      // Envía el email como string plano al endpoint de recuperación
       const res = await fetch("https://localhost:7044/Users/ForgotPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: `"${email}"`, // enviar como string plano
+        body: `"${email}"`,
       });
 
-      // Procesa la respuesta del backend
       const data = await res.json();
 
-      // Muestra mensaje genérico para evitar revelar si el email existe
-      setMessage(
-        data.message || "If this email exists, you will receive a reset link."
-      );
+      // Mostrar mensaje con toast y SweetAlert
+      toast.success(data.message || "If this email exists, you will receive a reset link.");
+      Swal.fire({
+        title: "Check your email",
+        text: data.message || "If this email exists, you will receive a reset link.",
+        icon: "info",
+        confirmButtonColor: "#4F46E5",
+      });
 
-      // Si el backend responde con un token, navega a la pantalla de cambio de contraseña
+      // Navegar si hay token
       if (data.token) {
         navigate({ to: "/ResetPassword", search: { token: data.token } });
       }
     } catch (err) {
-      // Si ocurre un error de red o servidor, muestra mensaje de error
       console.error("Error in ForgotPassword:", err);
-      setMessage("Server connection error");
+      toast.error("Server connection error");
+      Swal.fire({
+        title: "Error",
+        text: "Server connection error",
+        icon: "error",
+        confirmButtonColor: "#DC2626",
+      });
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      {/* Círculos decorativos de fondo */}
       <div className="absolute w-72 h-72 -top-20 -left-20 rounded-full bg-indigo-200 opacity-30"></div>
       <div className="absolute w-48 h-48 top-1/3 -right-24 rounded-full bg-indigo-300 opacity-30"></div>
       <div className="absolute w-96 h-96 bottom-0 right-0 translate-y-1/2 translate-x-1/2 rounded-full bg-indigo-100 opacity-40"></div>
@@ -61,7 +56,6 @@ export default function ForgotPassword() {
           Forgot your password?
         </h1>
 
-        {/* Formulario para ingresar el email */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
@@ -79,12 +73,6 @@ export default function ForgotPassword() {
           </button>
         </form>
 
-        {/* Mensaje informativo de éxito o error */}
-        {message && (
-          <p className="text-sm text-gray-600 mt-4 text-center">{message}</p>
-        )}
-
-        {/* Enlace para volver al login */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
             Remembered your password?{" "}

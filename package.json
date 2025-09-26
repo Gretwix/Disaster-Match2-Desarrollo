@@ -15,12 +15,16 @@
     "@tanstack/react-router": "^1.131.35",
     "@tanstack/react-router-devtools": "^1.131.35",
     "aos": "^2.3.4",
+    "cors": "^2.8.5",
     "feather-icons": "^4.29.2",
     "lucide-react": "^0.542.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-feather": "^2.0.10",
+    "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
+    "react-router-dom": "^7.9.2",
+    "sweetalert2": "^11.23.0",
     "tailwindcss": "^4.1.13"
   },
   "devDependencies": {

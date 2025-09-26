@@ -2,41 +2,63 @@ import { Home, User, Users, BarChart } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getLoggedUser } from "../../../utils/storage";
+import toast, { Toaster } from "react-hot-toast";
+
+// Función segura para fetch con timeout
+async function fetchWithCatch<T>(url: string, options?: RequestInit): Promise<T | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      toast.error(`Error: ${errorText || res.statusText}`);
+      return null;
+    }
+
+    return (await res.json()) as T;
+  } catch (err) {
+    console.error("Fetch error:", err);
+    toast.error("Server connection error");
+    return null;
+  }
+}
 
 export default function AdminReports() {
   const loggedUser = getLoggedUser();
 
   // Estados para estadísticas
   const [totalUsers, setTotalUsers] = useState<number | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [history, setHistory] = useState<any[]>([]);
   const [totalSales, setTotalSales] = useState<number | null>(null);
   const [totalRevenue, setTotalRevenue] = useState<number | null>(null);
 
   // Fetch total de usuarios
   useEffect(() => {
-    fetch("https://localhost:7044/Users/TotalUsers")
-      .then((res) => res.json())
-      .then((data) => setTotalUsers(data.totalUsers))
-      .catch((err) => console.error("Error fetching total users:", err));
-  }, []);
+    (async () => {
+      const usersData = await fetchWithCatch<{ totalUsers: number }>(
+        "https://localhost:7044/Users/TotalUsers"
+      );
+      if (usersData) setTotalUsers(usersData.totalUsers);
 
-  // Fetch historial (usuarios + compras)
-  useEffect(() => {
-    fetch("https://localhost:7044/Users/History")
-      .then((res) => res.json())
-      .then((data) => setHistory(data))
-      .catch((err) => console.error("Error fetching history:", err));
-  }, []);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const historyData = await fetchWithCatch<any[]>(
+        "https://localhost:7044/Users/History"
+      );
+      if (historyData) setHistory(historyData);
 
-  // Fetch estadísticas de ventas
-  useEffect(() => {
-    fetch("https://localhost:7044/Purchase/Stats")
-      .then((res) => res.json())
-      .then((data) => {
-        setTotalSales(data.totalSales);
-        setTotalRevenue(data.totalRevenue);
-      })
-      .catch((err) => console.error("Error fetching stats:", err));
+      const statsData = await fetchWithCatch<{ totalSales: number; totalRevenue: number }>(
+        "https://localhost:7044/Purchase/Stats"
+      );
+      if (statsData) {
+        setTotalSales(statsData.totalSales);
+        setTotalRevenue(statsData.totalRevenue);
+      }
+    })();
   }, []);
 
   if (loggedUser?.role !== "admin") {
@@ -45,6 +67,7 @@ export default function AdminReports() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <Toaster position="top-right" />
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
         <div className="rounded-2xl bg-white shadow-sm border border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
@@ -134,7 +157,15 @@ export default function AdminReports() {
                             </td>
                             <td className="px-4 py-3 text-gray-900">{item.event}</td>
                             <td className="px-4 py-3 text-gray-900">{item.user}</td>
-                            <td className={`px-4 py-3 ${ item.event === "Purchase" ? "text-green-600 font-semibold" : "text-gray-900" }`}>{item.amount}</td>
+                            <td
+                              className={`px-4 py-3 ${
+                                item.event === "Purchase"
+                                  ? "text-green-600 font-semibold"
+                                  : "text-gray-900"
+                              }`}
+                            >
+                              {item.amount}
+                            </td>
                           </tr>
                         ))
                       ) : (
