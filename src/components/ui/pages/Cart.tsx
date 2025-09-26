@@ -17,7 +17,6 @@ type PaymentMethod = {
 };
 
 export default function CartPage() {
-  // Storage keys
   const CART_KEY = "cart";
   const LOGGED_USER_KEY = "loggedUser";
 

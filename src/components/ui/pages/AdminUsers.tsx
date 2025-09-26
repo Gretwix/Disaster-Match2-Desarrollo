@@ -142,7 +142,6 @@ export default function AdminUsers() {
                   <Home className="h-5 w-5" />
                   <span className="font-medium">DisasterMatch</span>
                 </Link>
-
                 <Link
                   to="/Profile"
                   className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
@@ -229,7 +228,6 @@ export default function AdminUsers() {
                     </tbody>
                   </table>
                 ) : (
-                  // Formulario
                   <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-200">
                     <h2 className="text-xl font-semibold mb-4">
                       Edit User: {isEditing.username}
