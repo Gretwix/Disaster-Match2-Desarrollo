@@ -101,7 +101,6 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
                       <button
                         className="w-full px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200"
                         onClick={() => {
-                          alert(`✅ Purchase confirmed for ${formatCurrency(total)}`);
                           setIsCartOpen(false);
                           navigate({ to: "/Cart" });
                         }}
