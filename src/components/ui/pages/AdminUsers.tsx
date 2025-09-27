@@ -173,7 +173,7 @@ export default function AdminUsers() {
                   }}
                 >
                   <BarChart className="h-5 w-5" />
-                  <span className="font-medium">Reports</span>
+                  <span className="font-medium">Dashboard</span>
                 </Link>
               </nav>
             </aside>

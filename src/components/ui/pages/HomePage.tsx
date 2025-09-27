@@ -33,6 +33,7 @@ type CartItem = {
 
 export default function HomePage() {
   const navigate = useNavigate();
+
   // Estados
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
@@ -113,12 +114,15 @@ export default function HomePage() {
       const matchesFilter =
         filter === "all" ||
         lead.event_type.toLowerCase() === filter.toLowerCase();
+
+      // 🔎 búsqueda general en todos los campos string
       const matchesSearch =
         s === "" ||
-        lead.city.toLowerCase().includes(s) ||
-        lead.full_address.toLowerCase().includes(s);
-      const notPurchased = !purchasedLeadIds.includes(lead.id);
-      return matchesFilter && matchesSearch && notPurchased;
+        Object.values(lead)
+          .filter((v) => typeof v === "string")
+          .some((v) => v.toLowerCase().includes(s));
+      //const notPurchased = !purchasedLeadIds.includes(lead.id);
+      return matchesFilter && matchesSearch; //&& notPurchased;
     });
   }, [filter, search, leads, purchasedLeadIds]);
 
@@ -178,7 +182,7 @@ export default function HomePage() {
                 <div className="w-full md:w-1/2">
                   <input
                     type="text"
-                    placeholder="Search by location..."
+                    placeholder="Search by city, state, address or details..."
                     className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     value={search}
                     onChange={(e) => { setSearch(e.target.value); setPage(1); }}
