@@ -2,28 +2,27 @@ import { Home, User, Users, BarChart } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
 import { getLoggedUser } from "../../../utils/storage";
-import Pagination from "../Pagination"; 
+import Pagination from "../Pagination";
 
 type FilterMode = "current" | "all" | "custom";
 
 export default function AdminReports() {
   const loggedUser = getLoggedUser();
 
-  // --- Estado ---
+  // Estado de filtros y datos
   const [filterMode, setFilterMode] = useState<FilterMode>("current");
   const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
   const [year, setYear] = useState<number>(new Date().getFullYear());
-
   const [totalUsers, setTotalUsers] = useState<number | null>(null);
   const [history, setHistory] = useState<any[]>([]);
   const [totalSales, setTotalSales] = useState<number | null>(null);
   const [totalRevenue, setTotalRevenue] = useState<number | null>(null);
 
-  // 🔹 Paginación
+  // Paginación
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
 
-  // --- Fetch según modo ---
+  // Fetch según modo de filtro
   useEffect(() => {
     if (filterMode === "all") {
       fetch("https://localhost:7044/Users/TotalUsers")
@@ -66,8 +65,6 @@ export default function AdminReports() {
         })
         .catch(err => console.error("Error fetching monthly stats:", err));
     }
-
-    // resetear página cuando cambien filtros
     setPage(1);
   }, [filterMode, month, year]);
 
@@ -75,11 +72,11 @@ export default function AdminReports() {
     return <p className="text-center mt-10 text-red-500">Access denied</p>;
   }
 
-  // helper para mostrar "Sep 2025"
+  // Helper para mostrar "Sep 2025"
   const labelFor = (y: number, m: number) =>
-    `${new Date(0, m - 1).toLocaleString("default", { month: "long" })} ${y}`;
+    `${new Date(0, m - 1).toLocaleString("en-US", { month: "long" })} ${y}`;
 
-  // 🔹 Historial paginado
+  // Historial paginado
   const paginatedHistory = useMemo(() => {
     const startIndex = (page - 1) * itemsPerPage;
     return history.slice(startIndex, startIndex + itemsPerPage);
@@ -141,8 +138,6 @@ export default function AdminReports() {
                       </button>
                     ))}
                   </div>
-
-                  {/* Hint */}
                   <span className="text-sm text-gray-500 whitespace-nowrap min-w-[150px] text-right">
                     {filterMode === "all"
                       ? "Showing: All Time"
@@ -164,12 +159,11 @@ export default function AdminReports() {
                       >
                         {[...Array(12)].map((_, i) => (
                           <option key={i + 1} value={i + 1}>
-                            {new Date(0, i).toLocaleString("default", { month: "long" })}
+                            {new Date(0, i).toLocaleString("en-US", { month: "long" })}
                           </option>
                         ))}
                       </select>
                     </div>
-
                     <div className="flex flex-col">
                       <label className="text-sm font-medium text-gray-600 mb-1">Year</label>
                       <input
@@ -192,7 +186,6 @@ export default function AdminReports() {
                   </p>
                   <p className="text-sm text-gray-500">Registered users</p>
                 </div>
-
                 <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
                   <h2 className="text-lg font-semibold text-gray-800">Purchases</h2>
                   <p className="mt-2 text-3xl font-bold text-indigo-600">
@@ -200,7 +193,6 @@ export default function AdminReports() {
                   </p>
                   <p className="text-sm text-gray-500">Completed orders</p>
                 </div>
-
                 <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
                   <h2 className="text-lg font-semibold text-gray-800">Revenue</h2>
                   <p className="mt-2 text-3xl font-bold text-green-600">
@@ -247,8 +239,7 @@ export default function AdminReports() {
                     </tbody>
                   </table>
                 </div>
-
-                {/* 🔹 Paginación */}
+                {/* Paginación */}
                 <Pagination
                   currentPage={page}
                   totalItems={history.length}

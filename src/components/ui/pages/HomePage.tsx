@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import Header from "../Header";
-import IncidentCard from "../IncidentCard";
+import IncidentCard, { type IncidentCardProps } from "../IncidentCard";
+import { IncidentTable } from "../IncidentTable";
 import Pagination from "../Pagination";
 import Footer from "../Footer";
 import { getLoggedUser, purchasedIncidentsKey } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
 import { useNavigate } from "@tanstack/react-router";
 
-// URL base de tu API (ajusta el puerto al que corre tu backend en VS 2022)
+// URL base de tu API
 const API_URL = "https://localhost:7044/Leads/List";
 
 // Tipado de lo que viene del backend
@@ -49,6 +50,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [purchasedLeadIds, setPurchasedLeadIds] = useState<number[]>([]);
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
   // Constantes
   const itemsPerPage = 9;
@@ -73,8 +75,9 @@ export default function HomePage() {
             );
           }
         }
-        // Quitar duplicados
-        setPurchasedLeadIds(Array.from(new Set(allLeadIds.filter((id) => typeof id === "number"))));
+        setPurchasedLeadIds(
+          Array.from(new Set(allLeadIds.filter((id) => typeof id === "number")))
+        );
       } finally {
         setLoading(false);
       }
@@ -107,7 +110,7 @@ export default function HomePage() {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  // Filtros + búsqueda + ocultar leads comprados
+  // Filtros + búsqueda
   const filteredLeads = useMemo(() => {
     const s = search.trim().toLowerCase();
     return leads.filter((lead) => {
@@ -115,14 +118,13 @@ export default function HomePage() {
         filter === "all" ||
         lead.event_type.toLowerCase() === filter.toLowerCase();
 
-      // 🔎 búsqueda general en todos los campos string
       const matchesSearch =
         s === "" ||
         Object.values(lead)
           .filter((v) => typeof v === "string")
           .some((v) => v.toLowerCase().includes(s));
-      //const notPurchased = !purchasedLeadIds.includes(lead.id);
-      return matchesFilter && matchesSearch; //&& notPurchased;
+
+      return matchesFilter && matchesSearch;
     });
   }, [filter, search, leads, purchasedLeadIds]);
 
@@ -142,6 +144,25 @@ export default function HomePage() {
   const endIndex = startIndex + itemsPerPage;
   const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
 
+  // Mapear leads a IncidentCardProps para IncidentTable
+  const incidentProps: IncidentCardProps[] = paginatedLeads.map((lead) => ({
+    id: lead.id,
+    type:
+      (lead.event_type?.toUpperCase() as
+        | "ROBBERY"
+        | "FIRE"
+        | "CRIME"
+        | "OTHER") || "OTHER",
+    title: lead.details,
+    location: `${lead.city}, ${lead.lead_state}`,
+    date: lead.lead_date,
+    price: getPrice(lead),
+    verified: !!lead.home_owner_email && !!lead.home_owner_phone,
+    checked: cart.some((i) => i.id === lead.id),
+    onAddToCart: () => addToCart(lead),
+    onRemoveFromCart: () => removeFromCart(lead.id),
+  }));
+
   // Render
   return (
     <div className="bg-gray-50 flex flex-col min-h-screen">
@@ -149,27 +170,32 @@ export default function HomePage() {
 
       <main className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Contenedor con altura mínima: viewport - header - footer */}
           <div className="flex flex-col min-h-[calc(100vh-56px-88px)]">
-            
             {/* Título con tooltip */}
             <div className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-2">
                 Available Incident Reports
               </h2>
               <div className="text-gray-600 flex items-center gap-2">
-                <span>Browse and select incident reports to purchase for your contracting needs.</span>
-                {/* Tooltip de aclaración */}
+                <span>
+                  Browse and select incident reports to purchase for your
+                  contracting needs.
+                </span>
                 <div className="relative group">
                   <InformationCircleIcon className="w-5 h-5 text-gray-500 cursor-pointer" />
                   <div className="absolute left-6 top-0 hidden group-hover:block w-72 bg-white border border-gray-300 rounded-lg shadow-lg p-3 text-sm text-gray-700 z-10">
                     <div className="mb-1">
-                      <span className="font-semibold text-green-600">Verified ($200):</span>{" "}
+                      <span className="font-semibold text-green-600">
+                        Verified ($200):
+                      </span>{" "}
                       Includes full address, phone number and email.
                     </div>
                     <div>
-                      <span className="font-semibold text-yellow-600">Incomplete ($100):</span>{" "}
-                      Missing one or more key data such as phone, email or address.
+                      <span className="font-semibold text-yellow-600">
+                        Incomplete ($100):
+                      </span>{" "}
+                      Missing one or more key data such as phone, email or
+                      address.
                     </div>
                   </div>
                 </div>
@@ -178,21 +204,33 @@ export default function HomePage() {
 
             {/* Filtros */}
             <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                {/* Input búsqueda */}
                 <div className="w-full md:w-1/2">
                   <input
                     type="text"
                     placeholder="Search by city, state, address or details..."
-                    className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md 
+                      focus:outline-none focus:ring-2 focus:ring-indigo-500 
+                      focus:border-indigo-500 text-sm"
                     value={search}
-                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      setPage(1);
+                    }}
                   />
                 </div>
-                <div className="w-full md:w-1/2">
+                {/* Select + Toggle */}
+                <div className="flex items-center gap-2 w-full md:w-1/2">
                   <select
-                    className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="flex-1 pl-3 pr-8 py-2 border border-gray-300 rounded-md 
+                      focus:outline-none focus:ring-2 focus:ring-indigo-500 
+                      focus:border-indigo-500 text-sm"
                     value={filter}
-                    onChange={(e) => { setFilter(e.target.value); setPage(1); }}
+                    onChange={(e) => {
+                      setFilter(e.target.value);
+                      setPage(1);
+                    }}
                   >
                     <option value="all">All Incident Types</option>
                     <option value="robbery">Robbery</option>
@@ -200,35 +238,42 @@ export default function HomePage() {
                     <option value="crime">Crime</option>
                     <option value="other">Other</option>
                   </select>
+                  {/* Toggle Cards/Table */}
+                  <div className="inline-flex rounded-md border border-gray-300 overflow-hidden text-sm">
+                    <button
+                      onClick={() => setViewMode("cards")}
+                      className={`px-3 py-1.5 transition font-medium
+                        ${viewMode === "cards"
+                          ? "bg-indigo-600 text-white"
+                          : "bg-white text-gray-700 hover:bg-gray-50"}`}
+                    >
+                      Cards
+                    </button>
+                    <button
+                      onClick={() => setViewMode("table")}
+                      className={`px-3 py-1.5 transition font-medium
+                        ${viewMode === "table"
+                          ? "bg-indigo-600 text-white"
+                          : "bg-white text-gray-700 hover:bg-gray-50"}`}
+                    >
+                      Table
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Grid */}
+            {/* Grid o Tabla */}
             {loading ? (
               <p className="text-center text-gray-500">Loading incidents...</p>
-            ) : (
+            ) : viewMode === "cards" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {paginatedLeads.map((lead) => {
-                  const price = getPrice(lead);
-                  const isChecked = cart.some((i) => i.id === lead.id);
-                  return (
-                    <IncidentCard
-                      key={lead.id}
-                      id={lead.id}
-                      type={(lead.event_type?.toUpperCase() as "ROBBERY" | "FIRE" | "CRIME" | "OTHER") || "OTHER"}
-                      title={lead.details}
-                      location={`${lead.city}, ${lead.lead_state}`}
-                      date={lead.lead_date}
-                      price={price}
-                      verified={!!lead.home_owner_email && !!lead.home_owner_phone}
-                      checked={isChecked}
-                      onAddToCart={() => addToCart(lead)}
-                      onRemoveFromCart={() => removeFromCart(lead.id)}
-                    />
-                  );
-                })}
+                {incidentProps.map((incident) => (
+                  <IncidentCard key={incident.id} {...incident} />
+                ))}
               </div>
+            ) : (
+              <IncidentTable incidents={incidentProps} />
             )}
 
             {/* Paginación */}
@@ -263,10 +308,14 @@ export default function HomePage() {
                           return;
                         }
                         const key = purchasedIncidentsKey(user.username);
-                        const prev = JSON.parse(localStorage.getItem(key) || "[]");
+                        const prev = JSON.parse(
+                          localStorage.getItem(key) || "[]"
+                        );
                         const updated = [
                           ...prev,
-                          ...cart.filter((c) => !prev.some((p: any) => p.id === c.id)),
+                          ...cart.filter(
+                            (c) => !prev.some((p: any) => p.id === c.id)
+                          ),
                         ];
                         localStorage.setItem(key, JSON.stringify(updated));
                         navigate({ to: "/Cart" });
@@ -278,13 +327,11 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-
-          </div>{/* end: min-h calc wrapper */}
-        </div>{/* end: max-w wrapper */}
+          </div>
+        </div>
       </main>
 
       <Footer />
     </div>
   );
 }
-
