@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Centralized storage helpers and types
 
 export type LoggedUser = {
   username: string;
   role?: string;
   token?: string;
+  avatarUrl?: string;
   [key: string]: unknown;
 } | null;
 
