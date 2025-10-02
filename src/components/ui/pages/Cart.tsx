@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import CustomModal from "../CustomModal";
 import Swal from "sweetalert2";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -41,6 +42,11 @@ export default function CartPage() {
   });
   const navigate = useNavigate();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+
+  // 👇 estados para modales
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
 
   const saveCart = (items: CartItem[]) => {
     setCartItems(items);
@@ -186,31 +192,31 @@ export default function CartPage() {
                     : await response.text().catch(() => undefined);
                   console.log("Purchase created:", data);
 
-                   // Clear cart
-  localStorage.removeItem("cart");
-
- 
-  setModalTitle("Purchase Successful");
-  setModalMessage(
-    "Your purchase was completed successfully. A confirmation email has been sent to you "
-  );
-  setModalOpen(true);
+                  // Clear cart
+                  localStorage.removeItem("cart");
 
 
-  setTimeout(() => {
-    navigate({ to: "/Profile" });
-  }, 7000);
-} catch (error) {
-  console.error(error);
+                  setModalTitle("Purchase Successful");
+                  setModalMessage(
+                    "Your purchase was completed successfully. A confirmation email has been sent to you "
+                  );
+                  setModalOpen(true);
 
-  setModalTitle("Error");
-  setModalMessage(
-    error instanceof Error
-      ? error.message
-      : "The purchase could not be completed"
-  );
-  setModalOpen(true);
-}
+
+                  setTimeout(() => {
+                    navigate({ to: "/Profile" });
+                  }, 7000);
+                } catch (error) {
+                  console.error(error);
+
+                  setModalTitle("Error");
+                  setModalMessage(
+                    error instanceof Error
+                      ? error.message
+                      : "The purchase could not be completed"
+                  );
+                  setModalOpen(true);
+                }
               }
             }}
             type="button"
