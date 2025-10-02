@@ -1,5 +1,5 @@
-
-import { useEffect, useState, useRef } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Home, User, Users, BarChart } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
@@ -14,7 +14,6 @@ type User = {
   phone: string;
   company: string;
   user_password?: string;
-  avatarUrl?: string;
 };
 
 const API_URL = "https://localhost:7044/Users";
@@ -24,15 +23,12 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<User | null>();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const loggedUser = getLoggedUser();
 
   const fetchUser = async () => {
     try {
-      console.log(`${API_URL}/${getLoggedUser()?.id}`)
       const res = await fetch(`${API_URL}/${getLoggedUser()?.id}`);
       const data = await res.json();
-      console.log(data);
       const userData: User = {
         ID: data.ID ?? data.id,
         f_name: data.f_name,
@@ -42,10 +38,8 @@ const Profile = () => {
         phone: data.phone,
         company: data.company,
         user_password: data.user_password || "*******",
-        avatarUrl: data.avatarUrl,
       };
       setUser(userData);
-
       setFormData(userData);
     } catch (error) {
       console.error("Error fetching user", error);
@@ -55,10 +49,7 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    const asinc = async () => {
-      await fetchUser();
-    }
-    asinc()
+    fetchUser();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,7 +93,7 @@ const Profile = () => {
     }
   };
 
-  // Obtener incidentes comprados desde la base de datos
+  // Lista de incidentes comprados
   const [purchasedIncidents, setPurchasedIncidents] = useState<any[]>([]);
   useEffect(() => {
     const fetchPurchased = async () => {
@@ -110,7 +101,9 @@ const Profile = () => {
       try {
         const res = await fetch("https://localhost:7044/Purchase/List");
         const purchases = await res.json();
-        const userPurchases = purchases.filter((p: any) => p.user_id === loggedUser.id);
+        const userPurchases = purchases.filter(
+          (p: any) => p.user_id === loggedUser.id
+        );
         let allLeads: any[] = [];
         for (const purchase of userPurchases) {
           if (purchase.leads && Array.isArray(purchase.leads)) {
@@ -118,7 +111,7 @@ const Profile = () => {
               purchase.leads.map((l: any) => ({
                 id: l.lead_id,
                 title: l.lead?.full_address || l.lead_id,
-                price: purchase.amount, // O puedes usar l.lead.price si existe
+                price: purchase.amount,
               }))
             );
           }
@@ -153,7 +146,8 @@ const Profile = () => {
                   to="/Profile"
                   className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
                   activeProps={{
-                    className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                    className:
+                      "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
                   }}
                 >
                   <User className="h-5 w-5" />
@@ -166,7 +160,8 @@ const Profile = () => {
                       to="/AdminUsers"
                       className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
                       activeProps={{
-                        className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                        className:
+                          "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
                       }}
                     >
                       <Users className="h-5 w-5" />
@@ -177,7 +172,8 @@ const Profile = () => {
                       to="/AdminReports"
                       className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
                       activeProps={{
-                        className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                        className:
+                          "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
                       }}
                     >
                       <BarChart className="h-5 w-5" />
@@ -197,38 +193,12 @@ const Profile = () => {
               {user && (
                 <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow-sm hover:shadow-md transition duration-200">
                   <div className="flex items-center mb-4 gap-6">
-                    {/* Avatar con hover */}
+                    {/* Avatar fijo */}
                     <div className="relative w-32 h-32 flex-shrink-0">
                       <img
-                        src={"https://localhost:7044/" + user.avatarUrl}
-                        alt="Avatar"
+                        src="/avatars/default1.png"
+                        alt="Default Avatar"
                         className="w-full h-full rounded-full object-cover border-2 border-gray-300"
-                      />
-                      <div
-                        className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 opacity-0 hover:opacity-100 rounded-full cursor-pointer transition-opacity"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <span className="text-white font-bold">Editar</span>
-                      </div>
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        className="hidden"
-                        accept="image/*"
-                        onChange={async (e) => {
-                          console.log(user);
-                          if (!e.target.files || !user) return;
-                          const fromform = new FormData()
-                          fromform.append("file", e.target.files[0])
-                          try {
-                            const res = await fetch(`https://localhost:7044/users/upload-avatar?ID=${getLoggedUser()?.id}`, { method: "POST", body: fromform });
-                            const data = await res.json();
-                            console.log(data);
-                            fetchUser()
-                          } catch (error) {
-                            throw new Error("Error de subida de imagen" + error);
-                          }
-                        }}
                       />
                     </div>
 
@@ -302,10 +272,11 @@ const Profile = () => {
                             onChange={handleChange}
                             readOnly={field.readOnly || false}
                             className={`mt-1 border rounded-lg px-3 py-2 shadow-sm transition duration-200
-            ${field.readOnly
-                                ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-                                : "focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-                              }`}
+            ${
+              field.readOnly
+                ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                : "focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+            }`}
                           />
                         </label>
                       ))}
@@ -317,7 +288,8 @@ const Profile = () => {
                           name="user_password"
                           placeholder="Enter new password (optional)"
                           value={
-                            formData?.user_password && formData.user_password !== "*******"
+                            formData?.user_password &&
+                            formData.user_password !== "*******"
                               ? formData.user_password
                               : ""
                           }
@@ -346,7 +318,8 @@ const Profile = () => {
                             key={item.id}
                             className="p-2 rounded-md hover:bg-gray-100 transition duration-200"
                           >
-                            <span className="font-medium">{item.title}</span> — {formatCurrency(item.price)}
+                            <span className="font-medium">{item.title}</span>{" "}
+                            — {formatCurrency(item.price)}
                           </li>
                         ))}
                       </ul>

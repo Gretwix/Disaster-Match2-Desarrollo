@@ -1,8 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import CustomModal from "../CustomModal";
-import Swal from "sweetalert2";
-import toast, { Toaster } from "react-hot-toast";
+
 
 type CartItem = {
   id: number;
@@ -75,12 +74,12 @@ export default function CartPage() {
   const handleRemoveItem = (id: number) => {
     const updatedCart = cartItems.filter((item) => item.id !== id);
     saveCart(updatedCart);
-    toast.success("Item removed from cart");
+
   };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
-      <Toaster position="top-right" />
+
       <h1 className="text-2xl font-bold text-gray-900 mb-8">Confirm Purchase</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

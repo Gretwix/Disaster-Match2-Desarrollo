@@ -1,7 +1,10 @@
-
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { clearLoggedUser, getLoggedUser, type LoggedUser } from "../../utils/storage";
+import {
+  clearLoggedUser,
+  getLoggedUser,
+  type LoggedUser,
+} from "../../utils/storage";
 
 export default function Navigation() {
   const navigate = useNavigate();
@@ -29,11 +32,11 @@ export default function Navigation() {
         className="h-4 md:h-6 lg:h-8 w-auto opacity-90"
       />
 
-      {/* Centro: Logo Disaster Match (botón) - centrado */}
+      {/* Centro: Logo Disaster Match */}
       <div className="absolute left-1/2 transform -translate-x-1/2">
-        <Link 
-          to={loggedUser ? "/HomePage" : "/"} 
-          className="flex items-center" 
+        <Link
+          to={loggedUser ? "/HomePage" : "/"}
+          className="flex items-center"
           aria-label={loggedUser ? "Go to Home Page" : "Go to Landing Page"}
         >
           <img
@@ -69,8 +72,8 @@ export default function Navigation() {
               className="text-gray-300 hover:text-lime-400 transition-colors duration-200"
             >
               <img
-                src={"https://localhost:7044/"+loggedUser?.avatarUrl || "/avatars/default1.png"}
-                alt="Avatar"
+                src="/avatars/default1.png"
+                alt="Default Avatar"
                 className="w-10 h-10 rounded-full object-cover border-2 border-gray-300"
               />
             </Link>
