@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Home, User, Users, BarChart, Trash, Edit } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
+import Swal from "sweetalert2";
+import toast, { Toaster } from "react-hot-toast";
 
 type UserRecord = {
   id: number;
@@ -41,6 +43,7 @@ export default function AdminUsers() {
       setUsers(mapped);
     } catch (err) {
       console.error("Error cargando usuarios:", err);
+      toast.error("Error al cargar usuarios");
     } finally {
       setLoading(false);
     }
@@ -51,7 +54,17 @@ export default function AdminUsers() {
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (!confirm("¿Seguro que quieres eliminar este usuario?")) return;
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "No podrás revertir esta acción",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#e3342f",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       const res = await fetch(`${API_URL}/Delete?pID=${id}`, {
@@ -60,13 +73,13 @@ export default function AdminUsers() {
 
       if (res.ok) {
         setUsers((prev) => prev.filter((user) => user.id !== id));
-        alert("Usuario eliminado correctamente ✅");
+        toast.success("Usuario eliminado correctamente");
       } else {
-        alert("Error al eliminar usuario ❌");
+        toast.error("Error al eliminar usuario");
       }
     } catch (err) {
       console.error("Error en la petición:", err);
-      alert("Error al conectar con el servidor ❌");
+      toast.error("Error al conectar con el servidor");
     }
   };
 
@@ -108,15 +121,15 @@ export default function AdminUsers() {
           prev.map((u) => (u.id === formData.id ? { ...formData } : u))
         );
         setIsEditing(null);
-        alert("Usuario actualizado ✅");
+        toast.success("Usuario actualizado correctamente");
       } else {
         const errorText = await res.text();
         console.error("Error al actualizar:", errorText);
-        alert("Error al actualizar usuario ❌");
+        toast.error("Error al actualizar usuario");
       }
     } catch (err) {
       console.error("Error al guardar:", err);
-      alert("Server connection error ❌");
+      toast.error("Error al conectar con el servidor");
     }
   };
 
@@ -128,6 +141,7 @@ export default function AdminUsers() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
         <div className="rounded-2xl bg-white shadow-sm border border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">

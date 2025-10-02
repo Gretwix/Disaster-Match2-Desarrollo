@@ -64,7 +64,11 @@ export default function Navigation() {
               to="/Profile"
               className="text-gray-300 hover:text-lime-400 transition-colors duration-200"
             >
-              Profile
+              <img
+                src={"https://localhost:7044/"+loggedUser?.avatarUrl || "/avatars/default1.png"}
+                alt="Avatar"
+                className="w-10 h-10 rounded-full object-cover border-2 border-gray-300"
+              />
             </Link>
 
             <button

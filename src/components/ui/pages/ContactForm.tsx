@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { Mail, User, MessageSquare, ArrowLeft } from "react-feather";
 import { useNavigate } from "@tanstack/react-router";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 
 export default function ContactForm() {
   const [loading, setLoading] = useState(false);
@@ -30,24 +32,28 @@ export default function ContactForm() {
 
       if (!res.ok) {
         const text = await res.text();
-        setStatus("❌ Error: " + text);
+        toast.error(" Error: " + text);
         return;
       }
 
       const result = await res.json();
-      setStatus(result.message);
+      toast.success(result.message || "Message sent successfully!");
 
       if (formRef.current) {
         formRef.current.reset();
       }
 
-      //  Redirigir al landing page después de 1 segundo
-      setTimeout(() => {
-        navigate({ to: "/" }); 
-      }, 2000);
+      Swal.fire({
+        icon: "success",
+        title: "Message Sent!",
+        text: "We will get back to you soon.",
+        confirmButtonColor: "#4f46e5",
+      }).then(() => {
+        navigate({ to: "/" });
+      });
     } catch (err) {
       console.error("Fetch error:", err);
-      setStatus(" Server not available");
+      toast.error("Server not available");
     } finally {
       setLoading(false);
     }

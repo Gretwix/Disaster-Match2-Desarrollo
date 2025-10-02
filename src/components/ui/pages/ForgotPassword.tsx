@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -17,13 +19,25 @@ export default function ForgotPassword() {
       });
 
       const data = await res.json();
-      setMessage(data.message || "If this email exists, you will receive a reset code.");
+      toast.success(data.message || "If this email exists, you will receive a reset link.");
+      Swal.fire({
+        title: "Check your email",
+        text: data.message || "If this email exists, you will receive a reset link.",
+        icon: "info",
+        confirmButtonColor: "#4F46E5",
+      });
 
       // ✅ Después de enviar el correo, redirige a ResetPassword
       navigate({ to: "/ResetPassword" });
     } catch (err) {
       console.error("Error in ForgotPassword:", err);
-      setMessage("Server connection error");
+      toast.error("Server connection error");
+      Swal.fire({
+        title: "Error",
+        text: "Server connection error",
+        icon: "error",
+        confirmButtonColor: "#DC2626",
+      });
     }
   };
 

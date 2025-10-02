@@ -4,6 +4,7 @@ export type LoggedUser = {
   username: string;
   role?: string;
   token?: string;
+  avatarUrl?: string;
   [key: string]: unknown;
 } | null;
 

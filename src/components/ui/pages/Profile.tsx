@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import { Home, User, Users, BarChart } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
@@ -13,38 +14,39 @@ type User = {
   phone: string;
   company: string;
   user_password?: string;
+  avatarUrl?: string;
 };
 
 const API_URL = "https://localhost:7044/Users";
 
 const Profile = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<User | null>(null);
+  const [formData, setFormData] = useState<User | null>();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const loggedUser = getLoggedUser();
 
   const fetchUser = async () => {
     try {
-      const res = await fetch(`${API_URL}/List`);
+      console.log(`${API_URL}/${getLoggedUser()?.id}`)
+      const res = await fetch(`${API_URL}/${getLoggedUser()?.id}`);
       const data = await res.json();
-      if (Array.isArray(data)) {
-        const u = data.find((u: any) => u.username === loggedUser?.username);
-        if (u) {
-          const userData: User = {
-            ID: u.ID ?? u.id,
-            f_name: u.f_name,
-            l_name: u.l_name,
-            username: u.username,
-            email: u.email,
-            phone: u.phone,
-            company: u.company,
-            user_password: u.user_password || "*******",
-          };
-          setUser(userData);
-          setFormData(userData);
-        }
-      }
+      console.log(data);
+      const userData: User = {
+        ID: data.ID ?? data.id,
+        f_name: data.f_name,
+        l_name: data.l_name,
+        username: data.username,
+        email: data.email,
+        phone: data.phone,
+        company: data.company,
+        user_password: data.user_password || "*******",
+        avatarUrl: data.avatarUrl,
+      };
+      setUser(userData);
+
+      setFormData(userData);
     } catch (error) {
       console.error("Error fetching user", error);
     } finally {
@@ -53,7 +55,10 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    fetchUser();
+    const asinc = async () => {
+      await fetchUser();
+    }
+    asinc()
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +95,6 @@ const Profile = () => {
       });
 
       await res.text();
-
       setUser(formData);
       setIsEditing(false);
     } catch (error) {
@@ -106,9 +110,7 @@ const Profile = () => {
       try {
         const res = await fetch("https://localhost:7044/Purchase/List");
         const purchases = await res.json();
-        // Filtrar compras del usuario actual
         const userPurchases = purchases.filter((p: any) => p.user_id === loggedUser.id);
-        // Extraer todos los leads comprados
         let allLeads: any[] = [];
         for (const purchase of userPurchases) {
           if (purchase.leads && Array.isArray(purchase.leads)) {
@@ -136,58 +138,55 @@ const Profile = () => {
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
         <div className="rounded-2xl bg-white shadow-sm border border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
-           
             {/* Sidebar */}
-<aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50/60 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
-  <nav className="space-y-2">
-    <Link
-      to="/"
-      className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-    >
-      <Home className="h-5 w-5" />
-      <span className="font-medium">DisasterMatch</span>
-    </Link>
+            <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50/60 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
+              <nav className="space-y-2">
+                <Link
+                  to="/"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                >
+                  <Home className="h-5 w-5" />
+                  <span className="font-medium">DisasterMatch</span>
+                </Link>
 
-    <Link
-      to="/Profile"
-      className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-      activeProps={{
-        className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
-      }}
-    >
-      <User className="h-5 w-5" />
-      <span className="font-medium">Profile</span>
-    </Link>
+                <Link
+                  to="/Profile"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                  activeProps={{
+                    className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                  }}
+                >
+                  <User className="h-5 w-5" />
+                  <span className="font-medium">Profile</span>
+                </Link>
 
-    {/* Solo si es admin → mostrar Users y Reports */}
-    {loggedUser?.role === "admin" && (
-      <>
-        <Link
-          to="/AdminUsers"
-          className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-          activeProps={{
-            className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
-          }}
-        >
-          <Users className="h-5 w-5" />
-          <span className="font-medium">Users</span>
-        </Link>
+                {loggedUser?.role === "admin" && (
+                  <>
+                    <Link
+                      to="/AdminUsers"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                      activeProps={{
+                        className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                      }}
+                    >
+                      <Users className="h-5 w-5" />
+                      <span className="font-medium">Users</span>
+                    </Link>
 
-        <Link
-          to="/AdminReports"
-          className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-          activeProps={{
-            className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
-          }}
-        >
-          <BarChart className="h-5 w-5" />
-          <span className="font-medium">Dashboard</span>
-        </Link>
-      </>
-    )}
-  </nav>
-</aside>
-
+                    <Link
+                      to="/AdminReports"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                      activeProps={{
+                        className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                      }}
+                    >
+                      <BarChart className="h-5 w-5" />
+                      <span className="font-medium">Reports</span>
+                    </Link>
+                  </>
+                )}
+              </nav>
+            </aside>
 
             {/* Main content */}
             <section className="p-6 md:p-8">
@@ -197,7 +196,42 @@ const Profile = () => {
 
               {user && (
                 <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow-sm hover:shadow-md transition duration-200">
-                  <div className="flex justify-between items-center mb-4">
+                  <div className="flex items-center mb-4 gap-6">
+                    {/* Avatar con hover */}
+                    <div className="relative w-32 h-32 flex-shrink-0">
+                      <img
+                        src={"https://localhost:7044/" + user.avatarUrl}
+                        alt="Avatar"
+                        className="w-full h-full rounded-full object-cover border-2 border-gray-300"
+                      />
+                      <div
+                        className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 opacity-0 hover:opacity-100 rounded-full cursor-pointer transition-opacity"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <span className="text-white font-bold">Editar</span>
+                      </div>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          console.log(user);
+                          if (!e.target.files || !user) return;
+                          const fromform = new FormData()
+                          fromform.append("file", e.target.files[0])
+                          try {
+                            const res = await fetch(`https://localhost:7044/users/upload-avatar?ID=${getLoggedUser()?.id}`, { method: "POST", body: fromform });
+                            const data = await res.json();
+                            console.log(data);
+                            fetchUser()
+                          } catch (error) {
+                            throw new Error("Error de subida de imagen" + error);
+                          }
+                        }}
+                      />
+                    </div>
+
                     <h3 className="text-xl font-semibold text-gray-800">
                       {user.f_name} {user.l_name}
                     </h3>
@@ -233,71 +267,68 @@ const Profile = () => {
                   </div>
 
                   {!isEditing ? (
-  <div className="space-y-3 text-gray-700">
-    <p>
-      <strong>Username:</strong> {user.username}
-    </p>
-    <p>
-      <strong>Email:</strong> {user.email}
-    </p>
-    <p>
-      <strong>Phone:</strong> {user.phone}
-    </p>
-    <p>
-      <strong>Company:</strong> {user.company}
-    </p>
-  </div>
-) : (
-  <form className="grid gap-4">
-    {[
-      { name: "f_name", label: "First Name" },
-      { name: "l_name", label: "Last Name" },
-      // 👇 Username solo lectura
-      { name: "username", label: "Username", readOnly: true },
-      { name: "email", label: "Email" },
-      { name: "phone", label: "Phone" },
-      { name: "company", label: "Company" },
-    ].map((field) => (
-      <label
-        key={field.name}
-        className="flex flex-col text-sm font-medium"
-      >
-        {field.label}
-        <input
-          name={field.name}
-          value={(formData as any)?.[field.name] || ""}
-          onChange={handleChange}
-          readOnly={field.readOnly || false}
-          className={`mt-1 border rounded-lg px-3 py-2 shadow-sm transition duration-200
-            ${field.readOnly 
-              ? "bg-gray-100 text-gray-500 cursor-not-allowed" 
-              : "focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-            }`}
-        />
-      </label>
-    ))}
+                    <div className="space-y-3 text-gray-700">
+                      <p>
+                        <strong>Username:</strong> {user.username}
+                      </p>
+                      <p>
+                        <strong>Email:</strong> {user.email}
+                      </p>
+                      <p>
+                        <strong>Phone:</strong> {user.phone}
+                      </p>
+                      <p>
+                        <strong>Company:</strong> {user.company}
+                      </p>
+                    </div>
+                  ) : (
+                    <form className="grid gap-4">
+                      {[
+                        { name: "f_name", label: "First Name" },
+                        { name: "l_name", label: "Last Name" },
+                        { name: "username", label: "Username", readOnly: true },
+                        { name: "email", label: "Email" },
+                        { name: "phone", label: "Phone" },
+                        { name: "company", label: "Company" },
+                      ].map((field) => (
+                        <label
+                          key={field.name}
+                          className="flex flex-col text-sm font-medium"
+                        >
+                          {field.label}
+                          <input
+                            name={field.name}
+                            value={(formData as any)?.[field.name] || ""}
+                            onChange={handleChange}
+                            readOnly={field.readOnly || false}
+                            className={`mt-1 border rounded-lg px-3 py-2 shadow-sm transition duration-200
+            ${field.readOnly
+                                ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                : "focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                              }`}
+                          />
+                        </label>
+                      ))}
 
-    {/* 👇 Nuevo campo para cambiar contraseña */}
-    <label className="flex flex-col text-sm font-medium">
-      New Password
-      <input
-        type="password"
-        name="user_password"
-        placeholder="Enter new password (optional)"
-        value={
-          formData?.user_password && formData.user_password !== "*******"
-            ? formData.user_password
-            : ""
-        }
-        onChange={handleChange}
-        className="mt-1 border rounded-lg px-3 py-2 shadow-sm 
+                      <label className="flex flex-col text-sm font-medium">
+                        New Password
+                        <input
+                          type="password"
+                          name="user_password"
+                          placeholder="Enter new password (optional)"
+                          value={
+                            formData?.user_password && formData.user_password !== "*******"
+                              ? formData.user_password
+                              : ""
+                          }
+                          onChange={handleChange}
+                          className="mt-1 border rounded-lg px-3 py-2 shadow-sm 
                    focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 
                    transition duration-200"
-      />
-    </label>
-  </form>
-)}
-
+                        />
+                      </label>
+                    </form>
+                  )}
 
                   {/* Lista de incidentes comprados */}
                   <div className="mt-8">
@@ -327,7 +358,6 @@ const Profile = () => {
           </div>
         </div>
       </div>
-      
     </div>
   );
 };

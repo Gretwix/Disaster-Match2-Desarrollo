@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
 import { getLoggedUser } from "../../../utils/storage";
 import Pagination from "../Pagination";
+import toast, { Toaster } from "react-hot-toast";
 
 type FilterMode = "current" | "all" | "custom";
 
@@ -84,6 +85,7 @@ export default function AdminReports() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <Toaster position="top-right" />
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
         <div className="rounded-2xl bg-white shadow-sm border border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
