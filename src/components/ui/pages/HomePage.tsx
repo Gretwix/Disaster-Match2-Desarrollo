@@ -104,28 +104,32 @@ export default function HomePage() {
   const removeFromCart = (id: number) => {
     setCart((prev) => prev.filter((i) => i.id !== id));
   };
-
   // Sincronizar carrito con localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  // Filtros + búsqueda
+  // Filtros + búsqueda y ordenamiento
   const filteredLeads = useMemo(() => {
     const s = search.trim().toLowerCase();
-    return leads.filter((lead) => {
-      const matchesFilter =
-        filter === "all" ||
-        lead.event_type.toLowerCase() === filter.toLowerCase();
+    return [...leads]
+      .filter((lead) => {
+        const matchesFilter =
+          filter === "all" ||
+          lead.event_type.toLowerCase() === filter.toLowerCase();
 
-      const matchesSearch =
-        s === "" ||
-        Object.values(lead)
-          .filter((v) => typeof v === "string")
-          .some((v) => v.toLowerCase().includes(s));
+        const matchesSearch =
+          s === "" ||
+          Object.values(lead)
+            .filter((v) => typeof v === "string")
+            .some((v) => v.toLowerCase().includes(s));
 
-      return matchesFilter && matchesSearch;
-    });
+        return matchesFilter && matchesSearch;
+      })
+      .sort((a, b) => {
+        // Ordenar por lead_date de más reciente a más antiguo
+        return new Date(b.lead_date).getTime() - new Date(a.lead_date).getTime();
+      });
   }, [filter, search, leads, purchasedLeadIds]);
 
   // Totales
