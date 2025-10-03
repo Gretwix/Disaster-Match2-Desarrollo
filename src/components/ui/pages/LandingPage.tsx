@@ -8,30 +8,29 @@ export default function LandingPage() {
   <div className="min-h-screen grid grid-rows-[1fr_auto] bg-gray-50">
     {/* Contenido principal */}
     <main>
-      {/* Hero Section */}
       <section className="bg-gray-50 text-center py-20 px-6">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">
-          Real-time incident reporting
-        </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto mb-8">
-          Browse and get immediate access to verified reports of emergencies,
-          crimes, and incidents in your area.
-        </p>
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={() => navigate({ to: "/HomePage" })}
-            className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 transition"
-          >
-            Start now
-          </button>
-          <button
-            onClick={() => navigate({ to: "/Login" })}
-            className="px-6 py-3 border border-indigo-600 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition"
-          >
-            Register
-          </button>
-        </div>
-      </section>
+  <h1 className="text-3xl md:text-4xl font-bold mb-4">
+    Unlock more opportunities to win new clients and contracts
+  </h1>
+  <p className="text-gray-600 max-w-2xl mx-auto mb-8">
+    Turn real-time incident reports into qualified leads and grow your business 
+    faster with trusted data at your fingertips.
+  </p>
+  <div className="flex justify-center gap-4">
+    <button
+      onClick={() => navigate({ to: "/HomePage" })}
+      className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 transition"
+    >
+      Start now
+    </button>
+    <button
+      onClick={() => navigate({ to: "/Login" })}
+      className="px-6 py-3 border border-indigo-600 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition"
+    >
+      Register
+    </button>
+  </div>
+</section>
 
       {/* Benefits Section */}
       <section className="bg-white py-16">
