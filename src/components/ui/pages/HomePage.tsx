@@ -175,31 +175,25 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col min-h-[calc(100vh-56px-88px)]">
             {/* Título e información */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-                Available Incident Reports
-              </h2>
-              <div className="text-gray-600">
-                <p>
-                  Browse and select incident reports to purchase for your
-                  contracting needs.
-                </p>
-                <div className="mt-3 text-sm bg-white border border-gray-200 rounded-lg p-3">
+            <div className="mb-6">
+              <div className="flex flex-col md:flex-row md:items-start gap-0 w-full">
+                <div className="flex-1">
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-0 leading-tight">
+                    Available Incident Reports
+                  </h2>
+                  <p className="text-gray-600 leading-snug mt-0">
+                    Browse and select incident reports to purchase for your
+                    contracting needs.
+                  </p>
+                </div>
+                <div className="w-full md:w-72 max-w-md bg-white border border-gray-300 rounded-lg shadow-sm p-1 text-sm text-gray-700 md:ml-2">
                   <div className="mb-1">
-                    <span className="font-semibold text-green-600">
-                      Verified ($200):
-                    </span>
-                    <span className="ml-1 text-gray-700">
-                      Includes full address, phone number and email.
-                    </span>
+                    <span className="font-semibold text-green-600">Verified ($200):</span>
+                    <span className="ml-1 text-gray-700">Includes full address, phone number and email.</span>
                   </div>
                   <div>
-                    <span className="font-semibold text-yellow-600">
-                      Incomplete ($100):
-                    </span>
-                    <span className="ml-1 text-gray-700">
-                      Missing one or more key data such as phone, email or address.
-                    </span>
+                    <span className="font-semibold text-yellow-600">Incomplete ($100):</span>
+                    <span className="ml-1 text-gray-700">Missing one or more key data such as phone, email or address.</span>
                   </div>
                 </div>
               </div>
