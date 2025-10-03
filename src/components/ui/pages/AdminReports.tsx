@@ -23,68 +23,113 @@ export default function AdminReports() {
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Fetch según modo de filtro
+  // Fetch según modo de filtro (con manejo seguro de respuestas 404/vacías)
   useEffect(() => {
-    if (filterMode === "all") {
-      fetch("https://localhost:7044/Users/TotalUsers")
-        .then(r => r.json())
-        .then(d => setTotalUsers(d.totalUsers))
-        .catch(err => {
-          console.error("Error fetching total users:", err);
-          toast.error("Failed to load total users");
-        });
+    let cancelled = false;
 
-      fetch("https://localhost:7044/Users/History")
-        .then(r => r.json())
-        .then(d => setHistory(d))
-        .catch(err => {
-          console.error("Error fetching history:", err);
-          toast.error("Failed to load activity history");
-        });
+    const safeFetchJson = async <T,>(
+      url: string,
+      fallback: T,
+      onErrorMsg?: string
+    ): Promise<{ data: T; ok: boolean }> => {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        const text = await res.text();
+        if (!text) return { data: fallback, ok: false }; // respuesta sin cuerpo
+        return { data: JSON.parse(text) as T, ok: true };
+      } catch (err) {
+        console.error(`Fetch failed for ${url}:`, err);
+        if (onErrorMsg) toast.error(onErrorMsg);
+        return { data: fallback, ok: false };
+      }
+    };
 
-      fetch("https://localhost:7044/Purchase/Stats")
-        .then(r => r.json())
-        .then(d => {
-          setTotalSales(d.totalSales);
-          setTotalRevenue(d.totalRevenue);
-        })
-        .catch(err => {
-          console.error("Error fetching stats:", err);
-          toast.error("Failed to load stats");
-        });
-    } else {
-      const now = new Date();
-      const y = filterMode === "current" ? now.getFullYear() : year;
-      const m = filterMode === "current" ? now.getMonth() + 1 : month;
+    const run = async () => {
+      if (filterMode === "all") {
+        const usersRes = await safeFetchJson<{ totalUsers: number }>(
+          "https://localhost:7044/Users/TotalUsers",
+          { totalUsers: 0 },
+          "Failed to load total users"
+        );
+        const histRes = await safeFetchJson<any[]>(
+          "https://localhost:7044/Users/History",
+          [],
+          "Failed to load activity history"
+        );
+        const statsRes = await safeFetchJson<{ totalSales: number; totalRevenue: number }>(
+          "https://localhost:7044/Purchase/Stats",
+          { totalSales: 0, totalRevenue: 0 },
+          "Failed to load stats"
+        );
 
-      fetch(`https://localhost:7044/Users/TotalUsersByMonth?year=${y}&month=${m}`)
-        .then(r => r.json())
-        .then(d => setTotalUsers(d.totalUsers))
-        .catch(err => {
-          console.error("Error fetching monthly users:", err);
-          toast.error("Failed to load users for selected period");
-        });
+        if (cancelled) return;
+        setTotalUsers(usersRes.data.totalUsers ?? 0);
+        setHistory(histRes.data ?? []);
+        setTotalSales(statsRes.data.totalSales ?? 0);
+        setTotalRevenue(statsRes.data.totalRevenue ?? 0);
+      } else {
+        const now = new Date();
+        const y = filterMode === "current" ? now.getFullYear() : year;
+        const m = filterMode === "current" ? now.getMonth() + 1 : month;
 
-      fetch(`https://localhost:7044/Users/HistoryByMonth?year=${y}&month=${m}`)
-        .then(r => r.json())
-        .then(d => setHistory(d))
-        .catch(err => {
-          console.error("Error fetching monthly history:", err);
-          toast.error("Failed to load activity for selected period");
-        });
+        const usersMonth = await safeFetchJson<{ totalUsers: number }>(
+          `https://localhost:7044/Users/TotalUsersByMonth?year=${y}&month=${m}`,
+          { totalUsers: 0 }
+        );
+        const histMonth = await safeFetchJson<any[]>(
+          `https://localhost:7044/Users/HistoryByMonth?year=${y}&month=${m}`,
+          []
+        );
+        const statsMonth = await safeFetchJson<{ totalSales: number; totalRevenue: number }>(
+          `https://localhost:7044/Purchase/StatsByMonth?year=${y}&month=${m}`,
+          { totalSales: 0, totalRevenue: 0 }
+        );
 
-      fetch(`https://localhost:7044/Purchase/StatsByMonth?year=${y}&month=${m}`)
-        .then(r => r.json())
-        .then(d => {
-          setTotalSales(d.totalSales);
-          setTotalRevenue(d.totalRevenue);
-        })
-        .catch(err => {
-          console.error("Error fetching monthly stats:", err);
-          toast.error("Failed to load stats for selected period");
-        });
-    }
-    setPage(1);
+        // Si endpoints mensuales fallan (404/empty), intentar endpoints "all time" como respaldo
+        const usersAll = usersMonth.ok
+          ? usersMonth
+          : await safeFetchJson<{ totalUsers: number }>(
+              "https://localhost:7044/Users/TotalUsers",
+              { totalUsers: 0 }
+            );
+        const histAll = histMonth.ok
+          ? histMonth
+          : await safeFetchJson<any[]>(
+              "https://localhost:7044/Users/History",
+              []
+            );
+        const statsAll = statsMonth.ok
+          ? statsMonth
+          : await safeFetchJson<{ totalSales: number; totalRevenue: number }>(
+              "https://localhost:7044/Purchase/Stats",
+              { totalSales: 0, totalRevenue: 0 }
+            );
+
+        if (cancelled) return;
+        setTotalUsers((usersAll.data.totalUsers ?? 0));
+        setHistory(histAll.data ?? []);
+        setTotalSales((statsAll.data.totalSales ?? 0));
+        setTotalRevenue((statsAll.data.totalRevenue ?? 0));
+
+        // Only show an error if both monthly and fallback endpoints failed
+        if (!usersMonth.ok && !usersAll.ok) {
+          toast.error("Could not load users data");
+        }
+        if (!histMonth.ok && !histAll.ok) {
+          toast.error("Could not load activity data");
+        }
+        if (!statsMonth.ok && !statsAll.ok) {
+          toast.error("Could not load stats data");
+        }
+      }
+      setPage(1);
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
   }, [filterMode, month, year]);
 
   if (loggedUser?.role !== "admin") {
