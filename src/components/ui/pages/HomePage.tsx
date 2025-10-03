@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import Header from "../Header";
 import IncidentCard, { type IncidentCardProps } from "../IncidentCard";
 import { IncidentTable } from "../IncidentTable";
@@ -175,32 +174,32 @@ export default function HomePage() {
       <main className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col min-h-[calc(100vh-56px-88px)]">
-            {/* Título con tooltip */}
+            {/* Título e información */}
             <div className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-2">
                 Available Incident Reports
               </h2>
-              <div className="text-gray-600 flex items-center gap-2">
-                <span>
+              <div className="text-gray-600">
+                <p>
                   Browse and select incident reports to purchase for your
                   contracting needs.
-                </span>
-                <div className="relative group">
-                  <InformationCircleIcon className="w-5 h-5 text-gray-500 cursor-pointer" />
-                  <div className="absolute left-6 top-0 hidden group-hover:block w-72 bg-white border border-gray-300 rounded-lg shadow-lg p-3 text-sm text-gray-700 z-10">
-                    <div className="mb-1">
-                      <span className="font-semibold text-green-600">
-                        Verified ($200):
-                      </span>{" "}
+                </p>
+                <div className="mt-3 text-sm bg-white border border-gray-200 rounded-lg p-3">
+                  <div className="mb-1">
+                    <span className="font-semibold text-green-600">
+                      Verified ($200):
+                    </span>
+                    <span className="ml-1 text-gray-700">
                       Includes full address, phone number and email.
-                    </div>
-                    <div>
-                      <span className="font-semibold text-yellow-600">
-                        Incomplete ($100):
-                      </span>{" "}
-                      Missing one or more key data such as phone, email or
-                      address.
-                    </div>
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-yellow-600">
+                      Incomplete ($100):
+                    </span>
+                    <span className="ml-1 text-gray-700">
+                      Missing one or more key data such as phone, email or address.
+                    </span>
                   </div>
                 </div>
               </div>

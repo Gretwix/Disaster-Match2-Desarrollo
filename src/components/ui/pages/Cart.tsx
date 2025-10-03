@@ -1,6 +1,13 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import CustomModal from "../CustomModal";
+import {
+  getCart,
+  saveCart as saveCartStorage,
+  getLoggedUser as getLoggedUserStorage,
+  CART_KEY,
+} from "../../../utils/storage";
+import { formatCurrency } from "../../../utils/format";
 
 
 type CartItem = {
@@ -18,29 +25,13 @@ type PaymentMethod = {
 };
 
 export default function CartPage() {
-  // Storage keys
-  const CART_KEY = "cart";
-  const LOGGED_USER_KEY = "loggedUser";
-
-  // Helpers
-  const safeParseJSON = <T,>(value: string | null, fallback: T): T => {
-    try {
-      const parsed = value ? JSON.parse(value) : null;
-      return (parsed as T) ?? fallback;
-    } catch {
-      return fallback;
-    }
-  };
-
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
-
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-    const storedCart = safeParseJSON<CartItem[] | null>(localStorage.getItem(CART_KEY), null);
+    const storedCart = getCart<CartItem[]>();
     return Array.isArray(storedCart) ? storedCart : [];
   });
   const navigate = useNavigate();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
   // 👇 estados para modales
   const [modalOpen, setModalOpen] = useState(false);
@@ -49,14 +40,12 @@ export default function CartPage() {
 
   const saveCart = (items: CartItem[]) => {
     setCartItems(items);
-    localStorage.setItem(CART_KEY, JSON.stringify(items));
+    saveCartStorage(items);
   };
-
-  const getLoggedUser = () => safeParseJSON<any>(localStorage.getItem(LOGGED_USER_KEY), null);
 
   // Cargar métodos de pago del usuario logueado
   useEffect(() => {
-    const user = getLoggedUser();
+    const user = getLoggedUserStorage();
     if (user && user.username) {
       const key = `paymentMethods_${user.username}`;
       const stored = localStorage.getItem(key);
@@ -149,79 +138,84 @@ export default function CartPage() {
           </div>
 
           <button
-            className="w-full bg-indigo-600 text-white py-3 rounded-md font-medium hover:bg-indigo-700 transition cursor-pointer"
+            className={`w-full bg-indigo-600 text-white py-3 rounded-md font-medium transition cursor-pointer ${
+              isPurchasing ? "opacity-60 cursor-not-allowed" : "hover:bg-indigo-700"
+            }`}
             onClick={async () => {
-              const loggedUser = getLoggedUser();
+              if (isPurchasing) return; // guard against double clicks
+              const loggedUser = getLoggedUserStorage();
               if (!loggedUser || !loggedUser.username) {
+                // No bloquear el botón si redirigimos a login
                 localStorage.setItem("pendingCart", JSON.stringify(cartItems));
                 navigate({
                   to: "/Login",
                   search: { redirect: "/PaymentForm" },
                 });
-              } else {
-                try {
-                  const leadIds = cartItems.map((item) => item.id);
-                  const query = leadIds.map((id) => `leadIds=${id}`).join("&");
+                return;
+              }
+              try {
+                setIsPurchasing(true);
+                const leadIds = cartItems.map((item) => item.id);
+                const query = leadIds.map((id) => `leadIds=${id}`).join("&");
 
-                  const userId = (loggedUser as any)?.id ?? (loggedUser as any)?.ID ?? 0;
-                  const purchase = {
-                    user_id: userId,
-                    amount: total,
-                  };
+                const userId = (loggedUser as any)?.id ?? (loggedUser as any)?.ID ?? 0;
+                const purchase = {
+                  user_id: userId,
+                  amount: total,
+                };
 
-                  const token = localStorage.getItem("authToken");
-                  const response = await fetch(`https://localhost:7044/Purchase/Create?${query}`, {
-                    method: "PUT",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Accept: "application/json",
-                      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                    },
-                    body: JSON.stringify(purchase),
-                  });
+                const token = localStorage.getItem("authToken");
+                const response = await fetch(`https://localhost:7044/Purchase/Create?${query}`, {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                  },
+                  body: JSON.stringify(purchase),
+                });
 
-                  if (!response.ok) {
-                    const errorText = await response.text().catch(() => "");
-                    throw new Error(errorText || `Error creating purchase (${response.status})`);
-                  }
-
-                  const ct = response.headers.get("content-type") || "";
-                  const data = ct.includes("application/json")
-                    ? await response.json()
-                    : await response.text().catch(() => undefined);
-                  console.log("Purchase created:", data);
-
-                  // Clear cart
-                  localStorage.removeItem("cart");
-
-
-                  setModalTitle("Purchase Successful");
-                  setModalMessage(
-                    "Your purchase was completed successfully. A confirmation email has been sent to you "
-                  );
-                  setModalOpen(true);
-
-
-                  setTimeout(() => {
-                    navigate({ to: "/Profile" });
-                  }, 7000);
-                } catch (error) {
-                  console.error(error);
-
-                  setModalTitle("Error");
-                  setModalMessage(
-                    error instanceof Error
-                      ? error.message
-                      : "The purchase could not be completed"
-                  );
-                  setModalOpen(true);
+                if (!response.ok) {
+                  const errorText = await response.text().catch(() => "");
+                  throw new Error(errorText || `Error creating purchase (${response.status})`);
                 }
+
+                const ct = response.headers.get("content-type") || "";
+                const data = ct.includes("application/json")
+                  ? await response.json()
+                  : await response.text().catch(() => undefined);
+                console.log("Purchase created:", data);
+
+                // Clear cart
+                localStorage.removeItem(CART_KEY);
+
+                setModalTitle("Purchase Successful");
+                setModalMessage(
+                  "Your purchase was completed successfully. A confirmation email has been sent to you "
+                );
+                setModalOpen(true);
+
+                // Mantener el botón deshabilitado tras éxito para evitar duplicados
+                setTimeout(() => {
+                  navigate({ to: "/Profile" });
+                }, 7000);
+              } catch (error) {
+                console.error(error);
+                setIsPurchasing(false); // Rehabilitar para reintentar si falló
+
+                setModalTitle("Error");
+                setModalMessage(
+                  error instanceof Error
+                    ? error.message
+                    : "The purchase could not be completed"
+                );
+                setModalOpen(true);
               }
             }}
             type="button"
-            disabled={cartItems.length === 0}
+            disabled={cartItems.length === 0 || isPurchasing}
           >
-            Confirm Purchase
+            {isPurchasing ? "Processing..." : "Confirm Purchase"}
           </button>
         </div>
       </div>

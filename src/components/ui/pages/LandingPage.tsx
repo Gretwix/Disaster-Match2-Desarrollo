@@ -1,8 +1,10 @@
 import { useNavigate } from "@tanstack/react-router";
+import { getLoggedUser } from "../../../utils/storage";
 import { FaFilter, FaDatabase, FaClock } from "react-icons/fa";
 import Footer from "../Footer";
 export default function LandingPage() {
   const navigate = useNavigate();
+  const user = getLoggedUser();
 
   return (
   <div className="min-h-screen grid grid-rows-[1fr_auto] bg-gray-50">
@@ -23,12 +25,14 @@ export default function LandingPage() {
     >
       Start now
     </button>
-    <button
-      onClick={() => navigate({ to: "/Login" })}
-      className="px-6 py-3 border border-indigo-600 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition"
-    >
-      Register
-    </button>
+    {!user && (
+      <button
+        onClick={() => navigate({ to: "/Register" })}
+        className="px-6 py-3 border border-indigo-600 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition"
+      >
+        Register
+      </button>
+    )}
   </div>
 </section>
 

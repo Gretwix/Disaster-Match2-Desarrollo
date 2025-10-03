@@ -35,9 +35,9 @@ export default function Navigation() {
       {/* Centro: Logo Disaster Match */}
       <div className="absolute left-1/2 transform -translate-x-1/2">
         <Link
-          to={loggedUser ? "/HomePage" : "/"}
+          to="/"
           className="flex items-center"
-          aria-label={loggedUser ? "Go to Home Page" : "Go to Landing Page"}
+          aria-label="Go to Landing Page"
         >
           <img
             src="/Logo DM.png"
