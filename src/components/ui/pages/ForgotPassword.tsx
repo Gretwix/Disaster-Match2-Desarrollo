@@ -19,6 +19,7 @@ export default function ForgotPassword() {
       });
 
       const data = await res.json();
+      setMessage(data.message || "If this email exists, you will receive a reset link.");
       toast.success(data.message || "If this email exists, you will receive a reset link.");
       Swal.fire({
         title: "Check your email",
@@ -31,6 +32,7 @@ export default function ForgotPassword() {
       navigate({ to: "/ResetPassword" });
     } catch (err) {
       console.error("Error in ForgotPassword:", err);
+      setMessage("Server connection error");
       toast.error("Server connection error");
       Swal.fire({
         title: "Error",

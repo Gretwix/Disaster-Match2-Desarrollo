@@ -8,6 +8,7 @@ import {
   CART_KEY,
 } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
+import { createCheckout } from "../../../utils/stripe";
 
 
 type CartItem = {
@@ -32,6 +33,7 @@ export default function CartPage() {
   const navigate = useNavigate();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [isStripeRedirecting, setIsStripeRedirecting] = useState(false);
 
   // 👇 estados para modales
   const [modalOpen, setModalOpen] = useState(false);
@@ -216,6 +218,66 @@ export default function CartPage() {
             disabled={cartItems.length === 0 || isPurchasing}
           >
             {isPurchasing ? "Processing..." : "Confirm Purchase"}
+          </button>
+
+          <div className="my-3 text-center text-gray-400 text-sm">OR</div>
+
+          <button
+            className={`w-full bg-black text-white py-3 rounded-md font-medium transition cursor-pointer ${
+              isStripeRedirecting ? "opacity-60 cursor-not-allowed" : "hover:bg-gray-900"
+            }`}
+            onClick={async () => {
+              if (isStripeRedirecting) return;
+              const loggedUser = getLoggedUserStorage();
+              if (!loggedUser || !loggedUser.username) {
+                localStorage.setItem("pendingCart", JSON.stringify(cartItems));
+                navigate({ to: "/Login", search: { redirect: "/Cart" } });
+                return;
+              }
+              try {
+                setIsStripeRedirecting(true);
+                // Map your cart items to Stripe Price IDs.
+                // Replace this logic with real mapping from your backend or SKU table.
+                const PRICE_VERIFIED = import.meta.env.VITE_PRICE_VERIFIED || "price_123";
+                const PRICE_INCOMPLETE = import.meta.env.VITE_PRICE_INCOMPLETE || "price_456";
+
+                // Guard against placeholder IDs to avoid 500s from backend
+                const usingPlaceholders =
+                  !PRICE_VERIFIED || PRICE_VERIFIED === "price_123" ||
+                  !PRICE_INCOMPLETE || PRICE_INCOMPLETE === "price_456";
+                if (usingPlaceholders) {
+                  setModalTitle("Stripe setup required");
+                  setModalMessage(
+                    "Please set VITE_PRICE_VERIFIED and VITE_PRICE_INCOMPLETE in your .env.local with real Stripe Price IDs from your Dashboard, then restart the dev server."
+                  );
+                  setModalOpen(true);
+                  setIsStripeRedirecting(false);
+                  return;
+                }
+                const items = cartItems.map((ci) => ({
+                  priceId: ci.price >= 200 ? PRICE_VERIFIED : PRICE_INCOMPLETE,
+                  quantity: ci.quantity || 1,
+                }));
+                await createCheckout({
+                  items,
+                  customerEmail: (loggedUser as any)?.email,
+                  // Optional identifiers
+                  clientReferenceId: `user-${(loggedUser as any)?.id || (loggedUser as any)?.ID || "unknown"}`,
+                  // You can omit successUrl/cancelUrl to use backend defaults
+                });
+              } catch (e) {
+                console.error(e);
+                setModalTitle("Stripe error");
+                setModalMessage(e instanceof Error ? e.message : "Could not start Stripe checkout");
+                setModalOpen(true);
+              } finally {
+                setIsStripeRedirecting(false);
+              }
+            }}
+            type="button"
+            disabled={cartItems.length === 0 || isStripeRedirecting}
+          >
+            {isStripeRedirecting ? "Redirecting to Stripe..." : "Pay with Stripe"}
           </button>
         </div>
       </div>

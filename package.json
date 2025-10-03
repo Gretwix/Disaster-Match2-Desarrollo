@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@stripe/react-stripe-js": "^5.0.0",
+    "@stripe/stripe-js": "^8.0.0",
     "@tailwindcss/vite": "^4.1.13",
     "@tanstack/react-router": "^1.131.35",
     "@tanstack/react-router-devtools": "^1.131.35",

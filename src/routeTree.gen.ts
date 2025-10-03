@@ -23,6 +23,8 @@ import { Route as CartRouteImport } from './routes/Cart'
 import { Route as AdminUsersRouteImport } from './routes/AdminUsers'
 import { Route as AdminReportsRouteImport } from './routes/AdminReports'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout/success'
+import { Route as CheckoutCancelRouteImport } from './routes/checkout/cancel'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -94,6 +96,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
+  id: '/checkout/success',
+  path: '/checkout/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutCancelRoute = CheckoutCancelRouteImport.update({
+  id: '/checkout/cancel',
+  path: '/checkout/cancel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -110,6 +122,8 @@ export interface FileRoutesByFullPath {
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
   '/about': typeof AboutRoute
+  '/checkout/cancel': typeof CheckoutCancelRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -126,6 +140,8 @@ export interface FileRoutesByTo {
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
   '/about': typeof AboutRoute
+  '/checkout/cancel': typeof CheckoutCancelRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -143,6 +159,8 @@ export interface FileRoutesById {
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
   '/about': typeof AboutRoute
+  '/checkout/cancel': typeof CheckoutCancelRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,6 +179,8 @@ export interface FileRouteTypes {
     | '/Register'
     | '/ResetPassword'
     | '/about'
+    | '/checkout/cancel'
+    | '/checkout/success'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -177,6 +197,8 @@ export interface FileRouteTypes {
     | '/Register'
     | '/ResetPassword'
     | '/about'
+    | '/checkout/cancel'
+    | '/checkout/success'
   id:
     | '__root__'
     | '/'
@@ -193,6 +215,8 @@ export interface FileRouteTypes {
     | '/Register'
     | '/ResetPassword'
     | '/about'
+    | '/checkout/cancel'
+    | '/checkout/success'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -210,6 +234,8 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   AboutRoute: typeof AboutRoute
+  CheckoutCancelRoute: typeof CheckoutCancelRoute
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -312,6 +338,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout/success': {
+      id: '/checkout/success'
+      path: '/checkout/success'
+      fullPath: '/checkout/success'
+      preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout/cancel': {
+      id: '/checkout/cancel'
+      path: '/checkout/cancel'
+      fullPath: '/checkout/cancel'
+      preLoaderRoute: typeof CheckoutCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -330,6 +370,8 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   AboutRoute: AboutRoute,
+  CheckoutCancelRoute: CheckoutCancelRoute,
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

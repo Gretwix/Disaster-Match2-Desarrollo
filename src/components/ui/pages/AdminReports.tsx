@@ -29,12 +29,18 @@ export default function AdminReports() {
       fetch("https://localhost:7044/Users/TotalUsers")
         .then(r => r.json())
         .then(d => setTotalUsers(d.totalUsers))
-        .catch(err => console.error("Error fetching total users:", err));
+        .catch(err => {
+          console.error("Error fetching total users:", err);
+          toast.error("Failed to load total users");
+        });
 
       fetch("https://localhost:7044/Users/History")
         .then(r => r.json())
         .then(d => setHistory(d))
-        .catch(err => console.error("Error fetching history:", err));
+        .catch(err => {
+          console.error("Error fetching history:", err);
+          toast.error("Failed to load activity history");
+        });
 
       fetch("https://localhost:7044/Purchase/Stats")
         .then(r => r.json())
@@ -42,7 +48,10 @@ export default function AdminReports() {
           setTotalSales(d.totalSales);
           setTotalRevenue(d.totalRevenue);
         })
-        .catch(err => console.error("Error fetching stats:", err));
+        .catch(err => {
+          console.error("Error fetching stats:", err);
+          toast.error("Failed to load stats");
+        });
     } else {
       const now = new Date();
       const y = filterMode === "current" ? now.getFullYear() : year;
@@ -51,12 +60,18 @@ export default function AdminReports() {
       fetch(`https://localhost:7044/Users/TotalUsersByMonth?year=${y}&month=${m}`)
         .then(r => r.json())
         .then(d => setTotalUsers(d.totalUsers))
-        .catch(err => console.error("Error fetching monthly users:", err));
+        .catch(err => {
+          console.error("Error fetching monthly users:", err);
+          toast.error("Failed to load users for selected period");
+        });
 
       fetch(`https://localhost:7044/Users/HistoryByMonth?year=${y}&month=${m}`)
         .then(r => r.json())
         .then(d => setHistory(d))
-        .catch(err => console.error("Error fetching monthly history:", err));
+        .catch(err => {
+          console.error("Error fetching monthly history:", err);
+          toast.error("Failed to load activity for selected period");
+        });
 
       fetch(`https://localhost:7044/Purchase/StatsByMonth?year=${y}&month=${m}`)
         .then(r => r.json())
@@ -64,12 +79,16 @@ export default function AdminReports() {
           setTotalSales(d.totalSales);
           setTotalRevenue(d.totalRevenue);
         })
-        .catch(err => console.error("Error fetching monthly stats:", err));
+        .catch(err => {
+          console.error("Error fetching monthly stats:", err);
+          toast.error("Failed to load stats for selected period");
+        });
     }
     setPage(1);
   }, [filterMode, month, year]);
 
   if (loggedUser?.role !== "admin") {
+    toast.error("Access denied: Admins only");
     return <p className="text-center mt-10 text-red-500">Access denied</p>;
   }
 
