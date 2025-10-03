@@ -47,45 +47,70 @@ export default function Navigation() {
         </Link>
       </div>
 
-      {/* Derecha: Links + Logout */}
-      <div className="flex items-center gap-6">
-        {loggedUser && (
-          <>
-            {loggedUser.role === "admin" && (
+      {/* Derecha: Auth-aware actions */}
+      <div className="flex items-center gap-3 md:gap-4">
+        {(() => {
+          const path = routerState.location.pathname.toLowerCase();
+          const isLanding = path === "/" || path === "/landingpage";
+
+          if (loggedUser) {
+            return (
+              <>
+                {loggedUser.role === "admin" && (
+                  <Link
+                    to="/AdminUsers"
+                    className="text-gray-300 hover:text-lime-400 transition-colors duration-200"
+                  >
+                    AdminUsers
+                  </Link>
+                )}
+
+                <Link
+                  to="/HomePage"
+                  className="text-gray-300 hover:text-lime-400 transition-colors duration-200"
+                >
+                  DisasterMatch
+                </Link>
+
+                <Link
+                  to="/Profile"
+                  className="text-gray-300 hover:text-lime-400 transition-colors duration-200"
+                >
+                  <img
+                    src="/avatars/default1.png"
+                    alt="Default Avatar"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-gray-300"
+                  />
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200"
+                >
+                  Logout
+                </button>
+              </>
+            );
+          }
+
+          // Not logged in
+          return isLanding ? (
+            <div className="flex items-center gap-3 md:gap-4">
               <Link
-                to="/AdminUsers"
-                className="text-gray-300 hover:text-lime-400 transition-colors duration-200"
+                to="/Login"
+                className="px-4 py-2 text-sm md:text-base border border-indigo-500 text-indigo-400 hover:text-white hover:bg-indigo-600 rounded-lg transition-colors duration-200"
               >
-                AdminUsers
+                Login
               </Link>
-            )}
-
-            <Link
-              to="/HomePage"
-              className="text-gray-300 hover:text-lime-400 transition-colors duration-200"
-            >
-              DisasterMatch
-            </Link>
-
-            <Link
-              to="/Profile"
-              className="text-gray-300 hover:text-lime-400 transition-colors duration-200"
-            >
-              <img
-                src="/avatars/default1.png"
-                alt="Default Avatar"
-                className="w-10 h-10 rounded-full object-cover border-2 border-gray-300"
-              />
-            </Link>
-
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200"
-            >
-              Logout
-            </button>
-          </>
-        )}
+              <Link
+                to="/Register"
+                className="px-4 py-2 text-sm md:text-base bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200"
+              >
+                Register
+              </Link>
+            </div>
+          ) : null;
+        })()}
       </div>
     </nav>
   );

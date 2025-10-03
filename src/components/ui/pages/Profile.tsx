@@ -15,6 +15,7 @@ type User = {
   phone: string;
   company: string;
   user_password?: string;
+  user_address?: string;
 };
 
 const API_URL = "https://localhost:7044/Users";
@@ -57,7 +58,13 @@ const Profile = () => {
   const [user, setUser] = useState<User | null>();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  // Change password box state
+  const [pwdCurrent, setPwdCurrent] = useState("");
+  const [pwdNew, setPwdNew] = useState("");
+  const [pwdConfirm, setPwdConfirm] = useState("");
+  const [pwdLoading, setPwdLoading] = useState(false);
   const [formData, setFormData] = useState<User | null>();
+  const [userPasswordRaw, setUserPasswordRaw] = useState<string | undefined>(undefined);
   const loggedUser = getLoggedUser();
   const phoneInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -73,8 +80,10 @@ const Profile = () => {
         email: data.email,
         phone: formatPhone(String(data.phone || "")),
         company: data.company,
-        user_password: data.user_password || "*******",
+        user_password: data.user_password ? "*******" : undefined,
+        user_address: data.user_address ?? "",
       };
+      setUserPasswordRaw(data.user_password);
       setUser(userData);
       setFormData(userData);
     } catch {
@@ -152,26 +161,26 @@ const Profile = () => {
     const cleanPhone = formData.phone.startsWith("+")
       ? "+" + formData.phone.slice(1).replace(/[\s-]/g, "")
       : formData.phone.replace(/[\s-]/g, "");
+    // Do not include password here; password changes are handled in a separate box
+    // Send minimal fields to reduce backend validation issues
     const payload = {
       ID: formData.ID,
       f_name: formData.f_name,
       l_name: formData.l_name,
       username: formData.username,
       email: formData.email,
-      user_password:
-        formData.user_password && formData.user_password !== "*******"
-          ? formData.user_password
-          : user?.user_password || "1234",
       phone: cleanPhone,
-      user_address: "",
       company: formData.company,
-      remember_token: "",
-      fechaRegistro: new Date().toISOString(),
+      user_address: formData.user_address ?? "",
     };
     try {
-      const res = await fetch(`${API_URL}/Update`, {
+      const token = localStorage.getItem("authToken");
+      let res = await fetch(`${API_URL}/Update`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(payload),
       });
       if (res.ok) {
@@ -179,10 +188,88 @@ const Profile = () => {
         setUser({ ...(formData as User) });
         setIsEditing(false);
       } else {
-        toast.error("Error updating profile");
+        // Attempt compatibility retry if backend still requires fields
+        let text = await res.text().catch(() => "");
+        let retried = false;
+        try {
+          const json = JSON.parse(text);
+          const errors = json?.errors || {};
+          if ((errors.user_password || errors.user_address) && !retried) {
+            retried = true;
+            const compatPayload = {
+              ...payload,
+              user_password: userPasswordRaw || "********",
+              user_address: (formData.user_address && formData.user_address.trim() !== "") ? formData.user_address : "N/A",
+            };
+            res = await fetch(`${API_URL}/Update`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify(compatPayload),
+            });
+            if (res.ok) {
+              toast.success("Profile updated successfully");
+              setUser({ ...(formData as User) });
+              setIsEditing(false);
+              return;
+            }
+            text = await res.text().catch(() => text);
+          }
+        } catch {
+          // ignore JSON parse errors
+        }
+        console.error("Profile update failed", { status: res.status, payload, error: text });
+        toast.error(text || "Error updating profile");
       }
     } catch {
       toast.error("Error updating profile");
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!user?.ID && !(getLoggedUser() as any)?.id) {
+      toast.error("You must be logged in to change password");
+      return;
+    }
+    if (!pwdCurrent || !pwdNew || !pwdConfirm) {
+      toast.error("Please fill in all password fields");
+      return;
+    }
+    if (pwdNew.length < 6) {
+      toast.error("New password must be at least 6 characters");
+      return;
+    }
+    if (pwdNew !== pwdConfirm) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    if (pwdNew === pwdCurrent) {
+      toast.error("New password must be different from current password");
+      return;
+    }
+    try {
+      setPwdLoading(true);
+      const userId = (user as any)?.ID ?? (getLoggedUser() as any)?.id;
+      // New backend route: POST /Users/ChangePassword with { userId, currentPassword, newPassword }
+      const res = await fetch(`${API_URL}/ChangePassword`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, currentPassword: pwdCurrent, newPassword: pwdNew }),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || "Failed to change password");
+      }
+      toast.success("Password updated successfully");
+      setPwdCurrent("");
+      setPwdNew("");
+      setPwdConfirm("");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error changing password");
+    } finally {
+      setPwdLoading(false);
     }
   };
 
@@ -339,6 +426,7 @@ const Profile = () => {
                         { name: "username", label: "Username", readOnly: true },
                         { name: "email", label: "Email", inputType: "email" },
                         { name: "phone", label: "Phone", inputType: "tel", placeHolder: "+1 xxx xxx xxxx" },
+                        { name: "user_address", label: "Address", inputType: "text" },
                         { name: "company", label: "Company", inputType: "text" },
                       ].map((field) => (
                         <label key={field.name} className="flex flex-col text-sm font-medium">
@@ -359,21 +447,6 @@ const Profile = () => {
                           />
                         </label>
                       ))}
-                      <label className="flex flex-col text-sm font-medium">
-                        New Password
-                        <input
-                          type="password"
-                          name="user_password"
-                          placeholder="Enter new password (optional)"
-                          value={
-                            formData?.user_password && formData.user_password !== "*******"
-                              ? formData.user_password
-                              : ""
-                          }
-                          onChange={handleChange}
-                          className="mt-1 border rounded-lg px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition duration-200"
-                        />
-                      </label>
                     </form>
                   )}
                   {!isEditing && (
@@ -398,6 +471,51 @@ const Profile = () => {
                 </div>
               )}
             </section>
+          </div>
+        </div>
+        {/* Change Password Box */}
+        <div className="rounded-2xl bg-white shadow-sm border border-gray-200 mt-6 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h2>
+          <div className="grid gap-4 max-w-md">
+            <label className="flex flex-col text-sm font-medium">
+              Current Password
+              <input
+                type="password"
+                value={pwdCurrent}
+                onChange={(e) => setPwdCurrent(e.target.value)}
+                className="mt-1 border rounded-lg px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition duration-200"
+              />
+            </label>
+            <label className="flex flex-col text-sm font-medium">
+              New Password
+              <input
+                type="password"
+                value={pwdNew}
+                onChange={(e) => setPwdNew(e.target.value)}
+                className="mt-1 border rounded-lg px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition duration-200"
+              />
+            </label>
+            <label className="flex flex-col text-sm font-medium">
+              Confirm New Password
+              <input
+                type="password"
+                value={pwdConfirm}
+                onChange={(e) => setPwdConfirm(e.target.value)}
+                className="mt-1 border rounded-lg px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition duration-200"
+              />
+            </label>
+            <div>
+              <button
+                onClick={handleChangePassword}
+                disabled={pwdLoading}
+                className={`px-4 py-2 rounded-lg text-white font-medium transition ${
+                  pwdLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
+                }`}
+              >
+                {pwdLoading ? 'Updating…' : 'Update Password'}
+              </button>
+            </div>
+            <p className="text-xs text-gray-500">For security, please enter your current password and confirm the new password.</p>
           </div>
         </div>
       </div>
