@@ -157,6 +157,17 @@ export default function AdminUsers() {
                   <span className="font-medium">DisasterMatch</span>
                 </Link>
 
+                 <Link
+                  to="/AdminReports"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                  activeProps={{
+                    className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                  }}
+                >
+                  <BarChart className="h-5 w-5" />
+                  <span className="font-medium">Dashboard</span>
+                </Link>
+
                 <Link
                   to="/Profile"
                   className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
@@ -179,16 +190,7 @@ export default function AdminUsers() {
                   <span className="font-medium">Users</span>
                 </Link>
 
-                <Link
-                  to="/AdminReports"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                  activeProps={{
-                    className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
-                  }}
-                >
-                  <BarChart className="h-5 w-5" />
-                  <span className="font-medium">Dashboard</span>
-                </Link>
+               
               </nav>
             </aside>
 

@@ -58,10 +58,10 @@ export default function Navigation() {
               <>
                 {loggedUser.role === "admin" && (
                   <Link
-                    to="/AdminUsers"
+                    to="/AdminReports"
                     className="text-gray-300 hover:text-lime-400 transition-colors duration-200"
                   >
-                    AdminUsers
+                    Admin Panel
                   </Link>
                 )}
 

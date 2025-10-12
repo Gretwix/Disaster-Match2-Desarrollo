@@ -12,5 +12,46 @@
 	transform-origin: 0 0;
 	transform: scale(1.4);
 }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-/* Keep layout constraints but scale paddings/margins written in rem will follow root font-size. */
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes orbGlow {
+  0% {
+    background-position: 0% 50%;
+    box-shadow: 0 0 20px rgba(91, 61, 253, 0.6), 0 0 40px rgba(71, 44, 186, 0.3);
+  }
+  50% {
+    background-position: 100% 50%;
+    box-shadow: 0 0 30px rgba(91, 61, 253, 0.8), 0 0 60px rgba(71, 44, 186, 0.5);
+  }
+  100% {
+    background-position: 0% 50%;
+    box-shadow: 0 0 20px rgba(91, 61, 253, 0.6), 0 0 40px rgba(71, 44, 186, 0.3);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.animate-orbGlow {
+  background-size: 300% 300%;
+  animation: orbGlow 5s ease-in-out infinite;
+}
+
+.animate-pulseGlow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}

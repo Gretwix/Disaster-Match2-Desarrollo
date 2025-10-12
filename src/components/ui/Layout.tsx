@@ -4,6 +4,7 @@
 
 // Importamos ReactNode que permite aceptar cualquier contenido como children.
 import type { ReactNode } from "react";
+import ChatBubble from "./ChatBubble";
 
 // Definimos las props que acepta este componente.
 // children: cualquier contenido JSX que será renderizado dentro del layout.
@@ -19,6 +20,7 @@ export default function Layout({ children }: LayoutProps) {
     // Esto evita que páginas pequeñas dejen espacios blancos innecesarios.
     <div className="min-h-screen bg-gray-50">
       {children}
+       <ChatBubble />
     </div>
   );
 }
