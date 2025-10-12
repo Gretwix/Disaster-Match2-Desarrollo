@@ -10,7 +10,7 @@ export default function ChatBubble() {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Auto scroll
+  // Auto scroll al final del chat
   useEffect(() => {
     if (messagesEndRef.current) {
       const timeout = setTimeout(() => {
@@ -20,6 +20,7 @@ export default function ChatBubble() {
     }
   }, [messages, loading, open]);
 
+  // Enviar mensaje al backend y manejar respuesta/escalamiento
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -37,23 +38,20 @@ export default function ChatBubble() {
 
       const data = await res.json();
 
-      // 👇 New logic for escalation
-     if (data.escalate) {
-  setMessages((prev) => [
-    ...prev,
-    { sender: "bot", text: data.reply },
-    {
-      sender: "bot",
-      text: `
-💜 [Telegram Support](https://t.me/dghlhg)<br>
- ✉️ [Email Us](https://mail.google.com/mail/?view=cm&fs=1&to=disastermatch@gmail.com&su=Support%20Request%20from%20DisasterMatch&body=Hello%2C%20I%20have%20a%20question%20about%20my%20account.%20Please%20help%20me%20with%3A%20)
+      if (data.escalate) {
+        setMessages((prev) => [
+          ...prev,
+          { sender: "bot", text: data.reply },
+          {
+            sender: "bot",
+            text: `
+                💜 [Telegram Support](https://t.me/dghlhg)<br>
+                ✉️ [Email Us](https://mail.google.com/mail/?view=cm&fs=1&to=disastermatch@gmail.com&su=Support%20Request%20from%20DisasterMatch&body=Hello%2C%20I%20have%20a%20question%20about%20my%20account.%20Please%20help%20me%20with%3A%20)
 
-📱 [WhatsApp Chat](https://wa.me/50685988448?text=Hello%2C%20I%20need%20help%20with%20my%20DisasterMatch%20account.)
-      `,
-    },
-  ]);
-
-
+                📱 [WhatsApp Chat](https://wa.me/50685988448?text=Hello%2C%20I%20need%20help%20with%20my%20DisasterMatch%20account.)
+            `,
+          },
+        ]);
       } else {
         const botMsg: Message = {
           sender: "bot",
@@ -74,7 +72,7 @@ export default function ChatBubble() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Botón flotante */}
       <button
         onClick={() => setOpen(!open)}
         className="group fixed bottom-6 right-6 text-white p-5 rounded-full shadow-[0_0_25px_rgba(91,61,253,0.6)] 
@@ -88,7 +86,7 @@ export default function ChatBubble() {
         </span>
       </button>
 
-      {/* Chat Window */}
+      {/* Ventana del chat */}
       {open && (
         <div className="fixed bottom-24 right-6 w-80 sm:w-96 bg-white rounded-2xl border border-gray-200 shadow-2xl flex flex-col overflow-hidden animate-fadeIn z-[9999]">
           {/* Header */}
@@ -104,7 +102,7 @@ export default function ChatBubble() {
             </button>
           </div>
 
-          {/* Messages */}
+          {/* Mensajes */}
           <div className="flex-1 overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3 max-h-96 scroll-smooth">
             {messages.length === 0 && (
               <p className="text-gray-400 text-center text-sm mt-10">
