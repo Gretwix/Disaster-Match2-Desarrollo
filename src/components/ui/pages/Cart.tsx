@@ -57,6 +57,34 @@ export default function CartPage() {
     }
   }, []);
 
+  // Migrar títulos existentes del carrito a event_type
+  useEffect(() => {
+    const migrateTitles = async () => {
+      if (!cartItems.length) return;
+      try {
+        const res = await fetch("https://localhost:7044/Leads/List");
+        const leads: Array<{ id: number; event_type: string }> = await res.json();
+        const byId = new Map(leads.map((l) => [l.id, l.event_type]));
+        let changed = false;
+        const next = cartItems.map((ci) => {
+          const et = byId.get(ci.id);
+          if (et && ci.title !== et) {
+            changed = true;
+            return { ...ci, title: et };
+          }
+          return ci;
+        });
+        if (changed) {
+          saveCart(next);
+        }
+      } catch {
+        // ignore migration failures
+      }
+    };
+    migrateTitles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const total = useMemo(
     () => cartItems.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0),
     [cartItems]

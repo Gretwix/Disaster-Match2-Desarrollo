@@ -95,7 +95,7 @@ export default function HomePage() {
       if (prev.some((i) => i.id === lead.id)) return prev;
       return [
         ...prev,
-        { id: lead.id, title: lead.full_address, price, quantity: 1 },
+        { id: lead.id, title: lead.event_type, price, quantity: 1 },
       ];
     });
   };
@@ -107,6 +107,23 @@ export default function HomePage() {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
+
+  // Migrar títulos del carrito a event_type cuando tengamos leads cargados
+  useEffect(() => {
+    if (!leads.length || !cart.length) return;
+    setCart((prev) => {
+      let changed = false;
+      const next = prev.map((item) => {
+        const lead = leads.find((l) => l.id === item.id);
+        if (lead && item.title !== lead.event_type) {
+          changed = true;
+          return { ...item, title: lead.event_type };
+        }
+        return item;
+      });
+      return changed ? next : prev;
+    });
+  }, [leads]);
 
   // Filtros + búsqueda y ordenamiento
   const filteredLeads = useMemo(() => {
@@ -142,7 +159,7 @@ export default function HomePage() {
     [cart]
   );
 
-  // Paginación
+  // Paginación 
   const startIndex = (page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedLeads = filteredLeads.slice(startIndex, endIndex);

@@ -289,7 +289,7 @@ const Profile = () => {
             allLeads = allLeads.concat(
               purchase.leads.map((l: any) => ({
                 id: l.lead_id,
-                title: l.lead?.full_address || l.lead_id,
+                title: l.lead?.event_type || l.lead_id,
                 price: purchase.amount,
               }))
             );
