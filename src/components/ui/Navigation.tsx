@@ -13,6 +13,7 @@ export default function Navigation() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const [isTouch, setIsTouch] = useState(false);
+  const closeTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     setLoggedUserState(getLoggedUser());
@@ -34,6 +35,27 @@ export default function Navigation() {
     navigate({ to: "/" });
   };
 
+  // Hover intent helpers for stable open/close
+  const clearCloseTimer = () => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const openProfile = () => {
+    clearCloseTimer();
+    setIsProfileOpen(true);
+  };
+
+  const closeProfileWithDelay = (delay = 180) => {
+    clearCloseTimer();
+    closeTimerRef.current = window.setTimeout(() => {
+      setIsProfileOpen(false);
+      closeTimerRef.current = null;
+    }, delay);
+  };
+
   // Close on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -45,6 +67,9 @@ export default function Navigation() {
     if (isProfileOpen) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isProfileOpen]);
+
+  // Cleanup timer on unmount
+  useEffect(() => () => clearCloseTimer(), []);
 
   return (
     <nav className="relative z-40 flex items-center justify-between bg-gray-900/95 backdrop-blur-md px-6 py-3 shadow-md">
@@ -99,10 +124,10 @@ export default function Navigation() {
 
                 {/* Profile dropdown */}
                 <div
-                  className="relative"
+                  className="relative pb-2" // pad bottom to avoid hover gap between button and menu
                   ref={profileRef}
-                  onMouseEnter={!isTouch ? () => setIsProfileOpen(true) : undefined}
-                  onMouseLeave={!isTouch ? () => setIsProfileOpen(false) : undefined}
+                  onMouseEnter={!isTouch ? openProfile : undefined}
+                  onMouseLeave={!isTouch ? () => closeProfileWithDelay() : undefined}
                 >
                   <button
                     type="button"
@@ -121,11 +146,13 @@ export default function Navigation() {
                     <div
                       role="menu"
                       className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-sm p-2 z-50"
+                      onMouseEnter={!isTouch ? openProfile : undefined}
+                      onMouseLeave={!isTouch ? () => closeProfileWithDelay() : undefined}
                     >
                       <Link
                         to="/Profile"
                         onClick={() => setIsProfileOpen(false)}
-                        className="block w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100"
+                        className="block w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-200"
                       >
                         Profile
                       </Link>
@@ -135,7 +162,7 @@ export default function Navigation() {
                           setIsProfileOpen(false);
                           handleLogout();
                         }}
-                        className="block w-full text-left px-3 py-2 text-sm text-red-600 rounded-md hover:bg-red-50"
+                        className="block w-full text-left px-3 py-2 text-sm text-red-600 rounded-md hover:bg-red-500 hover:text-white"
                       >
                         Logout
                       </button>
