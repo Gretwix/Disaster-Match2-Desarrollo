@@ -22,12 +22,7 @@ export default function Footer() {
           <h3 className="text-white font-semibold mb-2">Help</h3>
           <ul className="space-y-1 text-sm">
             <li>
-              <Link to="/" className="hover:text-white transition">
-                Help Center
-              </Link>
-            </li>
-            <li>
-              <Link to="/" className="hover:text-white transition">
+              <Link to="/FAQ" className="hover:text-white transition">
                 FAQ
               </Link>
             </li>
