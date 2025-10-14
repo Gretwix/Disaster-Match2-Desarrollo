@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as TermsOfUseRouteImport } from './routes/TermsOfUse'
 import { Route as ResetPasswordRouteImport } from './routes/ResetPassword'
@@ -27,6 +28,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout/success'
 import { Route as CheckoutCancelRouteImport } from './routes/checkout/cancel'
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/ResetPassword': typeof ResetPasswordRoute
   '/TermsOfUse': typeof TermsOfUseRoute
   '/about': typeof AboutRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/success': typeof CheckoutSuccessRoute
 }
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/ResetPassword': typeof ResetPasswordRoute
   '/TermsOfUse': typeof TermsOfUseRoute
   '/about': typeof AboutRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/success': typeof CheckoutSuccessRoute
 }
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/ResetPassword': typeof ResetPasswordRoute
   '/TermsOfUse': typeof TermsOfUseRoute
   '/about': typeof AboutRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/success': typeof CheckoutSuccessRoute
 }
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/ResetPassword'
     | '/TermsOfUse'
     | '/about'
+    | '/verify-email'
     | '/checkout/cancel'
     | '/checkout/success'
   fileRoutesByTo: FileRoutesByTo
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/ResetPassword'
     | '/TermsOfUse'
     | '/about'
+    | '/verify-email'
     | '/checkout/cancel'
     | '/checkout/success'
   id:
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '/ResetPassword'
     | '/TermsOfUse'
     | '/about'
+    | '/verify-email'
     | '/checkout/cancel'
     | '/checkout/success'
   fileRoutesById: FileRoutesById
@@ -247,12 +259,20 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsOfUseRoute: typeof TermsOfUseRoute
   AboutRoute: typeof AboutRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -391,6 +411,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   TermsOfUseRoute: TermsOfUseRoute,
   AboutRoute: AboutRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
 }

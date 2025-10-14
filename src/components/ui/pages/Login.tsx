@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Mail, Lock } from "react-feather";
+import { notifyError, notifySuccess } from "../../../utils/notify";
+
+const API_BASE = "https://localhost:7044";
+const API_BASE_HTTP = "http://localhost:7044";
 
 export default function Login() {
   // Estados para los campos del formulario y mensajes
@@ -21,15 +25,35 @@ export default function Login() {
 
     try {
       // Realiza la petición al endpoint de login
-      const res = await fetch("https://localhost:7044/Users/Login", {
+      let res = await fetch(`${API_BASE}/Users/Login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+      if (!res.ok && res.type === 'opaque') {
+        // no-cors scenario; continue to error below
+      }
+      if (res.status === 0) {
+        // network error, attempt HTTP fallback
+        try {
+          res = await fetch(`${API_BASE_HTTP}/Users/Login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+        } catch {}
+      }
 
       // Si las credenciales son incorrectas
       if (res.status === 401) {
-        setError("Invalid email or password");
+        // Try to parse message to differentiate unverified email
+        const text = await res.text().catch(() => "");
+        const msg = text || "Invalid email or password";
+        if (msg.toLowerCase().includes("verify") || msg.toLowerCase().includes("not verified")) {
+          setError("Email not verified. Please verify your email to continue.");
+        } else {
+          setError("Invalid email or password");
+        }
         return;
       }
 
@@ -59,6 +83,39 @@ export default function Login() {
     } catch (err) {
       console.error("Login error:", err);
       setError("Server connection error");
+    }
+  };
+
+  const resendVerification = async () => {
+    if (!email) {
+      notifyError("Please enter your email first");
+      return;
+    }
+    try {
+      let res = await fetch(`${API_BASE}/Users/ResendVerification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        try {
+          res = await fetch(`${API_BASE_HTTP}/Users/ResendVerification`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+        } catch {}
+      }
+      if (res.ok) {
+        const text = await res.text().catch(() => "");
+        notifySuccess(text || "Verification email resent. Check your inbox.");
+      } else {
+        const text = await res.text().catch(() => "");
+        notifyError(text || `Could not resend email (${res.status}).`);
+      }
+    } catch (err) {
+      console.error("ResendVerification error:", err);
+      notifyError("Network error while resending email");
     }
   };
 
@@ -139,9 +196,22 @@ export default function Login() {
 
           {/* Mensaje de error si ocurre */}
           {error && (
-            <p className="text-red-500 text-sm font-medium text-center">
-              {error}
-            </p>
+            <div className="text-center space-y-2">
+              <p className="text-red-500 text-sm font-medium">{error}</p>
+              {error.toLowerCase().includes("verify") && (
+                <div className="text-sm">
+                  <button
+                    type="button"
+                    onClick={resendVerification}
+                    className="text-indigo-600 hover:text-indigo-500"
+                  >
+                    Resend verification email
+                  </button>
+                  <span className="text-gray-400 mx-2">·</span>
+                  <a href="/verify-email" className="text-indigo-600 hover:text-indigo-500">Enter verification page</a>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Botón de login */}

@@ -30,9 +30,36 @@ export default function Navigation() {
   }, []);
 
   const handleLogout = () => {
-    clearLoggedUser();
-    setLoggedUserState(null);
-    navigate({ to: "/" });
+    // Send logout to server with raw token in Authorization header
+    const doLogout = async () => {
+      try {
+        const token = (getLoggedUser() as any)?.token || localStorage.getItem("authToken");
+        if (token) {
+          const doRequest = async (url: string) => fetch(url, {
+            method: "POST",
+            headers: {
+              // Raw GUID token with no Bearer prefix per backend requirement
+              Authorization: token,
+            },
+          });
+          try {
+            await doRequest("https://localhost:7044/Users/Logout");
+          } catch {
+            // try HTTP fallback
+            try { await doRequest("http://localhost:7044/Users/Logout"); } catch {}
+          }
+        }
+      } catch (err) {
+        // Ignore network errors on logout
+        console.warn("Logout request failed", err);
+      } finally {
+        clearLoggedUser();
+        localStorage.removeItem("authToken");
+        setLoggedUserState(null);
+        navigate({ to: "/" });
+      }
+    };
+    void doLogout();
   };
 
   // Hover intent helpers for stable open/close

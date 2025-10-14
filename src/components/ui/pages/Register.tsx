@@ -47,13 +47,37 @@ export default function Register() {
    * @param user Objeto con los datos del usuario
    */
   async function apiRegister(user: User) {
-    const res = await fetch(`${API_URL}/Save`, {
-      method: "PUT",
+    // Try POST first (new flow). If 405, retry with PUT for backward compatibility.
+    // Also attempt HTTP fallback if HTTPS is unreachable.
+    const makeUrl = (proto: 'https' | 'http') => `${proto}://localhost:7044/Users/Save`;
+    const opts = (method: 'POST' | 'PUT') => ({
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user),
-    });
-    if (!res.ok) throw new Error("Server connection error");
-    return await res.text();
+    } as RequestInit);
+
+    // Attempt HTTPS POST
+    try {
+      const res = await fetch(makeUrl('https'), opts('POST'));
+      if (res.status === 405) {
+        // Retry with PUT on HTTPS
+        const resPut = await fetch(makeUrl('https'), opts('PUT'));
+        return resPut;
+      }
+      return res;
+    } catch {
+      // HTTPS failed (connection refused, etc.) — try HTTP
+      try {
+        const res = await fetch(makeUrl('http'), opts('POST'));
+        if (res.status === 405) {
+          const resPut = await fetch(makeUrl('http'), opts('PUT'));
+          return resPut;
+        }
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    }
   }
 
   /**
@@ -116,18 +140,21 @@ export default function Register() {
 
     try {
       // Llama a la API para registrar el usuario
-      const msg = await apiRegister(newUser);
+      const res = await apiRegister(newUser);
 
-      // Maneja la respuesta del backend
-      if (msg.includes("almacenado correctamente")) {
-        setSuccess("User registered successfully!");
-        setTimeout(() => navigate({ to: "/Login" }), 1500);
-      } else if (msg.includes("Email already in use")) {
-        setError("Email is already registered");
-      } else if (msg.includes("Username already in use")) {
-        setError("Username is already taken");
+      if (res.ok) {
+        // Success even if not active yet – show instruction to verify email
+        setSuccess("Registration successful. Check your email to verify your account.");
+        // Do NOT auto-login; prompt user to go to login after verifying
       } else {
-        setError("Registration failed. Please try again.");
+        const text = await res.text().catch(() => "");
+        if (res.status === 409 && text.toLowerCase().includes("email")) {
+          setError("Email is already registered");
+        } else if (res.status === 409 && text.toLowerCase().includes("username")) {
+          setError("Username is already taken");
+        } else {
+          setError(text || "Registration failed. Please try again.");
+        }
       }
     } catch (err) {
       console.error("Register error:", err);
@@ -417,7 +444,17 @@ export default function Register() {
                 <p className="text-red-500 text-sm font-medium text-center">{error}</p>
               )}
               {success && (
-                <p className="text-green-600 text-sm font-medium text-center">{success}</p>
+                <div className="text-center space-y-2">
+                  <p className="text-green-600 text-sm font-medium">{success}</p>
+                  <p className="text-gray-600 text-xs">Didn’t get the email? You can resend it from the verification page.</p>
+                  <button
+                    type="button"
+                    onClick={() => navigate({ to: "/verify-email" })}
+                    className="text-indigo-600 hover:text-indigo-500 text-sm"
+                  >
+                    Go to verification page
+                  </button>
+                </div>
               )}
 
               {/* Botón para enviar el formulario */}
@@ -444,7 +481,7 @@ export default function Register() {
           <p className="text-sm text-gray-500">
             Already have an account?{" "}
             <a
-              href="/login"
+              href="/Login"
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
               Sign in
