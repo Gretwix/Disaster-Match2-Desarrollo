@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as TermsOfUseRouteImport } from './routes/TermsOfUse'
 import { Route as ResetPasswordRouteImport } from './routes/ResetPassword'
 import { Route as RegisterRouteImport } from './routes/Register'
 import { Route as ProfileRouteImport } from './routes/Profile'
@@ -29,6 +30,11 @@ import { Route as CheckoutCancelRouteImport } from './routes/checkout/cancel'
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsOfUseRoute = TermsOfUseRouteImport.update({
+  id: '/TermsOfUse',
+  path: '/TermsOfUse',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/Profile': typeof ProfileRoute
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
+  '/TermsOfUse': typeof TermsOfUseRoute
   '/about': typeof AboutRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/success': typeof CheckoutSuccessRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/Profile': typeof ProfileRoute
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
+  '/TermsOfUse': typeof TermsOfUseRoute
   '/about': typeof AboutRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/success': typeof CheckoutSuccessRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/Profile': typeof ProfileRoute
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
+  '/TermsOfUse': typeof TermsOfUseRoute
   '/about': typeof AboutRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
   '/checkout/success': typeof CheckoutSuccessRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/Profile'
     | '/Register'
     | '/ResetPassword'
+    | '/TermsOfUse'
     | '/about'
     | '/checkout/cancel'
     | '/checkout/success'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/Profile'
     | '/Register'
     | '/ResetPassword'
+    | '/TermsOfUse'
     | '/about'
     | '/checkout/cancel'
     | '/checkout/success'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/Profile'
     | '/Register'
     | '/ResetPassword'
+    | '/TermsOfUse'
     | '/about'
     | '/checkout/cancel'
     | '/checkout/success'
@@ -233,6 +245,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TermsOfUseRoute: typeof TermsOfUseRoute
   AboutRoute: typeof AboutRoute
   CheckoutCancelRoute: typeof CheckoutCancelRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/TermsOfUse': {
+      id: '/TermsOfUse'
+      path: '/TermsOfUse'
+      fullPath: '/TermsOfUse'
+      preLoaderRoute: typeof TermsOfUseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ResetPassword': {
@@ -369,6 +389,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TermsOfUseRoute: TermsOfUseRoute,
   AboutRoute: AboutRoute,
   CheckoutCancelRoute: CheckoutCancelRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
