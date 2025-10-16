@@ -27,6 +27,82 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState({
+    length: false,
+    upper: false,
+    lower: false,
+    number: false,
+    special: false,
+  });
+
+  // Validate password in real-time
+  const validatePassword = (value: string) => {
+    const validations = {
+      length: value.length >= 8,
+      upper: /[A-Z]/.test(value),
+      lower: /[a-z]/.test(value),
+      number: /[0-9]/.test(value),
+      special: /[@#$%&*!?]/.test(value),
+    };
+    setPasswordStrength(validations);
+
+    if (value === "") {
+      setPasswordError("");
+      return false;
+    }
+
+    if (!Object.values(validations).every(Boolean)) {
+      setPasswordError("Password does not meet requirements");
+      return false;
+    }
+
+    setPasswordError("");
+    return true;
+  };
+
+  // Validate password confirmation
+  const validateConfirmPassword = (value: string) => {
+    if (value !== password) {
+      setError("Passwords do not match");
+      return false;
+    }
+    setError("");
+    return true;
+  };
+
+  // Handle password change
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+    validatePassword(value);
+    if (confirm) {
+      validateConfirmPassword(confirm);
+    }
+  };
+
+  // Handle confirm password change
+  const handleConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setConfirm(value);
+    validateConfirmPassword(value);
+  };
+
+  // Check if form is valid
+  const isFormValid = () => {
+    if (step === 1) {
+      return (
+        email && 
+        username && 
+        password && 
+        confirm && 
+        !passwordError && 
+        !error &&
+        Object.values(passwordStrength).every(Boolean)
+      );
+    }
+    return true;
+  };
 
   // Estado para los campos del paso 2
   const [f_name, setFName] = useState("");
@@ -255,7 +331,7 @@ export default function Register() {
                 />
               </div>
 
-              {/* Campo Password */}
+              {/* Password Field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Password
@@ -265,15 +341,64 @@ export default function Register() {
                   <input
                     type="password"
                     required
-                    className="pl-10 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full py-3 rounded-md"
+                    className={`pl-10 bg-gray-50 border ${
+                      passwordError
+                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                        : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'
+                    } block w-full py-3 rounded-md`}
                     placeholder="••••••••"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                   />
                 </div>
+                <div className="mt-2 space-y-1">
+                  <div className="flex items-center">
+                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                      passwordStrength.length ? 'bg-green-500' : 'bg-gray-200'
+                    }`}></div>
+                    <span className={`text-xs ${passwordStrength.length ? 'text-green-600' : 'text-gray-500'}`}>
+                      At least 8 characters
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                      passwordStrength.upper ? 'bg-green-500' : 'bg-gray-200'
+                    }`}></div>
+                    <span className={`text-xs ${passwordStrength.upper ? 'text-green-600' : 'text-gray-500'}`}>
+                      At least one uppercase letter
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                      passwordStrength.lower ? 'bg-green-500' : 'bg-gray-200'
+                    }`}></div>
+                    <span className={`text-xs ${passwordStrength.lower ? 'text-green-600' : 'text-gray-500'}`}>
+                      At least one lowercase letter
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                      passwordStrength.number ? 'bg-green-500' : 'bg-gray-200'
+                    }`}></div>
+                    <span className={`text-xs ${passwordStrength.number ? 'text-green-600' : 'text-gray-500'}`}>
+                      At least one number
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                      passwordStrength.special ? 'bg-green-500' : 'bg-gray-200'
+                    }`}></div>
+                    <span className={`text-xs ${passwordStrength.special ? 'text-green-600' : 'text-gray-500'}`}>
+                      At least one special character (@, #, $, %, &, *, !, ?)
+                    </span>
+                  </div>
+                </div>
+                {passwordError && (
+                  <p className="mt-1 text-sm text-red-600">{passwordError}</p>
+                )}
               </div>
 
-              {/* Campo Confirmar Password */}
+              {/* Confirm Password Field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Confirm Password
@@ -283,47 +408,57 @@ export default function Register() {
                   <input
                     type="password"
                     required
-                    className="pl-10 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full py-3 rounded-md"
+                    className={`pl-10 bg-gray-50 border ${
+                      error && confirm ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'
+                    } block w-full py-3 rounded-md`}
                     placeholder="••••••••"
                     value={confirm}
-                    onChange={(e) => setConfirm(e.target.value)}
+                    onChange={handleConfirmChange}
                   />
                 </div>
+                {error && confirm && (
+                  <p className="mt-1 text-sm text-red-600">{error}</p>
+                )}
               </div>
 
-              {/* Mensaje de error si ocurre */}
-              {error && (
+              {/* Error message if any */}
+              {error && !confirm && (
                 <p className="text-red-500 text-sm font-medium text-center">{error}</p>
               )}
 
-              {/* Botón para continuar al paso 2, valida campos y duplicados */}
+              {/* Continue Button - Validates fields and checks for duplicates */}
               <button
                 type="button"
+                disabled={!isFormValid()}
                 onClick={async () => {
-                  // Forzar validación HTML5
+                  // Force HTML5 validation
                   const form = document.querySelector("form") as HTMLFormElement;
                   if (!form.checkValidity()) {
                     form.reportValidity();
                     return;
                   }
 
-                  if (!email || !username || !password || !confirm) {
-                    setError("Please fill out all fields");
+                  if (!validatePassword(password)) {
                     return;
                   }
+
                   if (password !== confirm) {
                     setError("Passwords do not match");
                     return;
                   }
 
-                  // Verifica duplicados en el backend
+                  // Check for duplicates in the backend
                   const ok = await checkDuplicates(email, username);
                   if (ok) {
                     setError("");
                     setStep(2);
                   }
                 }}
-                className="w-full py-3 px-4 rounded-md text-white font-medium shadow-sm bg-gradient-to-r from-indigo-600 to-indigo-800 hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
+                className={`w-full py-3 px-4 rounded-md text-white font-medium shadow-sm transition-all duration-200 ${
+                  isFormValid()
+                    ? 'bg-gradient-to-r from-indigo-600 to-indigo-800 hover:scale-[1.02] hover:shadow-lg'
+                    : 'bg-gray-400 cursor-not-allowed'
+                }`}
               >
                 Continue
               </button>

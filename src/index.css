@@ -55,3 +55,61 @@
 .animate-pulseGlow {
   animation: pulseGlow 3s ease-in-out infinite;
 }
+
+/* Global dark mode defaults and common utility overrides */
+/* Ensure forms, scrollbars, inputs follow dark theme */
+.dark { color-scheme: dark; }
+.dark body { background-color: #0b1220; color: #e5e7eb; }
+
+/* Common background overrides */
+.dark .bg-white { background-color: #111827 !important; }
+.dark .bg-gray-50 { background-color: #0b1220 !important; }
+.dark .bg-gray-100 { background-color: #0f172a !important; }
+.dark .bg-gray-200 { background-color: #111827 !important; }
+
+/* Common text overrides */
+.dark .text-black, 
+.dark .text-gray-900 { color: #e5e7eb !important; }
+.dark .text-gray-800 { color: #e2e8f0 !important; }
+.dark .text-gray-700 { color: #cbd5e1 !important; }
+.dark .text-gray-600 { color: #94a3b8 !important; }
+
+/* Common border overrides */
+.dark .border-gray-100 { border-color: #334155 !important; }
+.dark .border-gray-200 { border-color: #334155 !important; }
+.dark .border-gray-300 { border-color: #475569 !important; }
+.dark .border-gray-400 { border-color: #64748b !important; }
+
+/* Inputs, selects, textareas */
+.dark input,
+.dark select,
+.dark textarea { background-color: #0f172a; color: #e5e7eb; border-color: #334155; }
+.dark input::placeholder,
+.dark textarea::placeholder { color: #94a3b8; }
+
+/* Generic card override when using white/gray backgrounds */
+.dark .shadow,
+.dark .shadow-md,
+.dark .shadow-lg { box-shadow: 0 10px 15px -3px rgba(2,6,23,0.6), 0 4px 6px -4px rgba(2,6,23,0.6) !important; }
+
+/* Light-mode helpers to enforce light backgrounds when not in dark mode */
+:root:not(.dark) .force-light-bg-white { background-color: #ffffff !important; }
+:root:not(.dark) .force-light-bg-gray-50 { background-color: #f9fafb !important; }
+:root:not(.dark) .force-light-bg-gray-100 { background-color: #f3f4f6 !important; }
+
+/* Light-mode text helpers */
+:root:not(.dark) .force-light-text { color: #111827 !important; } /* gray-900 */
+:root:not(.dark) .force-light-text-muted { color: #374151 !important; } /* gray-700 */
+
+/* Light-mode primary button helper (mimics 'Edit Profile' button) */
+:root:not(.dark) .force-light-btn-primary {
+  background-color: #2563eb !important; /* blue-600 */
+  color: #ffffff !important;
+  border-radius: 0.5rem !important; /* rounded-lg */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; /* shadow-sm */
+}
+:root:not(.dark) .force-light-btn-primary:hover {
+  background-color: #1d4ed8 !important; /* blue-700 */
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1) !important; /* hover:shadow-md */
+}
+:root:not(.dark) .force-light-icon-contrast { color: #ffffff !important; }

@@ -63,10 +63,82 @@ const Profile = () => {
   const [pwdNew, setPwdNew] = useState("");
   const [pwdConfirm, setPwdConfirm] = useState("");
   const [pwdLoading, setPwdLoading] = useState(false);
+  const [pwdError, setPwdError] = useState("");
+  const [pwdStrength, setPwdStrength] = useState({
+    length: false,
+    upper: false,
+    lower: false,
+    number: false,
+    special: false,
+  });
   const [formData, setFormData] = useState<User | null>();
   const [userPasswordRaw, setUserPasswordRaw] = useState<string | undefined>(undefined);
   const loggedUser = getLoggedUser();
   const phoneInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Validate password in real-time
+  const validatePassword = (value: string) => {
+    const validations = {
+      length: value.length >= 8,
+      upper: /[A-Z]/.test(value),
+      lower: /[a-z]/.test(value),
+      number: /[0-9]/.test(value),
+      special: /[@#$%&*!?]/.test(value),
+    };
+    setPwdStrength(validations);
+
+    if (value === "") {
+      setPwdError("");
+      return false;
+    }
+
+    if (!Object.values(validations).every(Boolean)) {
+      setPwdError("Password does not meet requirements");
+      return false;
+    }
+
+    setPwdError("");
+    return true;
+  };
+
+  // Validate password confirmation
+  const validateConfirmPassword = (value: string) => {
+    if (value !== pwdNew) {
+      setPwdError("New passwords do not match");
+      return false;
+    }
+    setPwdError("");
+    return true;
+  };
+
+  // Handle new password change
+  const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPwdNew(value);
+    validatePassword(value);
+    if (pwdConfirm) {
+      validateConfirmPassword(pwdConfirm);
+    }
+  };
+
+  // Handle confirm password change
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPwdConfirm(value);
+    validateConfirmPassword(value);
+  };
+
+  // Check if password form is valid
+  const isPasswordFormValid = () => {
+    return (
+      pwdCurrent &&
+      pwdNew &&
+      pwdConfirm &&
+      !pwdError &&
+      Object.values(pwdStrength).every(Boolean) &&
+      pwdNew === pwdConfirm
+    );
+  };
 
   const fetchUser = async () => {
     try {
@@ -233,41 +305,73 @@ const Profile = () => {
       toast.error("You must be logged in to change password");
       return;
     }
-    if (!pwdCurrent || !pwdNew || !pwdConfirm) {
-      toast.error("Please fill in all password fields");
+
+    // Validate all fields
+    if (!pwdCurrent) {
+      toast.error("Please enter your current password");
       return;
     }
-    if (pwdNew.length < 6) {
-      toast.error("New password must be at least 6 characters");
+
+    if (!validatePassword(pwdNew)) {
+      toast.error("Please fix the password requirements");
       return;
     }
+
     if (pwdNew !== pwdConfirm) {
-      toast.error("New passwords do not match");
+      setPwdError("New passwords do not match");
       return;
     }
+
     if (pwdNew === pwdCurrent) {
-      toast.error("New password must be different from current password");
+      setPwdError("New password must be different from current password");
       return;
     }
+
     try {
       setPwdLoading(true);
       const userId = (user as any)?.ID ?? (getLoggedUser() as any)?.id;
-      // New backend route: POST /Users/ChangePassword with { userId, currentPassword, newPassword }
+      
       const res = await fetch(`${API_URL}/ChangePassword`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, currentPassword: pwdCurrent, newPassword: pwdNew }),
+        headers: { 
+          "Content-Type": "application/json",
+          ...(localStorage.getItem("authToken") ? { 
+            'Authorization': `Bearer ${localStorage.getItem("authToken")}` 
+          } : {})
+        },
+        body: JSON.stringify({ 
+          userId, 
+          currentPassword: pwdCurrent, 
+          newPassword: pwdNew 
+        }),
       });
+
       if (!res.ok) {
         const text = await res.text().catch(() => "");
         throw new Error(text || "Failed to change password");
       }
-      toast.success("Password updated successfully");
-      setPwdCurrent("");
-      setPwdNew("");
-      setPwdConfirm("");
+
+      const result = await res.json();
+      if (result.success) {
+        toast.success("Password updated successfully");
+        setPwdCurrent("");
+        setPwdNew("");
+        setPwdConfirm("");
+        setPwdError("");
+        setPwdStrength({
+          length: false,
+          upper: false,
+          lower: false,
+          number: false,
+          special: false,
+        });
+      } else {
+        throw new Error(result.message || "Failed to update password");
+      }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Error changing password");
+      const errorMessage = e instanceof Error ? e.message : "Error changing password";
+      setPwdError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setPwdLoading(false);
     }
@@ -306,56 +410,56 @@ const Profile = () => {
   if (loading) return <p className="text-center mt-10">Loading profile...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100">
       <Toaster position="top-right" reverseOrder={false} />
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
-        <div className="rounded-2xl bg-white shadow-sm border border-gray-200">
+        <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
-            <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50/60 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
+            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50/60 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl force-light-bg-gray-50">
               <nav className="space-y-2">
                 <Link
                   to="/"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition force-light-btn-primary"
                 >
-                  <Home className="h-5 w-5" />
+                  <Home className="h-5 w-5 text-gray-900 dark:text-slate-300 force-light-icon-contrast" />
                   <span className="font-medium">DisasterMatch</span>
                 </Link>
 
                 {loggedUser?.role === "admin" && (
                   <Link
                     to="/AdminReports"
-                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition"
                     activeProps={{
-                      className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                      className: "bg-indigo-300 text-black shadow-sm dark:bg-indigo-900/40 dark:text-indigo-300 dark:ring-0",
                     }}
                   >
-                    <BarChart className="h-5 w-5" />
+                    <BarChart className="h-5 w-5 text-gray-900 dark:text-slate-300" />
                     <span className="font-medium">Dashboard</span>
                   </Link>
                 )}
 
                 <Link
                   to="/Profile"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition force-light-btn-primary"
                   activeProps={{
                     className:
-                      "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                      "dark:bg-indigo-900/40 dark:text-indigo-300 dark:ring-0",
                   }}
                 >
-                  <User className="h-5 w-5" />
+                  <User className="h-5 w-5 text-gray-900 dark:text-slate-300 force-light-icon-contrast" />
                   <span className="font-medium">Profile</span>
                 </Link>
                 {loggedUser?.role === "admin" && (
                   <>
                     <Link
                       to="/AdminUsers"
-                      className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition"
                       activeProps={{
                         className:
-                          "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
+                          "bg-indigo-300 text-black shadow-sm dark:bg-indigo-900/40 dark:text-indigo-300 dark:ring-0",
                       }}
                     >
-                      <Users className="h-5 w-5" />
+                      <Users className="h-5 w-5 text-gray-900 dark:text-slate-300" />
                       <span className="font-medium">Users</span>
                     </Link>
                     
@@ -364,11 +468,11 @@ const Profile = () => {
               </nav>
             </aside>
             <section className="p-6 md:p-8">
-              <h1 className="text-2xl font-semibold text-gray-900 mb-6">
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 mb-6 force-light-text">
                 My Profile
               </h1>
               {user && (
-                <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow-sm hover:shadow-md transition duration-200">
+                <div className="mt-6 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0b1220] p-6 shadow-sm hover:shadow-md transition duration-200 force-light-bg-gray-50">
                   <div className="flex items-center mb-4 gap-6">
                     <div className="relative w-32 h-32 flex-shrink-0">
                       <img
@@ -377,7 +481,7 @@ const Profile = () => {
                         className="w-full h-full rounded-full object-cover border-2 border-gray-300"
                       />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-800">
+                    <h3 className="text-xl font-semibold text-gray-800 dark:text-slate-100 force-light-text">
                       {user.f_name} {user.l_name}
                     </h3>
                     {!isEditing ? (
@@ -408,7 +512,7 @@ const Profile = () => {
                     )}
                   </div>
                   {!isEditing ? (
-                    <div className="space-y-3 text-gray-700">
+                    <div className="space-y-3 text-gray-700 dark:text-slate-300 force-light-text-muted">
                       <p>
                         <strong>Username:</strong> {user.username}
                       </p>
@@ -463,7 +567,7 @@ const Profile = () => {
                       ) : (
                         <ul className="list-disc pl-6 space-y-2">
                           {purchasedIncidents.map((item: any) => (
-                            <li key={item.id} className="p-2 rounded-md hover:bg-gray-100 transition duration-200">
+                            <li key={item.id} className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800/60 transition duration-200">
                               <span className="font-medium">{item.title}</span>{" "}
                               — {formatCurrency(item.price)}
                             </li>
@@ -478,8 +582,8 @@ const Profile = () => {
           </div>
         </div>
         {/* Change Password Box */}
-        <div className="rounded-2xl bg-white shadow-sm border border-gray-200 mt-6 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h2>
+        <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 mt-6 p-6 force-light-bg-white">
+          <h2 className="text-lg font-semibold text-black force-light-text dark:text-slate-100 mb-4">Change Password</h2>
           <div className="grid gap-4 max-w-md">
             <label className="flex flex-col text-sm font-medium">
               Current Password
@@ -490,36 +594,95 @@ const Profile = () => {
                 className="mt-1 border rounded-lg px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition duration-200"
               />
             </label>
+            
             <label className="flex flex-col text-sm font-medium">
               New Password
               <input
                 type="password"
                 value={pwdNew}
-                onChange={(e) => setPwdNew(e.target.value)}
-                className="mt-1 border rounded-lg px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition duration-200"
+                onChange={handleNewPasswordChange}
+                className={`mt-1 border ${
+                  pwdNew && pwdError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                } rounded-lg px-3 py-2 shadow-sm transition duration-200`}
               />
             </label>
+            
+            <div className="space-y-1 text-xs">
+              <div className="flex items-center">
+                <div className={`w-2 h-2 rounded-full mr-2 ${
+                  pwdStrength.length ? 'bg-green-500' : 'bg-gray-200'
+                }`}></div>
+                <span className={pwdStrength.length ? 'text-green-600' : 'text-gray-500'}>
+                  At least 8 characters
+                </span>
+              </div>
+              <div className="flex items-center">
+                <div className={`w-2 h-2 rounded-full mr-2 ${
+                  pwdStrength.upper ? 'bg-green-500' : 'bg-gray-200'
+                }`}></div>
+                <span className={pwdStrength.upper ? 'text-green-600' : 'text-gray-500'}>
+                  At least one uppercase letter
+                </span>
+              </div>
+              <div className="flex items-center">
+                <div className={`w-2 h-2 rounded-full mr-2 ${
+                  pwdStrength.lower ? 'bg-green-500' : 'bg-gray-200'
+                }`}></div>
+                <span className={pwdStrength.lower ? 'text-green-600' : 'text-gray-500'}>
+                  At least one lowercase letter
+                </span>
+              </div>
+              <div className="flex items-center">
+                <div className={`w-2 h-2 rounded-full mr-2 ${
+                  pwdStrength.number ? 'bg-green-500' : 'bg-gray-200'
+                }`}></div>
+                <span className={pwdStrength.number ? 'text-green-600' : 'text-gray-500'}>
+                  At least one number
+                </span>
+              </div>
+              <div className="flex items-center">
+                <div className={`w-2 h-2 rounded-full mr-2 ${
+                  pwdStrength.special ? 'bg-green-500' : 'bg-gray-200'
+                }`}></div>
+                <span className={pwdStrength.special ? 'text-green-600' : 'text-gray-500'}>
+                  At least one special character (@, #, $, %, &, *, !, ?)
+                </span>
+              </div>
+            </div>
+
             <label className="flex flex-col text-sm font-medium">
               Confirm New Password
               <input
                 type="password"
                 value={pwdConfirm}
-                onChange={(e) => setPwdConfirm(e.target.value)}
-                className="mt-1 border rounded-lg px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition duration-200"
+                onChange={handleConfirmPasswordChange}
+                className={`mt-1 border ${
+                  pwdConfirm && pwdError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                } rounded-lg px-3 py-2 shadow-sm transition duration-200`}
               />
+              {pwdError && (
+                <p className="mt-1 text-sm text-red-600">{pwdError}</p>
+              )}
             </label>
+
             <div>
               <button
                 onClick={handleChangePassword}
-                disabled={pwdLoading}
-                className={`px-4 py-2 rounded-lg text-white font-medium transition ${
-                  pwdLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
+                disabled={pwdLoading || !isPasswordFormValid()}
+                className={`w-full py-2 px-4 rounded-lg text-white font-medium shadow-sm transition ${
+                  isPasswordFormValid() && !pwdLoading
+                    ? 'bg-indigo-600 hover:bg-indigo-700 hover:scale-[1.02] hover:shadow-md'
+                    : 'bg-gray-400 cursor-not-allowed'
                 }`}
               >
                 {pwdLoading ? 'Updating…' : 'Update Password'}
               </button>
             </div>
-            <p className="text-xs text-gray-500">For security, please enter your current password and confirm the new password.</p>
+            
+            <p className="text-xs text-gray-500">
+              For security, please enter your current password and confirm the new password.
+              Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.
+            </p>
           </div>
         </div>
       </div>
