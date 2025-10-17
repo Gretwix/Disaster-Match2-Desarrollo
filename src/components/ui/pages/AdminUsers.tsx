@@ -157,36 +157,39 @@ export default function AdminUsers() {
     return <p className="text-center mt-10 text-red-500">{t("admin.deleteConfirmTitle")}</p>;
   }
 
-  const sidebarLinkBase = "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition";
-  const sidebarActiveClass = "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900 dark:text-indigo-300";
+  // Match Profile page sidebar styles for consistent contrast in light mode
+  const sidebarLinkBase =
+    "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition";
+  const sidebarActiveClass =
+    "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300";
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100">
       <Toaster position="top-right" reverseOrder={false} />
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
-        <div className="rounded-2xl bg-white shadow-sm border border-gray-200">
+        <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
 
             {/* Sidebar con mismo diseño de Profile */}
-            <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
+            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
                 <Link to="/" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <Home className="h-5 w-5" />
+                  <Home className="h-5 w-5 text-gray-900 dark:text-slate-300" />
                   <span className="font-medium" data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
                 </Link>
 
                 <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <BarChart className="h-5 w-5" />
+                  <BarChart className="h-5 w-5 text-gray-900 dark:text-slate-300" />
                   <span className="font-medium" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
                 </Link>
 
                 <Link to="/Profile" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <User className="h-5 w-5" />
+                  <User className="h-5 w-5 text-gray-900 dark:text-slate-300" />
                   <span className="font-medium" data-i18n="nav.profile">{t("nav.profile")}</span>
                 </Link>
 
                 <Link to="/AdminUsers" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <Users className="h-5 w-5" />
+                  <Users className="h-5 w-5 text-gray-900 dark:text-slate-300" />
                   <span className="font-medium" data-i18n="nav.users">{t("nav.users")}</span>
                 </Link>
               </nav>
@@ -194,9 +197,9 @@ export default function AdminUsers() {
 
             {/* Main content */}
             <section className="p-6 md:p-8">
-              <h1 className="text-2xl font-semibold text-gray-900 mb-6" data-i18n="admin.manageUsers">{t("admin.manageUsers")}</h1>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 mb-6 force-light-text" data-i18n="admin.manageUsers">{t("admin.manageUsers")}</h1>
 
-              <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
+              <div className="mt-6 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0b1220] p-4 sm:p-5">
                 {loading ? (
                   <p className="text-gray-500 text-center" data-i18n="admin.loadingUsers">{t("admin.loadingUsers")}</p>
                 ) : !isEditing ? (
@@ -242,7 +245,7 @@ export default function AdminUsers() {
                   </table>
                 ) : (
                   // Formulario
-                  <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-200">
+                  <div className="p-6 bg-white dark:bg-[#0f172a] rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
                     <h2 className="text-xl font-semibold mb-4">Edit User: {isEditing.username}</h2>
                     <form className="grid gap-4">
                       {[
