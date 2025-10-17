@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 function PaymentForm() {
   const [cardNumber, setCardNumber] = useState("");
@@ -8,13 +9,14 @@ function PaymentForm() {
   const [cvv, setCvv] = useState("");
   const [cardType, setCardType] = useState("visa");
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Obtener usuario logueado
     const loggedUser = JSON.parse(localStorage.getItem("loggedUser") || "null");
     if (!loggedUser || !loggedUser.username) {
-      alert("Debes iniciar sesión para guardar una forma de pago.");
+      alert(t("payment.mustLoginError"));
       navigate({ to: "/Login" });
       return;
     }
@@ -34,14 +36,14 @@ function PaymentForm() {
       paymentMethod
     ];
     localStorage.setItem(key, JSON.stringify(updated));
-    alert("Forma de pago registrada correctamente ✅");
+    alert(t("payment.savedSuccess"));
     navigate({ to: "/Cart" });
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-2xl mx-auto p-6">
-        <h1 className="text-2xl font-semibold mb-6">Add payment method</h1>
+        <h1 className="text-2xl font-semibold mb-6" data-i18n="payment.addPayment">{t("payment.addPayment")}</h1>
 
         <form
           onSubmit={handleSubmit}
@@ -49,9 +51,7 @@ function PaymentForm() {
         >
           {/* Tipo de tarjeta */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Card Type
-            </label>
+            <label className="block mb-2 text-sm font-medium text-gray-700" data-i18n="payment.cardType">{t("payment.cardType")}</label>
             <select
               value={cardType}
               onChange={(e) => setCardType(e.target.value)}
@@ -65,9 +65,7 @@ function PaymentForm() {
 
           {/* Número de tarjeta */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Card Number
-            </label>
+            <label className="block mb-2 text-sm font-medium text-gray-700" data-i18n="payment.cardNumber">{t("payment.cardNumber")}</label>
             <input
               type="text"
               value={cardNumber}
@@ -81,14 +79,12 @@ function PaymentForm() {
 
           {/* Nombre del titular */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Name of the owner
-            </label>
+            <label className="block mb-2 text-sm font-medium text-gray-700" data-i18n="payment.cardHolder">{t("payment.cardHolder")}</label>
             <input
               type="text"
               value={cardHolder}
               onChange={(e) => setCardHolder(e.target.value)}
-              placeholder="Como aparece en la tarjeta"
+              placeholder={t("payment.cardHolder")}
               className="w-full border rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
@@ -97,9 +93,7 @@ function PaymentForm() {
           {/* Expiración y CVV en grid */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Expiry Date
-              </label>
+              <label className="block mb-2 text-sm font-medium text-gray-700" data-i18n="payment.expiryDate">{t("payment.expiryDate")}</label>
               <input
                 type="text"
                 value={expiryDate}
@@ -110,9 +104,7 @@ function PaymentForm() {
               />
             </div>
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                CVV
-              </label>
+              <label className="block mb-2 text-sm font-medium text-gray-700" data-i18n="payment.cvv">{t("payment.cvv")}</label>
               <input
                 type="password"
                 value={cvv}
@@ -129,8 +121,9 @@ function PaymentForm() {
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+            data-i18n="payment.confirm"
           >
-            Confirm Payment Method
+            {t("payment.confirm")}
           </button>
         </form>
       </main>

@@ -9,7 +9,7 @@ import {
 } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
 import { createCheckout } from "../../../utils/stripe";
-
+import { useTranslation } from "react-i18next";
 
 type CartItem = {
   id: number;
@@ -26,6 +26,8 @@ type PaymentMethod = {
 };
 
 export default function CartPage() {
+  const { t } = useTranslation();
+
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     const storedCart = getCart<CartItem[]>();
     return Array.isArray(storedCart) ? storedCart : [];
@@ -98,29 +100,21 @@ export default function CartPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
-
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Confirm Purchase</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-8" data-i18n="cart.confirmPurchase">{t("cart.confirmPurchase")}</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
           {cartItems.length === 0 ? (
-            <p className="text-gray-500">Your cart is empty.</p>
+            <p className="text-gray-500" data-i18n="cart.empty">{t("cart.empty")}</p>
           ) : (
             cartItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white shadow-sm rounded-lg p-4 flex justify-between items-center border border-gray-200"
-              >
+              <div key={item.id} className="bg-white shadow-sm rounded-lg p-4 flex justify-between items-center border border-gray-200">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-800">{item.title}</h2>
                 </div>
                 <span className="text-indigo-600 font-semibold">{formatCurrency(item.price)}</span>
-                <button
-                  onClick={() => handleRemoveItem(item.id)}
-                  type="button"
-                  className="text-red-600 hover:text-red-800 font-semibold cursor-pointer"
-                >
-                  Remove
+                <button onClick={() => handleRemoveItem(item.id)} type="button" className="text-red-600 hover:text-red-800 font-semibold cursor-pointer" data-i18n="cart.delete">
+                  {t("cart.delete")}
                 </button>
               </div>
             ))
@@ -128,7 +122,7 @@ export default function CartPage() {
         </div>
 
         <div className="bg-white shadow-md rounded-lg p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4" data-i18n="cart.orderSummary">{t("cart.orderSummary")}</h2>
 
           <ul className="divide-y divide-gray-200 mb-4">
             {cartItems.map((item) => (
@@ -140,15 +134,14 @@ export default function CartPage() {
           </ul>
 
           <div className="flex justify-between font-semibold text-gray-900 text-base mb-6">
-            <span>Total</span>
+            <span data-i18n="cart.total">{t("cart.total")}</span>
             <span className="text-indigo-600">{formatCurrency(total)}</span>
           </div>
 
-          {/* Saved payment methods */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Payment Form</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2" data-i18n="cart.noSavedPayments">{t("cart.noSavedPayments")}</label>
             {paymentMethods.length === 0 ? (
-              <div className="text-gray-500 text-sm mb-2">You don't have any saved payment methods</div>
+              <div className="text-gray-500 text-sm mb-2">{t("cart.noSavedPayments")}</div>
             ) : (
               <select className="w-full border rounded-xl p-3 mb-2">
                 {paymentMethods.map((pm, idx) => (
@@ -158,20 +151,12 @@ export default function CartPage() {
                 ))}
               </select>
             )}
-            <button
-              className="text-indigo-600 hover:underline text-sm"
-              type="button"
-              onClick={() => navigate({ to: "/PaymentForm" })}
-            >
-              Add new payment method
+            <button className="text-indigo-600 hover:underline text-sm" type="button" onClick={() => navigate({ to: "/PaymentForm" })} data-i18n="cart.addPaymentMethod">
+              {t("cart.addPaymentMethod")}
             </button>
           </div>
 
-          <button
-            className={`w-full bg-indigo-600 text-white py-3 rounded-md font-medium transition cursor-pointer ${
-              isPurchasing ? "opacity-60 cursor-not-allowed" : "hover:bg-indigo-700"
-            }`}
-            onClick={async () => {
+          <button className={`w-full bg-indigo-600 text-white py-3 rounded-md font-medium transition cursor-pointer ${isPurchasing ? "opacity-60 cursor-not-allowed" : "hover:bg-indigo-700"}`} onClick={async () => {
               if (isPurchasing) return; // guard against double clicks
               const loggedUser = getLoggedUserStorage();
               if (!loggedUser || !loggedUser.username) {
@@ -210,19 +195,12 @@ export default function CartPage() {
                   throw new Error(errorText || `Error creating purchase (${response.status})`);
                 }
 
-                const ct = response.headers.get("content-type") || "";
-                const data = ct.includes("application/json")
-                  ? await response.json()
-                  : await response.text().catch(() => undefined);
-                console.log("Purchase created:", data);
-
                 // Clear cart
                 localStorage.removeItem(CART_KEY);
 
-                setModalTitle("Purchase Successful");
-                setModalMessage(
-                  "Your purchase was completed successfully. A confirmation email has been sent to you "
-                );
+                setModalTitle(t("cart.purchaseSuccessTitle"));
+                setModalMessage(t("cart.purchaseSuccessMessage"));
+
                 setModalOpen(true);
 
                 // Mantener el botón deshabilitado tras éxito para evitar duplicados
@@ -233,28 +211,25 @@ export default function CartPage() {
                 console.error(error);
                 setIsPurchasing(false); // Rehabilitar para reintentar si falló
 
-                setModalTitle("Error");
+                setModalTitle(t("cart.purchaseErrorTitle"));
                 setModalMessage(
                   error instanceof Error
                     ? error.message
-                    : "The purchase could not be completed"
+                    : t("cart.purchaseErrorMessage")
                 );
                 setModalOpen(true);
               }
             }}
             type="button"
             disabled={cartItems.length === 0 || isPurchasing}
+            data-i18n="cart.confirmPurchaseBtn"
           >
-            {isPurchasing ? "Processing..." : "Confirm Purchase"}
+            {isPurchasing ? t("cart.processing") : t("cart.confirmPurchaseBtn")}
           </button>
 
-          <div className="my-3 text-center text-gray-400 text-sm">OR</div>
+          <div className="my-3 text-center text-gray-400 text-sm" data-i18n="cart.or">{t("cart.or")}</div>
 
-          <button
-            className={`w-full bg-black text-white py-3 rounded-md font-medium transition cursor-pointer ${
-              isStripeRedirecting ? "opacity-60 cursor-not-allowed" : "hover:bg-gray-900"
-            }`}
-            onClick={async () => {
+          <button className={`w-full bg-black text-white py-3 rounded-md font-medium transition cursor-pointer ${isStripeRedirecting ? "opacity-60 cursor-not-allowed" : "hover:bg-gray-900"}`} onClick={async () => {
               if (isStripeRedirecting) return;
               const loggedUser = getLoggedUserStorage();
               if (!loggedUser || !loggedUser.username) {
@@ -274,10 +249,8 @@ export default function CartPage() {
                   !PRICE_VERIFIED || PRICE_VERIFIED === "price_123" ||
                   !PRICE_INCOMPLETE || PRICE_INCOMPLETE === "price_456";
                 if (usingPlaceholders) {
-                  setModalTitle("Stripe setup required");
-                  setModalMessage(
-                    "Please set VITE_PRICE_VERIFIED and VITE_PRICE_INCOMPLETE in your .env.local with real Stripe Price IDs from your Dashboard, then restart the dev server."
-                  );
+                  setModalTitle(t("cart.stripeSetupTitle"));
+                  setModalMessage(t("cart.stripeSetupMessage"));
                   setModalOpen(true);
                   setIsStripeRedirecting(false);
                   return;
@@ -295,8 +268,8 @@ export default function CartPage() {
                 });
               } catch (e) {
                 console.error(e);
-                setModalTitle("Stripe error");
-                setModalMessage(e instanceof Error ? e.message : "Could not start Stripe checkout");
+                setModalTitle(t("cart.stripeErrorTitle"));
+                setModalMessage(e instanceof Error ? e.message : t("cart.stripeErrorMessage"));
                 setModalOpen(true);
               } finally {
                 setIsStripeRedirecting(false);
@@ -304,8 +277,9 @@ export default function CartPage() {
             }}
             type="button"
             disabled={cartItems.length === 0 || isStripeRedirecting}
+            data-i18n="cart.payWithStripe"
           >
-            {isStripeRedirecting ? "Redirecting to Stripe..." : "Pay with Stripe"}
+            {isStripeRedirecting ? t("cart.redirectStripe") : t("cart.payWithStripe")}
           </button>
         </div>
       </div>

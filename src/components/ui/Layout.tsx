@@ -63,7 +63,7 @@ export default function Layout({ children }: LayoutProps) {
     // Esto evita que páginas pequeñas dejen espacios blancos innecesarios.
     <div className="min-h-screen bg-gray-50">
       {children}
-       <ChatBubble />
+      <ChatBubble />
     </div>
   );
 }

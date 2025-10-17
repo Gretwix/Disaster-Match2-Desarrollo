@@ -1,19 +1,21 @@
-
+import { useTranslation } from "react-i18next";
 
 export default function TermsOfUsePage() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-[#f9fafb] flex justify-center py-12 px-6">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-md border border-gray-200 p-8">
         <header className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
-            Terms of Use
+            {t("terms.title")}
           </h1>
-          <p className="text-gray-500 text-sm mt-2">Last updated: October 13, 2025</p>
+          <p className="text-gray-500 text-sm mt-2">
+            {t("terms.lastUpdated", { date: "October 13, 2025" })}
+          </p>
         </header>
 
         <div className="h-[70vh] overflow-y-auto pr-2 text-gray-700 leading-relaxed space-y-8">
           <section>
-            
             <p>
               Welcome to DisasterMatch. These Terms of Use ("Terms") govern your
               access to and use of the DisasterMatch website, products, and
@@ -23,106 +25,104 @@ export default function TermsOfUsePage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">1. Who May Use the Service</h2>
+            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+              1. Who May Use the Service
+            </h2>
             <p>
-              You must be at least 18 years old to register for an account or purchase content on DisasterMatch. By using the Service you represent and warrant that you are at least 18 and have legal capacity to enter into these Terms.
+              You must be at least 18 years old to register for an account or
+              purchase content on DisasterMatch. By using the Service you
+              represent and warrant that you are at least 18 and have legal
+              capacity to enter into these Terms.
             </p>
             <p className="mt-3">
-             The Service is available to any individual or business. DisasterMatch’s intended audience includes contractors working with insurance companies, but anyone may create an account and purchase incident data cards.
+              The Service is available to any individual or business.
+              DisasterMatch’s intended audience includes contractors working with
+              insurance companies, but anyone may create an account and purchase
+              incident data cards.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">2. Description of Service</h2>
+            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+              2. Description of Service
+            </h2>
             <p>
-              DisasterMatch aggregates and presents incident data ("Incident Cards" or "Cards") that are compiled from third-party sources, including paid third‑party websites and public emergency call records. Each Card displays information such as state, city, a short description, date and time, and an indication whether the Card is “complete” or “incomplete.”
+              DisasterMatch aggregates and presents incident data ("Incident Cards"
+              or "Cards") that are compiled from third-party sources, including
+              paid third‑party websites and public emergency call records. Each
+              Card displays information such as state, city, a short description,
+              date and time, and an indication whether the Card is “complete” or
+              “incomplete.”
             </p>
             <p className="mt-3">
-              When you purchase a Card, DisasterMatch delivers the information associated with that Card to the email address you provide during checkout (for example, purchase confirmation and incident details as in the sample email included on our site).
+              When you purchase a Card, DisasterMatch delivers the information
+              associated with that Card to the email address you provide during
+              checkout (for example, purchase confirmation and incident details as
+              in the sample email included on our site).
             </p>
             <p className="mt-3">
-                A Card marked complete indicates DisasterMatch has captured all key fields for that incident. A Card marked incomplete means one or more key data fields (for example: phone, email, or address) are missing; incomplete Cards are priced lower.
+              A Card marked complete indicates DisasterMatch has captured all key
+              fields for that incident. A Card marked incomplete means one or more
+              key data fields (for example: phone, email, or address) are
+              missing; incomplete Cards are priced lower.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">3. Account Registration and Security</h2>
+            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+              3. Account Registration and Security
+            </h2>
             <p>
-             To use certain features you must create an account. You agree to provide accurate, current, and complete information and to update it as needed. You are responsible for maintaining the confidentiality of your account credentials and for all activity that occurs under your account. Notify us immediately of any unauthorized use of your account.
+              To use certain features you must create an account. You agree to
+              provide accurate, current, and complete information and to update it
+              as needed. You are responsible for maintaining the confidentiality
+              of your account credentials and for all activity that occurs under
+              your account. Notify us immediately of any unauthorized use of your
+              account.
             </p>
             <p className="mt-3">
-                You may not share account credentials, and you agree not to transfer or sell your account without DisasterMatch’s prior written consent.
-                </p>
+              You may not share account credentials, and you agree not to transfer
+              or sell your account without DisasterMatch’s prior written consent.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">4. Purchases, Payment, and Invoicing</h2>
+            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+              4. Purchases, Payment, and Invoicing
+            </h2>
             <p>
-              All purchases are one‑time purchases for the specific Card(s) bought. We do not offer subscriptions or commission-based arrangements by default.
+              All purchases are one‑time purchases for the specific Card(s)
+              bought. We do not offer subscriptions or commission-based
+              arrangements by default.
             </p>
             <p className="mt-3">
-           By purchasing a Card you authorize DisasterMatch to charge the payment method provided. You are responsible for any applicable taxes. After purchase, DisasterMatch will send a confirmation email and an invoice (when applicable) to the email address you supply. The confirmation email will contain the details of the purchased incidents.
-           </p>
-              <p className="mt-3">
-                No refunds. All purchases are final and non-refundable once the incident details are delivered to you. To the fullest extent permitted by law, purchases are non-refundable even if the information later proves to be inaccurate or incomplete.
-            </p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">5. Use of Incident Data and Restrictions</h2>
-            <p>
-                The data you purchase is licensed to you for your lawful business use only. You may not:
-                <br />
-
-- Represent that DisasterMatch guarantees the accuracy, completeness, or timeliness of any incident data.
-<br/>
-
-- Reproduce, resell, redistribute, or publicly publish purchased incident data for the benefit of third parties, except as expressly permitted in writing by DisasterMatch.
-<br />
-
-- Use the Service to stalk, harass, defraud, intimidate, or otherwise harm any person or to facilitate illegal activities.
-<br />
-
-
-            </p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">6. Third‑Party Sources and Accuracy</h2>
-            <p>
-                DisasterMatch compiles Cards from third‑party sources, including paid third‑party websites and public emergency call records. While DisasterMatch endeavors to obtain and present information accurately, we do not control these third‑party sources and cannot guarantee their accuracy, completeness, or reliability.
+              By purchasing a Card you authorize DisasterMatch to charge the
+              payment method provided. You are responsible for any applicable
+              taxes. After purchase, DisasterMatch will send a confirmation email
+              and an invoice (when applicable) to the email address you supply.
+              The confirmation email will contain the details of the purchased
+              incidents.
             </p>
             <p className="mt-3">
-            YOU ACKNOWLEDGE AND AGREE THAT DISASTERMATCH PROVIDES INCIDENT DATA "AS IS" AND "AS AVAILABLE," AND MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING THE ACCURACY, COMPLETENESS, OR FITNESS FOR A PARTICULAR PURPOSE OF ANY DATA.
+              No refunds. All purchases are final and non-refundable once the
+              incident details are delivered to you. To the fullest extent
+              permitted by law, purchases are non-refundable even if the
+              information later proves to be inaccurate or incomplete.
             </p>
           </section>
           <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">7. Emergency Disclaimer — DO NOT RELY ON DISASTERMATCH FOR EMERGENCY RESPONSE</h2>
+            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+              5. Use of Incident Data and Restrictions
+            </h2>
             <p>
-                DisasterMatch is not an emergency response service. The Service does not monitor incidents in real time for the purpose of dispatching emergency services. If you or someone else is in immediate danger, call the local emergency number (e.g., 9‑1‑1 in the United States) immediately. Do not rely on DisasterMatch to respond to or handle emergencies.
-            </p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">8. Privacy</h2>
-            <p>
-                We collect and process certain personal information as part of operating the Service (account information, payment information, and the incident details you purchase). The incident data we display may contain personal information gathered from third‑party sources.
-
-            </p>
-            <p className="mt-3">
-            Our full practices regarding the collection, use, and disclosure of personal information are described in our Privacy Policy, which is incorporated into these Terms by reference. By using the Service you consent to the collection and use of information as described in the Privacy Policy.
-            </p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">9. Intellectual Property</h2>
-            <p>
-                All content on the Service, including the DisasterMatch name, logos, website design, underlying code, and other materials, is the property of DisasterMatch or its licensors and is protected by intellectual property laws.
-            </p>
-            <p className="mt-3">
-            You are granted a limited, non‑exclusive, non‑transferable license to access and use the Service in accordance with these Terms. No rights are transferred to you except the limited right to access and use the incident data you purchase as set forth herein.
-            </p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">10. Prohibited Conduct</h2>
-            <p>
-                You agree not to:
+              The data you purchase is licensed to you for your lawful business
+              use only. You may not:
+              <br />- Represent that DisasterMatch guarantees the accuracy,
+              completeness, or timeliness of any incident data.
+              <br />- Reproduce, resell, redistribute, or publicly publish
+              purchased incident data for the benefit of third parties, except as
+              expressly permitted in writing by DisasterMatch.
+              <br />- Use the Service to stalk
 <br />
 - Use the Service to violate any law or regulation.
 <br />

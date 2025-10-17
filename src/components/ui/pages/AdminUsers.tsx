@@ -4,6 +4,7 @@ import { Home, User, Users, BarChart, Trash, Edit } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
 import Swal from "sweetalert2";
 import toast, { Toaster } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 type UserRecord = {
   id: number;
@@ -19,6 +20,7 @@ type UserRecord = {
 const API_URL = "https://localhost:7044/Users";
 
 export default function AdminUsers() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState<UserRecord | null>(null);
@@ -136,8 +138,11 @@ export default function AdminUsers() {
   const loggedUser = getLoggedUser();
 
   if (loggedUser?.role !== "admin") {
-    return <p className="text-center mt-10 text-red-500">Access denied</p>;
+    return <p className="text-center mt-10 text-red-500">{t("admin.deleteConfirmTitle")}</p>;
   }
+
+  const sidebarLinkBase = "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition";
+  const sidebarActiveClass = "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300";
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -149,68 +154,43 @@ export default function AdminUsers() {
             {/* Sidebar con mismo diseño de Profile */}
             <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50/60 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
-                <Link
-                  to="/"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                >
+                <Link to="/" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <Home className="h-5 w-5" />
-                  <span className="font-medium">DisasterMatch</span>
+                  <span className="font-medium" data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
                 </Link>
 
-                 <Link
-                  to="/AdminReports"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                  activeProps={{
-                    className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
-                  }}
-                >
-                  <BarChart className="h-5 w-5" />
-                  <span className="font-medium">Dashboard</span>
-                </Link>
+                 <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
+                   <BarChart className="h-5 w-5" />
+                   <span className="font-medium" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
+                 </Link>
 
-                <Link
-                  to="/Profile"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                  activeProps={{
-                    className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
-                  }}
-                >
+                <Link to="/Profile" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <User className="h-5 w-5" />
-                  <span className="font-medium">Profile</span>
+                  <span className="font-medium" data-i18n="nav.profile">{t("nav.profile")}</span>
                 </Link>
 
-                <Link
-                  to="/AdminUsers"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                  activeProps={{
-                    className: "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
-                  }}
-                >
+                <Link to="/AdminUsers" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <Users className="h-5 w-5" />
-                  <span className="font-medium">Users</span>
+                  <span className="font-medium" data-i18n="nav.users">{t("nav.users")}</span>
                 </Link>
-
-               
               </nav>
             </aside>
 
             {/* Main content */}
             <section className="p-6 md:p-8">
-              <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-                Manage Users
-              </h1>
+              <h1 className="text-2xl font-semibold text-gray-900 mb-6" data-i18n="admin.manageUsers">{t("admin.manageUsers")}</h1>
 
               <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
                 {loading ? (
-                  <p className="text-gray-500 text-center">Loading users...</p>
+                  <p className="text-gray-500 text-center" data-i18n="admin.loadingUsers">{t("admin.loadingUsers")}</p>
                 ) : !isEditing ? (
                   // Tabla
                   <table className="min-w-full text-left text-sm">
                     <thead>
                       <tr className="text-gray-700">
                         <th className="w-16 px-4 py-3 font-semibold">ID</th>
-                        <th className="px-4 py-3 font-semibold">Username</th>
-                        <th className="px-4 py-3 font-semibold">Email</th>
+                        <th className="px-4 py-3 font-semibold">{t("profile.username")}</th>
+                        <th className="px-4 py-3 font-semibold">{t("profile.email")}</th>
                         <th className="px-4 py-3 font-semibold">Actions</th>
                       </tr>
                     </thead>
@@ -231,13 +211,13 @@ export default function AdminUsers() {
                               }}
                               className="flex items-center gap-2 px-3 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600"
                             >
-                              <Edit className="h-4 w-4" /> Edit
+                              {t("admin.edit")}
                             </button>
                             <button
                               onClick={() => handleDelete(u.id)}
                               className="flex items-center gap-2 px-3 py-1 rounded-md bg-red-500 text-white hover:bg-red-600"
                             >
-                              <Trash className="h-4 w-4" /> Delete
+                              {t("admin.delete")}
                             </button>
                           </td>
                         </tr>
@@ -247,9 +227,7 @@ export default function AdminUsers() {
                 ) : (
                   // Formulario
                   <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-200">
-                    <h2 className="text-xl font-semibold mb-4">
-                      Edit User: {isEditing.username}
-                    </h2>
+                    <h2 className="text-xl font-semibold mb-4">Edit User: {isEditing.username}</h2>
                     <form className="grid gap-4">
                       {[
                         { name: "f_name", label: "First Name" },
@@ -297,7 +275,7 @@ export default function AdminUsers() {
                         onClick={handleSave}
                         className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                       >
-                        Save
+                        {t("profile.save")}
                       </button>
                       <button
                         onClick={() => {
@@ -306,7 +284,7 @@ export default function AdminUsers() {
                         }}
                         className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
                       >
-                        Cancel
+                        {t("profile.cancel")}
                       </button>
                     </div>
                   </div>

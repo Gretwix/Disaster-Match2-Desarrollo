@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { Home, User, Users, BarChart } from "lucide-react";
@@ -16,13 +15,15 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 // ======================= TYPES ========================
 type FilterMode = "current" | "all" | "custom";
 type DataType = "all" | "purchases" | "users";
 
-
 export default function AdminReports() {
+  const { t } = useTranslation();
+
   // ========== AUTH ==========
   const loggedUser = getLoggedUser();
 
@@ -353,6 +354,8 @@ export default function AdminReports() {
     }
   };
 
+  const sidebarLinkBase = "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-800/60 transition";
+  const sidebarActiveClass = "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300";
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -363,41 +366,21 @@ export default function AdminReports() {
             {/* ========== SIDEBAR ========== */}
             <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50/60 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
-                <Link
-                  to="/"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                >
+                <Link to="/" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <Home className="h-5 w-5" />
-                  <span className="font-medium">DisasterMatch</span>
+                  <span className="font-medium" data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
                 </Link>
-                <Link
-                  to="/AdminReports"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                  activeProps={{
-                    className:
-                      "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
-                  }}
-                >
+                <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <BarChart className="h-5 w-5" />
-                  <span className="font-medium">Dashboard</span>
+                  <span className="font-medium" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
                 </Link>
-                <Link
-                  to="/Profile"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                >
+                <Link to="/Profile" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <User className="h-5 w-5" />
-                  <span className="font-medium">Profile</span>
+                  <span className="font-medium" data-i18n="nav.profile">{t("nav.profile")}</span>
                 </Link>
-                <Link
-                  to="/AdminUsers"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 transition"
-                  activeProps={{
-                    className:
-                      "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200",
-                  }}
-                >
+                <Link to="/AdminUsers" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <Users className="h-5 w-5" />
-                  <span className="font-medium">Users</span>
+                  <span className="font-medium" data-i18n="nav.users">{t("nav.users")}</span>
                 </Link>
               </nav>
             </aside>
@@ -406,15 +389,8 @@ export default function AdminReports() {
             <section className="p-6 md:p-8" id="report-content">
               {/* ======= HEADER ======= */}
               <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  Reports Overview
-                </h1>
-                <button
-                  onClick={handleExportPDF}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
-                >
-                  Export PDF
-                </button>
+                <h1 className="text-2xl font-semibold text-gray-900" data-i18n="reports.overview">{t("reports.overview")}</h1>
+                <button onClick={handleExportPDF} className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition" data-i18n="reports.exportPDF">{t("reports.exportPDF")}</button>
               </div>
 
               {/* ======= FILTER TOOLBAR ======= */}
@@ -422,33 +398,13 @@ export default function AdminReports() {
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                   <div className="flex gap-2">
                     {(["current", "all", "custom"] as FilterMode[]).map((mode) => (
-                      <button
-                        key={mode}
-                        onClick={() => setFilterMode(mode)}
-                        className={`px-4 py-2 rounded-lg border text-sm font-medium transition
-                          ${
-                            filterMode === mode
-                              ? "bg-indigo-600 text-white border-indigo-600"
-                              : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"
-                          }`}
-                      >
-                        {mode === "current"
-                          ? "Current Month"
-                          : mode === "all"
-                          ? "All Time"
-                          : "Custom Date"}
+                      <button key={mode} onClick={() => setFilterMode(mode)} className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${filterMode === mode ? "bg-indigo-600 text-white border-indigo-600" : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"}`}>
+                        {mode === "current" ? t("reports.currentMonth") : mode === "all" ? t("reports.allTime") : t("reports.customDate")}
                       </button>
                     ))}
                   </div>
                   <span className="text-sm text-gray-500 whitespace-nowrap min-w-[150px] text-right">
-                    {filterMode === "all"
-                      ? "Showing: All Time"
-                      : filterMode === "current"
-                      ? `Showing: ${labelFor(
-                          new Date().getFullYear(),
-                          new Date().getMonth() + 1
-                        )}`
-                      : `Selected: ${labelFor(year, month)}`}
+                    {filterMode === "all" ? t("reports.showing", { label: t("reports.allTime") }) : filterMode === "current" ? t("reports.showing", { label: labelFor(new Date().getFullYear(), new Date().getMonth() + 1) }) : t("reports.showing", { label: labelFor(year, month) })}
                   </span>
                 </div>
                 {/* Custom Date Controls */}
@@ -490,30 +446,18 @@ export default function AdminReports() {
               {/* ======= SUMMARY CARDS ======= */}
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    Total Users
-                  </h2>
-                  <p className="mt-2 text-3xl font-bold text-indigo-600">
-                    {totalUsers !== null ? totalUsers : "Loading..."}
-                  </p>
+                  <h2 className="text-lg font-semibold text-gray-800" data-i18n="reports.totalUsers">{t("reports.totalUsers")}</h2>
+                  <p className="mt-2 text-3xl font-bold text-indigo-600">{totalUsers !== null ? totalUsers : "Loading..."}</p>
                   <p className="text-sm text-gray-500">Registered users</p>
                 </div>
                 <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    Purchases
-                  </h2>
-                  <p className="mt-2 text-3xl font-bold text-indigo-600">
-                    {totalSales !== null ? totalSales : "Loading..."}
-                  </p>
+                  <h2 className="text-lg font-semibold text-gray-800" data-i18n="reports.purchases">{t("reports.purchases")}</h2>
+                  <p className="mt-2 text-3xl font-bold text-indigo-600">{totalSales !== null ? totalSales : "Loading..."}</p>
                   <p className="text-sm text-gray-500">Completed orders</p>
                 </div>
                 <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
-                  <h2 className="text-lg font-semibold text-gray-800">Revenue</h2>
-                  <p className="mt-2 text-3xl font-bold text-green-600">
-                    {totalRevenue !== null
-                      ? `$${totalRevenue.toFixed(2)}`
-                      : "Loading..."}
-                  </p>
+                  <h2 className="text-lg font-semibold text-gray-800" data-i18n="reports.revenue">{t("reports.revenue")}</h2>
+                  <p className="mt-2 text-3xl font-bold text-green-600">{totalRevenue !== null ? `$${totalRevenue.toFixed(2)}` : "Loading..."}</p>
                   <p className="text-sm text-gray-500">Total earnings</p>
                 </div>
               </div>

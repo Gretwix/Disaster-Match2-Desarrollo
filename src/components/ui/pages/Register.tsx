@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Mail, Lock } from "react-feather";
+import { useTranslation } from "react-i18next";
 
 // Tipo de usuario para el registro
 type User = {
@@ -35,6 +36,8 @@ export default function Register() {
     number: false,
     special: false,
   });
+
+  const { t } = useTranslation();
 
   // Validate password in real-time
   const validatePassword = (value: string) => {
@@ -92,11 +95,11 @@ export default function Register() {
   const isFormValid = () => {
     if (step === 1) {
       return (
-        email && 
-        username && 
-        password && 
-        confirm && 
-        !passwordError && 
+        email &&
+        username &&
+        password &&
+        confirm &&
+        !passwordError &&
         !error &&
         Object.values(passwordStrength).every(Boolean)
       );
@@ -125,8 +128,8 @@ export default function Register() {
   async function apiRegister(user: User) {
     // Try POST first (new flow). If 405, retry with PUT for backward compatibility.
     // Also attempt HTTP fallback if HTTPS is unreachable.
-    const makeUrl = (proto: 'https' | 'http') => `${proto}://localhost:7044/Users/Save`;
-    const opts = (method: 'POST' | 'PUT') => ({
+    const makeUrl = (proto: "https" | "http") => `${proto}://localhost:7044/Users/Save`;
+    const opts = (method: "POST" | "PUT") => ({
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user),
@@ -134,19 +137,19 @@ export default function Register() {
 
     // Attempt HTTPS POST
     try {
-      const res = await fetch(makeUrl('https'), opts('POST'));
+      const res = await fetch(makeUrl("https"), opts("POST"));
       if (res.status === 405) {
         // Retry with PUT on HTTPS
-        const resPut = await fetch(makeUrl('https'), opts('PUT'));
+        const resPut = await fetch(makeUrl("https"), opts("PUT"));
         return resPut;
       }
       return res;
     } catch {
       // HTTPS failed (connection refused, etc.) — try HTTP
       try {
-        const res = await fetch(makeUrl('http'), opts('POST'));
+        const res = await fetch(makeUrl("http"), opts("POST"));
         if (res.status === 405) {
-          const resPut = await fetch(makeUrl('http'), opts('PUT'));
+          const resPut = await fetch(makeUrl("http"), opts("PUT"));
           return resPut;
         }
         return res;
@@ -246,9 +249,8 @@ export default function Register() {
       <div className="absolute w-72 h-72 -top-20 -left-20 rounded-full bg-indigo-200 opacity-30"></div>
       <div className="absolute w-48 h-48 top-1/3 -right-24 rounded-full bg-indigo-300 opacity-30"></div>
       <div className="absolute w-96 h-96 bottom-0 right-0 translate-y-1/2 translate-x-1/2 rounded-full bg-indigo-100 opacity-40"></div>
-      <div className="absolute w-40 h-40 bottom-10 left-10 rounded-full bg-indigo-200 opacity-30"></div> 
+      <div className="absolute w-40 h-40 bottom-10 left-10 rounded-full bg-indigo-200 opacity-30"></div>
 
-      
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 relative z-10">
         {/* Stepper visual para mostrar el progreso del registro */}
         <div className="flex justify-center mb-8">
@@ -278,7 +280,7 @@ export default function Register() {
         </div>
 
         <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-          {step === 1 ? "Create your account" : "Personal details"}
+          {step === 1 ? t("register.titleStep1") : t("register.titleStep2")}
         </h1>
 
         {/* Formulario de registro dividido en dos pasos */}
@@ -291,8 +293,8 @@ export default function Register() {
             <>
               {/* Campo Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.email">
+                  {t("register.email")}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
@@ -300,13 +302,12 @@ export default function Register() {
                     type="email"
                     required
                     className="pl-10 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full py-3 rounded-md"
-                    placeholder="you@example.com"
+                    placeholder={t("register.placeholderEmail")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    // Mensaje personalizado si el email no es válido
                     onInvalid={(e) =>
                       (e.currentTarget as HTMLInputElement).setCustomValidity(
-                        "Please enter a valid email address"
+                        t("register.invalidEmail")
                       )
                     }
                     onInput={(e) =>
@@ -318,14 +319,14 @@ export default function Register() {
 
               {/* Campo Username */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Username
+                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.username">
+                  {t("register.username")}
                 </label>
                 <input
                   type="text"
                   required
                   className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full px-3 py-3 rounded-md"
-                  placeholder="johndoe123"
+                  placeholder={t("register.placeholderUsername")}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
@@ -333,8 +334,8 @@ export default function Register() {
 
               {/* Password Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
+                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.password">
+                  {t("register.password")}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
@@ -343,87 +344,78 @@ export default function Register() {
                     required
                     className={`pl-10 bg-gray-50 border ${
                       passwordError
-                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                        : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'
+                        ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                        : "border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600"
                     } block w-full py-3 rounded-md`}
-                    placeholder="••••••••"
+                    placeholder={t("register.placeholderPassword")}
                     value={password}
                     onChange={handlePasswordChange}
                   />
                 </div>
+
+                {/* Advertencias de contraseña (ya traducidas previamente) */}
                 <div className="mt-2 space-y-1">
                   <div className="flex items-center">
-                    <div className={`w-2 h-2 rounded-full mr-2 ${
-                      passwordStrength.length ? 'bg-green-500' : 'bg-gray-200'
-                    }`}></div>
-                    <span className={`text-xs ${passwordStrength.length ? 'text-green-600' : 'text-gray-500'}`}>
-                      At least 8 characters
+                    <div className={`w-2 h-2 rounded-full mr-2 ${passwordStrength.length ? 'bg-green-500' : 'bg-gray-200'}`}></div>
+                    <span className={`text-xs ${passwordStrength.length ? 'text-green-600' : 'text-gray-500'}`} data-i18n="register.pwdLength">
+                      {t("register.pwdLength")}
                     </span>
                   </div>
                   <div className="flex items-center">
-                    <div className={`w-2 h-2 rounded-full mr-2 ${
-                      passwordStrength.upper ? 'bg-green-500' : 'bg-gray-200'
-                    }`}></div>
-                    <span className={`text-xs ${passwordStrength.upper ? 'text-green-600' : 'text-gray-500'}`}>
-                      At least one uppercase letter
+                    <div className={`w-2 h-2 rounded-full mr-2 ${passwordStrength.upper ? 'bg-green-500' : 'bg-gray-200'}`}></div>
+                    <span className={`text-xs ${passwordStrength.upper ? 'text-green-600' : 'text-gray-500'}`} data-i18n="register.pwdUpper">
+                      {t("register.pwdUpper")}
                     </span>
                   </div>
                   <div className="flex items-center">
-                    <div className={`w-2 h-2 rounded-full mr-2 ${
-                      passwordStrength.lower ? 'bg-green-500' : 'bg-gray-200'
-                    }`}></div>
-                    <span className={`text-xs ${passwordStrength.lower ? 'text-green-600' : 'text-gray-500'}`}>
-                      At least one lowercase letter
+                    <div className={`w-2 h-2 rounded-full mr-2 ${passwordStrength.lower ? 'bg-green-500' : 'bg-gray-200'}`}></div>
+                    <span className={`text-xs ${passwordStrength.lower ? 'text-green-600' : 'text-gray-500'}`} data-i18n="register.pwdLower">
+                      {t("register.pwdLower")}
                     </span>
                   </div>
                   <div className="flex items-center">
-                    <div className={`w-2 h-2 rounded-full mr-2 ${
-                      passwordStrength.number ? 'bg-green-500' : 'bg-gray-200'
-                    }`}></div>
-                    <span className={`text-xs ${passwordStrength.number ? 'text-green-600' : 'text-gray-500'}`}>
-                      At least one number
+                    <div className={`w-2 h-2 rounded-full mr-2 ${passwordStrength.number ? 'bg-green-500' : 'bg-gray-200'}`}></div>
+                    <span className={`text-xs ${passwordStrength.number ? 'text-green-600' : 'text-gray-500'}`} data-i18n="register.pwdNumber">
+                      {t("register.pwdNumber")}
                     </span>
                   </div>
                   <div className="flex items-center">
-                    <div className={`w-2 h-2 rounded-full mr-2 ${
-                      passwordStrength.special ? 'bg-green-500' : 'bg-gray-200'
-                    }`}></div>
-                    <span className={`text-xs ${passwordStrength.special ? 'text-green-600' : 'text-gray-500'}`}>
-                      At least one special character (@, #, $, %, &, *, !, ?)
+                    <div className={`w-2 h-2 rounded-full mr-2 ${passwordStrength.special ? 'bg-green-500' : 'bg-gray-200'}`}></div>
+                    <span className={`text-xs ${passwordStrength.special ? 'text-green-600' : 'text-gray-500'}`} data-i18n="register.pwdSpecial">
+                      {t("register.pwdSpecial")}
                     </span>
                   </div>
                 </div>
+
                 {passwordError && (
-                  <p className="mt-1 text-sm text-red-600">{passwordError}</p>
+                  <p className="mt-1 text-sm text-red-600">{t("register.errorPwdRequirements")}</p>
                 )}
               </div>
 
               {/* Confirm Password Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Confirm Password
+                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.confirmPassword">
+                  {t("register.confirmPassword")}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
                   <input
                     type="password"
                     required
-                    className={`pl-10 bg-gray-50 border ${
-                      error && confirm ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'
-                    } block w-full py-3 rounded-md`}
-                    placeholder="••••••••"
+                    className={`pl-10 bg-gray-50 border ${error && confirm ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'} block w-full py-3 rounded-md`}
+                    placeholder={t("register.placeholderConfirm")}
                     value={confirm}
                     onChange={handleConfirmChange}
                   />
                 </div>
                 {error && confirm && (
-                  <p className="mt-1 text-sm text-red-600">{error}</p>
+                  <p className="mt-1 text-sm text-red-600">{t("register.errorPasswordsMismatch")}</p>
                 )}
               </div>
 
               {/* Error message if any */}
               {error && !confirm && (
-                <p className="text-red-500 text-sm font-medium text-center">{error}</p>
+                <p className="text-red-500 text-sm font-medium text-center">{t(errorKeyMapper(error))}</p>
               )}
 
               {/* Continue Button - Validates fields and checks for duplicates */}
@@ -443,7 +435,7 @@ export default function Register() {
                   }
 
                   if (password !== confirm) {
-                    setError("Passwords do not match");
+                    setError("PASSWORD_MISMATCH");
                     return;
                   }
 
@@ -454,13 +446,10 @@ export default function Register() {
                     setStep(2);
                   }
                 }}
-                className={`w-full py-3 px-4 rounded-md text-white font-medium shadow-sm transition-all duration-200 ${
-                  isFormValid()
-                    ? 'bg-gradient-to-r from-indigo-600 to-indigo-800 hover:scale-[1.02] hover:shadow-lg'
-                    : 'bg-gray-400 cursor-not-allowed'
-                }`}
+                className={`w-full py-3 px-4 rounded-md text-white font-medium shadow-sm transition-all duration-200 ${isFormValid() ? 'bg-gradient-to-r from-indigo-600 to-indigo-800 hover:scale-[1.02] hover:shadow-lg' : 'bg-gray-400 cursor-not-allowed'}`}
+                data-i18n="register.continue"
               >
-                Continue
+                {t("register.continue")}
               </button>
             </>
           )}
@@ -468,31 +457,27 @@ export default function Register() {
           {/* Paso 2: Datos personales */}
           {step === 2 && (
             <>
-              {/* Campo First name */}
+              {/* First name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  First name
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.firstName">{t("register.firstName")}</label>
                 <input
                   type="text"
                   required
                   className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full px-3 py-3 rounded-md"
-                  placeholder="John"
+                  placeholder={t("register.placeholderFirstName")}
                   value={f_name}
                   onChange={(e) => setFName(e.target.value)}
                 />
               </div>
 
-              {/* Campo Last name */}
+              {/* Last name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Last name
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.lastName">{t("register.lastName")}</label>
                 <input
                   type="text"
                   required
                   className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full px-3 py-3 rounded-md"
-                  placeholder="Doe"
+                  placeholder={t("register.placeholderLastName")}
                   value={l_name}
                   onChange={(e) => setLName(e.target.value)}
                 />
@@ -500,37 +485,28 @@ export default function Register() {
 
               {/* Phone Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.phone">{t("register.phone")}</label>
                 <div>
                   <input
                     type="tel"
-                    className={`bg-gray-50 border ${
-                      phoneError
-                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                        : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'
-                    } block w-full px-3 py-3 rounded-md`}
-                    placeholder="12345678"
+                    className={`bg-gray-50 border ${phoneError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'} block w-full px-3 py-3 rounded-md`}
+                    placeholder={t("register.placeholderPhone")}
                     value={phone}
                     inputMode="numeric"
                     onChange={(e) => {
                       const value = e.target.value;
-                      // Allow only numbers
                       if (value === '' || /^\d*$/.test(value)) {
                         setPhone(value);
-                        // Real-time validation
                         if (value && (value.length < 8 || value.length > 15)) {
-                          setPhoneError('Phone number must be between 8 and 15 digits');
+                          setPhoneError(t("register.phoneRange"));
                         } else {
                           setPhoneError('');
                         }
                       }
                     }}
                     onBlur={() => {
-                      // Validation on blur
                       if (phone && (phone.length < 8 || phone.length > 15)) {
-                        setPhoneError('Phone number must be between 8 and 15 digits');
+                        setPhoneError(t("register.phoneRange"));
                       } else {
                         setPhoneError('');
                       }
@@ -540,21 +516,19 @@ export default function Register() {
                 {phoneError ? (
                   <p className="mt-1 text-sm text-red-600">{phoneError}</p>
                 ) : (
-                  <p className="mt-1 text-xs text-gray-500">
-                    Only numbers allowed. Must be 8-15 digits.
-                  </p>
+                  <p className="mt-1 text-xs text-gray-500">{t("register.phoneHint")}</p>
                 )}
               </div>
 
               {/* Campo Address */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Address
+                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.address">
+                  {t("register.address")}
                 </label>
                 <input
                   type="text"
                   className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full px-3 py-3 rounded-md"
-                  placeholder="Street, City"
+                  placeholder={t("register.placeholderAddress")}
                   value={user_address}
                   onChange={(e) => setAddress(e.target.value)}
                 />
@@ -562,13 +536,13 @@ export default function Register() {
 
               {/* Campo Company */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Company
+                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.company">
+                  {t("register.company")}
                 </label>
                 <input
                   type="text"
                   className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full px-3 py-3 rounded-md"
-                  placeholder="Company name"
+                  placeholder={t("register.placeholderCompany")}
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                 />
@@ -580,14 +554,15 @@ export default function Register() {
               )}
               {success && (
                 <div className="text-center space-y-2">
-                  <p className="text-green-600 text-sm font-medium">{success}</p>
-                  <p className="text-gray-600 text-xs">Didn’t get the email? You can resend it from the verification page.</p>
+                  <p className="text-green-600 text-sm font-medium">{t("register.success")}</p>
+                  <p className="text-gray-600 text-xs">{t("register.resendVerifyNote")}</p>
                   <button
                     type="button"
                     onClick={() => navigate({ to: "/verify-email" })}
                     className="text-indigo-600 hover:text-indigo-500 text-sm"
+                    data-i18n="register.goToVerification"
                   >
-                    Go to verification page
+                    {t("register.goToVerification")}
                   </button>
                 </div>
               )}
@@ -601,11 +576,12 @@ export default function Register() {
                   // Validar el teléfono antes de enviar el formulario
                   if (phone && !/^[0-9+\-()\s]+$/.test(phone)) {
                     e.preventDefault();
-                    setPhoneError('Por favor ingresa un número de teléfono válido');
+                    setPhoneError(t("register.invalidPhone"));
                   }
                 }}
+                data-i18n="register.register"
               >
-                {loading ? "Registering..." : "Register"}
+                {loading ? t("register.registering") : t("register.register")}
               </button>
             </>
           )}
@@ -614,16 +590,27 @@ export default function Register() {
         {/* Enlace para ir al login si ya tienes cuenta */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
-            Already have an account?{" "}
+            {t("register.alreadyHave")}{" "}
             <a
               href="/Login"
               className="font-medium text-indigo-600 hover:text-indigo-500"
+              data-i18n="register.signIn"
             >
-              Sign in
+              {t("register.signIn")}
             </a>
           </p>
         </div>
       </div>
     </div>
   );
+}
+
+// Helper: map some internal error markers to i18n keys (keeps logic unchanged)
+function errorKeyMapper(key: string) {
+  switch (key) {
+    case "PASSWORD_MISMATCH":
+      return "register.errorPasswordsMismatch";
+    default:
+      return key; // fall back: if key already i18n key or raw message, leave caller to handle
+  }
 }

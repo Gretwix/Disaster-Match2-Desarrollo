@@ -7,6 +7,7 @@ import Footer from "../Footer";
 import { getLoggedUser, purchasedIncidentsKey } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 // URL base de tu API
 const API_URL = "https://localhost:7044/Leads/List";
@@ -33,6 +34,7 @@ type CartItem = {
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Estados
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -195,22 +197,19 @@ export default function HomePage() {
             <div className="mb-6">
               <div className="flex flex-col md:flex-row md:items-start gap-0 w-full">
                 <div className="flex-1">
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-0 leading-tight">
-                    Available Incident Reports
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-0 leading-tight" data-i18n="home.availableReports">
+                    {t("home.availableReports")}
                   </h2>
-                  <p className="text-gray-600 leading-snug mt-0">
-                    Browse and select incident reports to purchase for your
-                    contracting needs.
-                  </p>
+                  <p className="text-gray-600 leading-snug mt-0">{t("home.browse")}</p>
                 </div>
                 <div className="w-full md:w-72 max-w-md bg-white border border-gray-300 rounded-lg shadow-sm p-1 text-sm text-gray-700 md:ml-2">
                   <div className="mb-1">
-                    <span className="font-semibold text-green-600">Verified ($200):</span>
-                    <span className="ml-1 text-gray-700">Includes full address, phone number and email.</span>
+                    <span className="font-semibold text-green-600" data-i18n="home.verifiedLabel">{t("home.verifiedLabel")}</span>
+                    <span className="ml-1 text-gray-700" data-i18n="home.verifiedDetail">{t("home.verifiedDetail")}</span>
                   </div>
                   <div>
-                    <span className="font-semibold text-yellow-600">Incomplete ($100):</span>
-                    <span className="ml-1 text-gray-700">Missing one or more key data such as phone, email or address.</span>
+                    <span className="font-semibold text-yellow-600" data-i18n="home.incompleteLabel">{t("home.incompleteLabel")}</span>
+                    <span className="ml-1 text-gray-700" data-i18n="home.incompleteDetail">{t("home.incompleteDetail")}</span>
                   </div>
                 </div>
               </div>
@@ -223,10 +222,8 @@ export default function HomePage() {
                 <div className="w-full md:w-1/2">
                   <input
                     type="text"
-                    placeholder="Search by city, state, address or details..."
-                    className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md 
-                      focus:outline-none focus:ring-2 focus:ring-indigo-500 
-                      focus:border-indigo-500 text-sm"
+                    placeholder={t("home.searchPlaceholder")}
+                    className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                     value={search}
                     onChange={(e) => {
                       setSearch(e.target.value);
@@ -237,16 +234,14 @@ export default function HomePage() {
                 {/* Select + Toggle */}
                 <div className="flex items-center gap-2 w-full md:w-1/2">
                   <select
-                    className="flex-1 pl-3 pr-8 py-2 border border-gray-300 rounded-md 
-                      focus:outline-none focus:ring-2 focus:ring-indigo-500 
-                      focus:border-indigo-500 text-sm"
+                    className="flex-1 pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                     value={filter}
                     onChange={(e) => {
                       setFilter(e.target.value);
                       setPage(1);
                     }}
                   >
-                    <option value="all">All Incident Types</option>
+                    <option value="all">{t("home.allIncidentTypes")}</option>
                     <option value="robbery">Robbery</option>
                     <option value="fire">Fire</option>
                     <option value="crime">Crime</option>
@@ -254,23 +249,11 @@ export default function HomePage() {
                   </select>
                   {/* Toggle Cards/Table */}
                   <div className="inline-flex rounded-md border border-gray-300 overflow-hidden text-sm">
-                    <button
-                      onClick={() => setViewMode("cards")}
-                      className={`px-3 py-1.5 transition font-medium
-                        ${viewMode === "cards"
-                          ? "bg-indigo-600 text-white"
-                          : "bg-white text-gray-700 hover:bg-gray-50"}`}
-                    >
-                      Cards
+                    <button onClick={() => setViewMode("cards")} className={`px-3 py-1.5 transition font-medium ${viewMode === "cards" ? "bg-indigo-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"}`} data-i18n="home.cards">
+                      {t("home.cards")}
                     </button>
-                    <button
-                      onClick={() => setViewMode("table")}
-                      className={`px-3 py-1.5 transition font-medium
-                        ${viewMode === "table"
-                          ? "bg-indigo-600 text-white"
-                          : "bg-white text-gray-700 hover:bg-gray-50"}`}
-                    >
-                      Table
+                    <button onClick={() => setViewMode("table")} className={`px-3 py-1.5 transition font-medium ${viewMode === "table" ? "bg-indigo-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"}`} data-i18n="home.table">
+                      {t("home.table")}
                     </button>
                   </div>
                 </div>
@@ -279,7 +262,7 @@ export default function HomePage() {
 
             {/* Grid o Tabla */}
             {loading ? (
-              <p className="text-center text-gray-500">Loading incidents...</p>
+              <p className="text-center text-gray-500" data-i18n="home.loadingIncidents">{t("home.loadingIncidents")}</p>
             ) : viewMode === "cards" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {incidentProps.map((incident) => (
@@ -291,26 +274,17 @@ export default function HomePage() {
             )}
 
             {/* Paginación */}
-            <Pagination
-              currentPage={page}
-              totalItems={filteredLeads.length}
-              itemsPerPage={itemsPerPage}
-              onPageChange={setPage}
-            />
+            <Pagination currentPage={page} totalItems={filteredLeads.length} itemsPerPage={itemsPerPage} onPageChange={setPage} />
 
             {/* Barra inferior al fondo del contenido */}
             <div className="mt-auto">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-6 py-4 flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-700 font-medium">
-                      {cart.length} incidents selected
-                    </span>
+                    <span className="text-gray-700 font-medium">{t("home.incidentsSelected", { count: cart.length })}</span>
                   </div>
                   <div className="flex items-center gap-6">
-                    <span className="text-lg font-semibold text-gray-900">
-                      Total: {formatCurrency(total)}
-                    </span>
+                    <span className="text-lg font-semibold text-gray-900">{t("home.total")} {formatCurrency(total)}</span>
                     <button
                       type="button"
                       className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -322,20 +296,17 @@ export default function HomePage() {
                           return;
                         }
                         const key = purchasedIncidentsKey(user.username);
-                        const prev = JSON.parse(
-                          localStorage.getItem(key) || "[]"
-                        );
+                        const prev = JSON.parse(localStorage.getItem(key) || "[]");
                         const updated = [
                           ...prev,
-                          ...cart.filter(
-                            (c) => !prev.some((p: any) => p.id === c.id)
-                          ),
+                          ...cart.filter((c) => !prev.some((p: any) => p.id === c.id)),
                         ];
                         localStorage.setItem(key, JSON.stringify(updated));
                         navigate({ to: "/Cart" });
                       }}
+                      data-i18n="home.proceedToCheckout"
                     >
-                      Proceed to Checkout
+                      {t("home.proceedToCheckout")}
                     </button>
                   </div>
                 </div>

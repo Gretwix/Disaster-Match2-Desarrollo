@@ -5,6 +5,7 @@ import { Home, User, Users, BarChart } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
 import toast, { Toaster } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 type User = {
   ID: number;
@@ -54,7 +55,13 @@ const formatPhone = (phone: string) => {
   return result;
 };
 
-const Profile = () => {
+export default function Profile() {
+  const { t } = useTranslation();
+
+  // Sidebar common classes (light/dark + active)
+  const sidebarLinkBase = "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition";
+  const sidebarActiveClass = "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300";
+
   const [user, setUser] = useState<User | null>();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -407,7 +414,7 @@ const Profile = () => {
     fetchPurchased();
   }, [loggedUser?.id]);
 
-  if (loading) return <p className="text-center mt-10">Loading profile...</p>;
+  if (loading) return <p className="text-center mt-10">{t("home.loadingIncidents")}</p>;
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100">
@@ -415,61 +422,38 @@ const Profile = () => {
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
         <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
-            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50/60 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl force-light-bg-gray-50">
+            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50/60 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
-                <Link
-                  to="/"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition force-light-btn-primary"
-                >
-                  <Home className="h-5 w-5 text-gray-900 dark:text-slate-300 force-light-icon-contrast" />
-                  <span className="font-medium">DisasterMatch</span>
+                <Link to="/" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
+                  <Home className="h-5 w-5 text-gray-900 dark:text-slate-300" />
+                  <span className="font-medium" data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
                 </Link>
 
                 {loggedUser?.role === "admin" && (
-                  <Link
-                    to="/AdminReports"
-                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition"
-                    activeProps={{
-                      className: "bg-indigo-300 text-black shadow-sm dark:bg-indigo-900/40 dark:text-indigo-300 dark:ring-0",
-                    }}
-                  >
+                  <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                     <BarChart className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                    <span className="font-medium">Dashboard</span>
+                    <span className="font-medium" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
                   </Link>
                 )}
 
-                <Link
-                  to="/Profile"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition force-light-btn-primary"
-                  activeProps={{
-                    className:
-                      "dark:bg-indigo-900/40 dark:text-indigo-300 dark:ring-0",
-                  }}
-                >
-                  <User className="h-5 w-5 text-gray-900 dark:text-slate-300 force-light-icon-contrast" />
-                  <span className="font-medium">Profile</span>
+                <Link to="/Profile" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
+                  <User className="h-5 w-5 text-gray-900 dark:text-slate-300" />
+                  <span className="font-medium" data-i18n="nav.profile">{t("nav.profile")}</span>
                 </Link>
+
                 {loggedUser?.role === "admin" && (
                   <>
-                    <Link
-                      to="/AdminUsers"
-                      className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition"
-                      activeProps={{
-                        className:
-                          "bg-indigo-300 text-black shadow-sm dark:bg-indigo-900/40 dark:text-indigo-300 dark:ring-0",
-                      }}
-                    >
+                    <Link to="/AdminUsers" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                       <Users className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                      <span className="font-medium">Users</span>
+                      <span className="font-medium" data-i18n="nav.users">{t("nav.users")}</span>
                     </Link>
-                    
                   </>
                 )}
               </nav>
             </aside>
             <section className="p-6 md:p-8">
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 mb-6 force-light-text">
-                My Profile
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 mb-6 force-light-text" data-i18n="profile.myProfile">
+                {t("profile.myProfile")}
               </h1>
               {user && (
                 <div className="mt-6 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0b1220] p-6 shadow-sm hover:shadow-md transition duration-200 force-light-bg-gray-50">
@@ -488,16 +472,18 @@ const Profile = () => {
                       <button
                         onClick={() => setIsEditing(true)}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 shadow-sm hover:shadow-md"
+                        data-i18n="profile.editProfile"
                       >
-                        Edit Profile
+                        {t("profile.editProfile")}
                       </button>
                     ) : (
                       <div className="flex gap-2">
                         <button
                           onClick={handleSave}
                           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 shadow-sm hover:shadow-md"
+                          data-i18n="profile.save"
                         >
-                          Save
+                          {t("profile.save")}
                         </button>
                         <button
                           onClick={() => {
@@ -505,8 +491,9 @@ const Profile = () => {
                             setFormData(user);
                           }}
                           className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition duration-200 shadow-sm hover:shadow-md"
+                          data-i18n="profile.cancel"
                         >
-                          Cancel
+                          {t("profile.cancel")}
                         </button>
                       </div>
                     )}
@@ -514,28 +501,28 @@ const Profile = () => {
                   {!isEditing ? (
                     <div className="space-y-3 text-gray-700 dark:text-slate-300 force-light-text-muted">
                       <p>
-                        <strong>Username:</strong> {user.username}
+                        <strong data-i18n="profile.username">{t("profile.username")}:</strong> {user.username}
                       </p>
                       <p>
-                        <strong>Email:</strong> {user.email}
+                        <strong data-i18n="profile.email">{t("profile.email")}:</strong> {user.email}
                       </p>
                       <p>
-                        <strong>Phone:</strong> {user.phone}
+                        <strong data-i18n="profile.phone">{t("profile.phone")}:</strong> {user.phone}
                       </p>
                       <p>
-                        <strong>Company:</strong> {user.company}
+                        <strong data-i18n="profile.company">{t("profile.company")}:</strong> {user.company}
                       </p>
                     </div>
                   ) : (
                     <form className="grid gap-4">
                       {[
-                        { name: "f_name", label: "First Name", inputType: "text" },
-                        { name: "l_name", label: "Last Name", inputType: "text" },
-                        { name: "username", label: "Username", readOnly: true },
-                        { name: "email", label: "Email", inputType: "email" },
-                        { name: "phone", label: "Phone", inputType: "tel", placeHolder: "+1 xxx xxx xxxx" },
-                        { name: "user_address", label: "Address", inputType: "text" },
-                        { name: "company", label: "Company", inputType: "text" },
+                        { name: "f_name", label: t("profile.username"), inputType: "text" },
+                        { name: "l_name", label: t("profile.lastName"), inputType: "text" },
+                        { name: "username", label: t("profile.username"), readOnly: true },
+                        { name: "email", label: t("profile.email"), inputType: "email" },
+                        { name: "phone", label: t("profile.phone"), inputType: "tel", placeHolder: "+1 xxx xxx xxxx" },
+                        { name: "user_address", label: t("profile.address"), inputType: "text" },
+                        { name: "company", label: t("profile.company"), inputType: "text" },
                       ].map((field) => (
                         <label key={field.name} className="flex flex-col text-sm font-medium">
                           {field.label}
@@ -559,17 +546,14 @@ const Profile = () => {
                   )}
                   {!isEditing && (
                     <div className="mt-8">
-                      <h2 className="text-lg font-semibold mb-2">
-                        Purchased Incidents
-                      </h2>
+                      <h2 className="text-lg font-semibold mb-2" data-i18n="profile.purchasedIncidents">{t("profile.purchasedIncidents")}</h2>
                       {purchasedIncidents.length === 0 ? (
-                        <p className="text-gray-500">No incidents purchased yet.</p>
+                        <p className="text-gray-500" data-i18n="profile.noPurchased">{t("profile.noPurchased")}</p>
                       ) : (
                         <ul className="list-disc pl-6 space-y-2">
                           {purchasedIncidents.map((item: any) => (
                             <li key={item.id} className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800/60 transition duration-200">
-                              <span className="font-medium">{item.title}</span>{" "}
-                              — {formatCurrency(item.price)}
+                              <span className="font-medium">{item.title}</span>{" — "} {formatCurrency(item.price)}
                             </li>
                           ))}
                         </ul>
@@ -581,113 +565,80 @@ const Profile = () => {
             </section>
           </div>
         </div>
+
         {/* Change Password Box */}
         <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 mt-6 p-6 force-light-bg-white">
-          <h2 className="text-lg font-semibold text-black force-light-text dark:text-slate-100 mb-4">Change Password</h2>
+          <h2 className="text-lg font-semibold text-black force-light-text dark:text-slate-100 mb-4" data-i18n="profile.changePassword">{t("profile.changePassword")}</h2>
           <div className="grid gap-4 max-w-md">
-            <label className="flex flex-col text-sm font-medium">
-              Current Password
-              <input
-                type="password"
-                value={pwdCurrent}
-                onChange={(e) => setPwdCurrent(e.target.value)}
-                className="mt-1 border rounded-lg px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition duration-200"
-              />
+            <label className="flex flex-col text-sm font-medium" data-i18n="profile.currentPassword">
+              {t("profile.currentPassword")}
+              <input type="password" value={pwdCurrent} onChange={(e) => setPwdCurrent(e.target.value)} className="mt-1 border rounded-lg px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition duration-200" />
             </label>
-            
-            <label className="flex flex-col text-sm font-medium">
-              New Password
-              <input
-                type="password"
-                value={pwdNew}
-                onChange={handleNewPasswordChange}
-                className={`mt-1 border ${
-                  pwdNew && pwdError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-                } rounded-lg px-3 py-2 shadow-sm transition duration-200`}
-              />
+
+            <label className="flex flex-col text-sm font-medium" data-i18n="profile.newPassword">
+              {t("profile.newPassword")}
+              <input type="password" value={pwdNew} onChange={handleNewPasswordChange} className={`mt-1 border ${pwdNew && pwdError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'} rounded-lg px-3 py-2 shadow-sm transition duration-200`} />
             </label>
-            
+
             <div className="space-y-1 text-xs">
               <div className="flex items-center">
                 <div className={`w-2 h-2 rounded-full mr-2 ${
                   pwdStrength.length ? 'bg-green-500' : 'bg-gray-200'
                 }`}></div>
-                <span className={pwdStrength.length ? 'text-green-600' : 'text-gray-500'}>
-                  At least 8 characters
+                <span className={pwdStrength.length ? 'text-green-600' : 'text-gray-500'} data-i18n="register.pwdLength">
+                  {t("register.pwdLength")}
                 </span>
               </div>
               <div className="flex items-center">
                 <div className={`w-2 h-2 rounded-full mr-2 ${
                   pwdStrength.upper ? 'bg-green-500' : 'bg-gray-200'
                 }`}></div>
-                <span className={pwdStrength.upper ? 'text-green-600' : 'text-gray-500'}>
-                  At least one uppercase letter
+                <span className={pwdStrength.upper ? 'text-green-600' : 'text-gray-500'} data-i18n="register.pwdUpper">
+                  {t("register.pwdUpper")}
                 </span>
               </div>
               <div className="flex items-center">
                 <div className={`w-2 h-2 rounded-full mr-2 ${
                   pwdStrength.lower ? 'bg-green-500' : 'bg-gray-200'
                 }`}></div>
-                <span className={pwdStrength.lower ? 'text-green-600' : 'text-gray-500'}>
-                  At least one lowercase letter
+                <span className={pwdStrength.lower ? 'text-green-600' : 'text-gray-500'} data-i18n="register.pwdLower">
+                  {t("register.pwdLower")}
                 </span>
               </div>
               <div className="flex items-center">
                 <div className={`w-2 h-2 rounded-full mr-2 ${
                   pwdStrength.number ? 'bg-green-500' : 'bg-gray-200'
                 }`}></div>
-                <span className={pwdStrength.number ? 'text-green-600' : 'text-gray-500'}>
-                  At least one number
+                <span className={pwdStrength.number ? 'text-green-600' : 'text-gray-500'} data-i18n="register.pwdNumber">
+                  {t("register.pwdNumber")}
                 </span>
               </div>
               <div className="flex items-center">
                 <div className={`w-2 h-2 rounded-full mr-2 ${
                   pwdStrength.special ? 'bg-green-500' : 'bg-gray-200'
                 }`}></div>
-                <span className={pwdStrength.special ? 'text-green-600' : 'text-gray-500'}>
-                  At least one special character (@, #, $, %, &, *, !, ?)
+                <span className={pwdStrength.special ? 'text-green-600' : 'text-gray-500'} data-i18n="register.pwdSpecial">
+                  {t("register.pwdSpecial")}
                 </span>
               </div>
             </div>
 
-            <label className="flex flex-col text-sm font-medium">
-              Confirm New Password
-              <input
-                type="password"
-                value={pwdConfirm}
-                onChange={handleConfirmPasswordChange}
-                className={`mt-1 border ${
-                  pwdConfirm && pwdError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-                } rounded-lg px-3 py-2 shadow-sm transition duration-200`}
-              />
-              {pwdError && (
-                <p className="mt-1 text-sm text-red-600">{pwdError}</p>
-              )}
+            <label className="flex flex-col text-sm font-medium" data-i18n="profile.confirmNewPassword">
+              {t("profile.confirmNewPassword")}
+              <input type="password" value={pwdConfirm} onChange={handleConfirmPasswordChange} className={`mt-1 border ${pwdConfirm && pwdError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'} rounded-lg px-3 py-2 shadow-sm transition duration-200`} />
+              {pwdError && <p className="mt-1 text-sm text-red-600">{pwdError}</p>}
             </label>
 
             <div>
-              <button
-                onClick={handleChangePassword}
-                disabled={pwdLoading || !isPasswordFormValid()}
-                className={`w-full py-2 px-4 rounded-lg text-white font-medium shadow-sm transition ${
-                  isPasswordFormValid() && !pwdLoading
-                    ? 'bg-indigo-600 hover:bg-indigo-700 hover:scale-[1.02] hover:shadow-md'
-                    : 'bg-gray-400 cursor-not-allowed'
-                }`}
-              >
-                {pwdLoading ? 'Updating…' : 'Update Password'}
+              <button onClick={handleChangePassword} disabled={pwdLoading || !isPasswordFormValid()} className={`w-full py-2 px-4 rounded-lg text-white font-medium shadow-sm transition ${isPasswordFormValid() && !pwdLoading ? 'bg-indigo-600 hover:bg-indigo-700 hover:scale-[1.02] hover:shadow-md' : 'bg-gray-400 cursor-not-allowed'}`} data-i18n="profile.updatePassword">
+                {pwdLoading ? 'Updating…' : t("profile.updatePassword")}
               </button>
             </div>
-            
-            <p className="text-xs text-gray-500">
-              For security, please enter your current password and confirm the new password.
-              Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.
-            </p>
+
+            <p className="text-xs text-gray-500" data-i18n="profile.passwordInstructions">{t("profile.passwordInstructions")}</p>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-export default Profile;

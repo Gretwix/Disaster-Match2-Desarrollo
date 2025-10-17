@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Mail, Lock } from "react-feather";
 import { notifyError, notifySuccess } from "../../../utils/notify";
+import { useTranslation } from "react-i18next";
 
 const API_BASE = "https://localhost:7044";
 const API_BASE_HTTP = "http://localhost:7044";
@@ -14,6 +15,7 @@ export default function Login() {
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(window.location.search);
   const redirectTo = searchParams.get('redirect') || '/HomePage';
+  const { t } = useTranslation();
 
   /**
    * Maneja el envío del formulario de login.
@@ -135,17 +137,15 @@ export default function Login() {
         </div>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
-          <p className="text-gray-500">Sign in to your account to continue</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2" data-i18n="login.welcome">{t("login.welcome")}</h1>
+          <p className="text-gray-500" data-i18n="login.signInToContinue">{t("login.signInToContinue")}</p>
         </div>
 
         {/* Formulario de login */}
         <form className="space-y-6" onSubmit={handleLogin}>
           {/* Campo Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email address
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="login.emailAddress">{t("login.emailAddress")}</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Mail className="text-gray-400 w-5 h-5" />
@@ -164,9 +164,7 @@ export default function Login() {
           {/* Campo Password */}
 <div>
   <div className="flex justify-between items-center mb-1">
-    <label className="block text-sm font-medium text-gray-700">
-      Password
-    </label>
+    <label className="block text-sm font-medium text-gray-700" data-i18n="login.password">{t("login.password")}</label>
     <a
       href="/forgot-password"
       onClick={(e) => {
@@ -174,8 +172,9 @@ export default function Login() {
         navigate({ to: "/ForgotPassword" });
       }}
       className="text-sm font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
+      data-i18n="login.forgotPassword"
     >
-      Forgot password?
+      {t("login.forgotPassword")}
     </a>
   </div>
   <div className="relative">
@@ -204,11 +203,12 @@ export default function Login() {
                     type="button"
                     onClick={resendVerification}
                     className="text-indigo-600 hover:text-indigo-500"
+                    data-i18n="login.resendVerification"
                   >
-                    Resend verification email
+                    {t("login.resendVerification")}
                   </button>
                   <span className="text-gray-400 mx-2">·</span>
-                  <a href="/verify-email" className="text-indigo-600 hover:text-indigo-500">Enter verification page</a>
+                  <a href="/verify-email" className="text-indigo-600 hover:text-indigo-500" data-i18n="login.enterVerification">{t("login.enterVerification")}</a>
                 </div>
               )}
             </div>
@@ -219,21 +219,23 @@ export default function Login() {
             <button
               type="submit"
               className="w-full py-3 px-4 rounded-md text-white font-medium shadow-sm bg-gradient-to-r from-indigo-600 to-indigo-800 hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
+              data-i18n="login.signIn"
             >
-              Sign in
+              {t("login.signIn")}
             </button>
           </div>
         </form>
 
         {/* Enlace para ir al registro si no tienes cuenta */}
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
-            Don&apos;t have an account?{" "}
+          <p className="text-sm text-gray-500" data-i18n="login.noAccount">
+            {t("login.noAccount")}{" "}
             <a
               href="/register"
               className="font-medium text-indigo-600 hover:text-indigo-500"
+              data-i18n="login.signUp"
             >
-              Sign up
+              {t("login.signUp")}
             </a>
           </p>
         </div>

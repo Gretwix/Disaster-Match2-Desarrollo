@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "@tanstack/react-router";
 import { formatCurrency } from "../../utils/format";
+import { useTranslation } from "react-i18next"; // added
 
 interface CartItem {
   id: number;
@@ -20,8 +21,7 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
   const navigate = useNavigate();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const cartRef = useRef<HTMLDivElement>(null);
-
-  
+  const { t } = useTranslation(); // added
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -64,7 +64,7 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
                   role="menu"
                 >
                   {cartItems.length === 0 ? (
-                    <p className="text-gray-500 text-center">Your cart is empty</p>
+                    <p className="text-gray-500 text-center">{t("cart.empty")}</p>
                   ) : (
                     <div className="flex flex-col gap-4">
                       <ul className="divide-y divide-gray-200 max-h-60 overflow-y-auto">
@@ -91,7 +91,7 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
 
                       <div className="flex justify-between items-center">
                         <span className="text-base font-semibold text-gray-900">
-                          Total
+                          {t("cart.total")}
                         </span>
                         <span className="text-base font-semibold text-indigo-600">
                           {formatCurrency(total)}
@@ -105,8 +105,9 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
                           navigate({ to: "/Cart" });
                         }}
                         type="button"
+                        data-i18n="cart.goToCart"
                       >
-                        Go to Cart
+                        {t("cart.goToCart")}
                       </button>
                     </div>
                   )}

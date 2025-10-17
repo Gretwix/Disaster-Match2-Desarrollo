@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { Moon, Sun } from "lucide-react";
@@ -16,6 +17,7 @@ export default function Navigation() {
   const [isTouch, setIsTouch] = useState(false);
   const closeTimerRef = useRef<number | null>(null);
   const [isDark, setIsDark] = useState<boolean>(false);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     setLoggedUserState(getLoggedUser());
@@ -97,6 +99,10 @@ export default function Navigation() {
     void doLogout();
   };
 
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+
   // Hover intent helpers for stable open/close
   const clearCloseTimer = () => {
     if (closeTimerRef.current !== null) {
@@ -146,15 +152,12 @@ export default function Navigation() {
 
       {/* Centro: Logo Disaster Match */}
       <div className="absolute left-1/2 transform -translate-x-1/2">
-        <Link
-          to="/"
-          className="flex items-center"
-          aria-label="Go to Landing Page"
-        >
+        <Link to="/" className="flex items-center" aria-label={t("nav.disasterMatch")}>
           <img
             src="/Logo DM.png"
-            alt="Disaster Match logo"
+            alt={t("nav.disasterMatch")}
             className="h-12 md:h-16 lg:h-20 w-auto drop-shadow-sm hover:opacity-90 transition-opacity"
+            data-i18n="nav.disasterMatch"
           />
         </Link>
       </div>
@@ -165,12 +168,25 @@ export default function Navigation() {
         <button
           type="button"
           onClick={toggleTheme}
-          aria-label={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+          aria-label={isDark ? t("nav.themeLight") : t("nav.themeDark")}
           className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-700/60 bg-black/30 text-gray-200 hover:bg-black/50 transition-colors"
-          title={isDark ? "Modo claro" : "Modo oscuro"}
+          title={isDark ? t("nav.themeLight") : t("nav.themeDark")}
         >
           {isDark ? <Sun size={18} /> : <Moon size={18} />}
         </button>
+
+        {/* Language selector */}
+        <select
+          value={i18n.language}
+          onChange={(e) => changeLanguage(e.target.value)}
+          className="rounded-md border px-2 py-1 text-sm"
+          aria-label={t("nav.language")}
+          data-i18n="nav.language"
+        >
+          <option value="en">EN</option>
+          <option value="es">ES</option>
+        </select>
+
         {(() => {
           const path = routerState.location.pathname.toLowerCase();
           const isLanding = path === "/" || path === "/landingpage";
@@ -183,7 +199,7 @@ export default function Navigation() {
                     to="/AdminReports"
                     className="text-gray-700 dark:text-gray-300 hover:text-lime-600 dark:hover:text-lime-400 transition-colors duration-200"
                   >
-                    Admin Panel
+                    <span data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
                   </Link>
                 )}
 
@@ -191,12 +207,12 @@ export default function Navigation() {
                   to="/HomePage"
                   className="text-gray-700 dark:text-gray-300 hover:text-lime-600 dark:hover:text-lime-400 transition-colors duration-200"
                 >
-                  DisasterMatch
+                  <span data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
                 </Link>
 
                 {/* Profile dropdown */}
                 <div
-                  className="relative pb-2" // pad bottom to avoid hover gap between button and menu
+                  className="relative pb-2"
                   ref={profileRef}
                   onMouseEnter={!isTouch ? openProfile : undefined}
                   onMouseLeave={!isTouch ? () => closeProfileWithDelay() : undefined}
@@ -210,7 +226,7 @@ export default function Navigation() {
                   >
                     <img
                       src="/avatars/default1.png"
-                      alt="Open profile menu"
+                      alt={t("nav.profile")}
                       className="w-10 h-10 rounded-full object-cover border-2 border-gray-300 hover:opacity-90 transition"
                     />
                   </button>
@@ -226,7 +242,7 @@ export default function Navigation() {
                         onClick={() => setIsProfileOpen(false)}
                         className="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-slate-200 rounded-md hover:bg-gray-200 dark:hover:bg-slate-800/60"
                       >
-                        Profile
+                        <span data-i18n="nav.profile">{t("nav.profile")}</span>
                       </Link>
                       <button
                         type="button"
@@ -236,7 +252,7 @@ export default function Navigation() {
                         }}
                         className="block w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-md hover:bg-red-500 hover:text-white dark:hover:bg-red-600/30 dark:hover:text-red-200"
                       >
-                        Logout
+                        <span data-i18n="nav.logout">{t("nav.logout")}</span>
                       </button>
                     </div>
                   )}
@@ -252,13 +268,13 @@ export default function Navigation() {
                 to="/Login"
                 className="px-4 py-2 text-sm md:text-base border border-indigo-500 text-indigo-600 dark:text-indigo-400 hover:text-white hover:bg-indigo-600 rounded-lg transition-colors duration-200"
               >
-                Login
+                <span data-i18n="nav.login">{t("nav.login")}</span>
               </Link>
               <Link
                 to="/Register"
                 className="px-4 py-2 text-sm md:text-base bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200"
               >
-                Register
+                <span data-i18n="nav.register">{t("nav.register")}</span>
               </Link>
             </div>
           ) : null;
