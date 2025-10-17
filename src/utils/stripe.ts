@@ -1,3 +1,4 @@
+import apiUrl from './api'
 export type CheckoutItem = {
   priceId: string
   quantity?: number
@@ -13,10 +14,8 @@ export type CreateCheckoutParams = {
 }
 
 export async function createCheckout(params: CreateCheckoutParams) {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL
-  if (!baseUrl) throw new Error('VITE_API_BASE_URL is not set')
-
-  const res = await fetch(`${baseUrl}/api/payments/create-checkout-session`, {
+  // Route through our API helper to respect env overrides and proxies
+  const res = await fetch(apiUrl('/payments/create-checkout-session'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),

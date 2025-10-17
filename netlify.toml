@@ -2,6 +2,13 @@
   command = "npm run build"
   publish = "dist"
 
+# Proxy API requests securely to the backend (prevents mixed content & CORS)
+[[redirects]]
+  from = "/api/*"
+  to = "http://apidisastermatch.somee.com/:splat"
+  status = 200
+  force = true
+
 # Ensure SPA routing works (TanStack Router)
 [[redirects]]
   from = "/*"
