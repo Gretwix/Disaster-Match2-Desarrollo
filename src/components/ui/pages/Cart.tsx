@@ -5,7 +5,6 @@ import {
   getCart,
   saveCart as saveCartStorage,
   getLoggedUser as getLoggedUserStorage,
-  CART_KEY,
 } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
 import { createCheckout } from "../../../utils/stripe";
@@ -19,13 +18,6 @@ type CartItem = {
   quantity: number;
 };
 
-type PaymentMethod = {
-  cardType: string;
-  cardNumber: string;
-  cardHolder: string;
-  expiryDate: string;
-};
-
 export default function CartPage() {
   const { t } = useTranslation();
 
@@ -34,8 +26,6 @@ export default function CartPage() {
     return Array.isArray(storedCart) ? storedCart : [];
   });
   const navigate = useNavigate();
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [isPurchasing, setIsPurchasing] = useState(false);
   const [isStripeRedirecting, setIsStripeRedirecting] = useState(false);
 
   // 👇 estados para modales
@@ -48,17 +38,7 @@ export default function CartPage() {
     saveCartStorage(items);
   };
 
-  // Cargar métodos de pago del usuario logueado
-  useEffect(() => {
-    const user = getLoggedUserStorage();
-    if (user && user.username) {
-      const key = `paymentMethods_${user.username}`;
-      const stored = localStorage.getItem(key);
-      setPaymentMethods(stored ? JSON.parse(stored) : []);
-    } else {
-      setPaymentMethods([]);
-    }
-  }, []);
+  // (Removed) Saved payment methods are no longer used; Stripe-only flow.
 
   // Migrar títulos existentes del carrito a event_type
   useEffect(() => {
@@ -139,96 +119,6 @@ export default function CartPage() {
             <span className="text-indigo-600">{formatCurrency(total)}</span>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2" data-i18n="cart.noSavedPayments">{t("cart.noSavedPayments")}</label>
-            {paymentMethods.length === 0 ? (
-              <div className="text-gray-500 text-sm mb-2">{t("cart.noSavedPayments")}</div>
-            ) : (
-              <select className="w-full border rounded-xl p-3 mb-2">
-                {paymentMethods.map((pm, idx) => (
-                  <option key={idx} value={pm.cardNumber}>
-                    {pm.cardType.toUpperCase()} •••• {pm.cardNumber.slice(-4)} - {pm.cardHolder} (exp: {pm.expiryDate})
-                  </option>
-                ))}
-              </select>
-            )}
-            <button className="text-indigo-600 hover:underline text-sm" type="button" onClick={() => navigate({ to: "/PaymentForm" })} data-i18n="cart.addPaymentMethod">
-              {t("cart.addPaymentMethod")}
-            </button>
-          </div>
-
-          <button className={`w-full bg-indigo-600 text-white py-3 rounded-md font-medium transition cursor-pointer ${isPurchasing ? "opacity-60 cursor-not-allowed" : "hover:bg-indigo-700"}`} onClick={async () => {
-              if (isPurchasing) return; // guard against double clicks
-              const loggedUser = getLoggedUserStorage();
-              if (!loggedUser || !loggedUser.username) {
-                // No bloquear el botón si redirigimos a login
-                localStorage.setItem("pendingCart", JSON.stringify(cartItems));
-                navigate({
-                  to: "/Login",
-                  search: { redirect: "/PaymentForm" },
-                });
-                return;
-              }
-              try {
-                setIsPurchasing(true);
-                const leadIds = cartItems.map((item) => item.id);
-                const query = leadIds.map((id) => `leadIds=${id}`).join("&");
-
-                const userId = (loggedUser as any)?.id ?? (loggedUser as any)?.ID ?? 0;
-                const purchase = {
-                  user_id: userId,
-                  amount: total,
-                };
-
-                const token = localStorage.getItem("authToken");
-                const response = await fetch(`${apiUrl("/Purchase/Create")}?${query}`, {
-                  method: "PUT",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                  },
-                  body: JSON.stringify(purchase),
-                });
-
-                if (!response.ok) {
-                  const errorText = await response.text().catch(() => "");
-                  throw new Error(errorText || `Error creating purchase (${response.status})`);
-                }
-
-                // Clear cart
-                localStorage.removeItem(CART_KEY);
-
-                setModalTitle(t("cart.purchaseSuccessTitle"));
-                setModalMessage(t("cart.purchaseSuccessMessage"));
-
-                setModalOpen(true);
-
-                // Mantener el botón deshabilitado tras éxito para evitar duplicados
-                setTimeout(() => {
-                  navigate({ to: "/Profile" });
-                }, 7000);
-              } catch (error) {
-                console.error(error);
-                setIsPurchasing(false); // Rehabilitar para reintentar si falló
-
-                setModalTitle(t("cart.purchaseErrorTitle"));
-                setModalMessage(
-                  error instanceof Error
-                    ? error.message
-                    : t("cart.purchaseErrorMessage")
-                );
-                setModalOpen(true);
-              }
-            }}
-            type="button"
-            disabled={cartItems.length === 0 || isPurchasing}
-            data-i18n="cart.confirmPurchaseBtn"
-          >
-            {isPurchasing ? t("cart.processing") : t("cart.confirmPurchaseBtn")}
-          </button>
-
-          <div className="my-3 text-center text-gray-400 text-sm" data-i18n="cart.or">{t("cart.or")}</div>
 
           <button className={`w-full bg-black text-white py-3 rounded-md font-medium transition cursor-pointer ${isStripeRedirecting ? "opacity-60 cursor-not-allowed" : "hover:bg-gray-900"}`} onClick={async () => {
               if (isStripeRedirecting) return;
