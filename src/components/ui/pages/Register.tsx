@@ -33,6 +33,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [confirmError, setConfirmError] = useState("");
   const [passwordStrength, setPasswordStrength] = useState({
     length: false,
     upper: false,
@@ -70,11 +71,12 @@ export default function Register() {
 
   // Validate password confirmation
   const validateConfirmPassword = (value: string) => {
-    if (value !== password) {
-      setError("Passwords do not match");
+    // Only show mismatch when both fields have a value
+    if (value && password && value !== password) {
+      setConfirmError("register.errorPasswordsMismatch");
       return false;
     }
-    setError("");
+    setConfirmError("");
     return true;
   };
 
@@ -104,6 +106,7 @@ export default function Register() {
         password &&
         confirm &&
         !passwordError &&
+        !confirmError &&
         !error &&
         Object.values(passwordStrength).every(Boolean)
       );
@@ -130,37 +133,23 @@ export default function Register() {
    * @param user Objeto con los datos del usuario
    */
   async function apiRegister(user: User) {
-    // Try POST first (new flow). If 405, retry with PUT for backward compatibility.
-    // Also attempt HTTP fallback if HTTPS is unreachable.
-    const makeUrl = (proto: "https" | "http") => `${proto}://localhost:7044/Users/Save`;
+    // Use centralized API base; in dev Vite proxies /api -> target server (vite.config.ts)
+    // Try POST first; if 405, fallback to PUT for backward compatibility.
+    const url = `${API_BASE}/Users/Save`;
     const opts = (method: "POST" | "PUT") => ({
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user),
     } as RequestInit);
 
-    // Attempt HTTPS POST
-    try {
-      const res = await fetch(makeUrl("https"), opts("POST"));
-      if (res.status === 405) {
-        // Retry with PUT on HTTPS
-        const resPut = await fetch(makeUrl("https"), opts("PUT"));
-        return resPut;
-      }
-      return res;
-    } catch {
-      // HTTPS failed (connection refused, etc.) — try HTTP
-      try {
-        const res = await fetch(makeUrl("http"), opts("POST"));
-        if (res.status === 405) {
-          const resPut = await fetch(makeUrl("http"), opts("PUT"));
-          return resPut;
-        }
-        return res;
-      } catch (err) {
-        throw err;
-      }
+    const res = await fetch(url, opts("POST")).catch((e) => {
+      throw e;
+    });
+    if (res.status === 405) {
+      const resPut = await fetch(url, opts("PUT"));
+      return resPut;
     }
+    return res;
   }
 
   /**
@@ -202,7 +191,7 @@ export default function Register() {
 
     // Validación de contraseñas
     if (password !== confirm) {
-      setError("Passwords do not match");
+      setError("PASSWORD_MISMATCH");
       setLoading(false);
       return;
     }
@@ -408,19 +397,19 @@ export default function Register() {
                   <input
                     type="password"
                     required
-                    className={`pl-10 bg-gray-50 border ${error && confirm ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'} block w-full py-3 rounded-md`}
+                    className={`pl-10 bg-gray-50 border ${confirmError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'} block w-full py-3 rounded-md`}
                     placeholder={t("register.placeholderConfirm")}
                     value={confirm}
                     onChange={handleConfirmChange}
                   />
                 </div>
-                {error && confirm && (
-                  <p className="mt-1 text-sm text-red-600">{t("register.errorPasswordsMismatch")}</p>
+                {confirmError && (
+                  <p className="mt-1 text-sm text-red-600">{t(confirmError)}</p>
                 )}
               </div>
 
               {/* Error message if any */}
-              {error && !confirm && (
+              {error && !confirmError && (
                 <p className="text-red-500 text-sm font-medium text-center">{t(errorKeyMapper(error))}</p>
               )}
 
@@ -440,8 +429,8 @@ export default function Register() {
                     return;
                   }
 
-                  if (password !== confirm) {
-                    setError("PASSWORD_MISMATCH");
+                  // Recheck confirm match explicitly before checking duplicates
+                  if (!validateConfirmPassword(confirm)) {
                     return;
                   }
 
@@ -449,6 +438,7 @@ export default function Register() {
                   const ok = await checkDuplicates(email, username);
                   if (ok) {
                     setError("");
+                    setConfirmError("");
                     setStep(2);
                   }
                 }}
@@ -559,7 +549,7 @@ export default function Register() {
 
               {/* Mensajes de error y éxito */}
               {error && (
-                <p className="text-red-500 text-sm font-medium text-center">{error}</p>
+                <p className="text-red-500 text-sm font-medium text-center">{t(errorKeyMapper(error))}</p>
               )}
               {success && (
                 <div className="text-center space-y-2">
