@@ -6,6 +6,11 @@
 	font-size: 130%;
 }
 
+/* Cap font size on very narrow screens to prevent overflow */
+@media (max-width: 400px) {
+  :root { font-size: 112.5%; } /* ~18px */
+}
+
 /* Some third-party or component styles may use px values. Provide a helper to scale everything as a fallback.
 	 Use this only if you notice elements not scaling (apply the class on the body in index.html or at runtime). */
 .dm-scale-140 {
@@ -113,3 +118,5 @@
   box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1) !important; /* hover:shadow-md */
 }
 :root:not(.dark) .force-light-icon-contrast { color: #ffffff !important; }
+
+/* Removed force-white sidebar/text utilities to preserve dark mode styling */

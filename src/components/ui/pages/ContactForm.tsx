@@ -3,6 +3,7 @@ import { Mail, User, MessageSquare, ArrowLeft } from "react-feather";
 import { useNavigate } from "@tanstack/react-router";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
+import apiUrl from "../../../utils/api";
 
 export default function ContactForm() {
   const [loading, setLoading] = useState(false);
@@ -24,7 +25,7 @@ export default function ContactForm() {
     };
 
     try {
-      const res = await fetch("https://localhost:7044/Contact/Send", {
+  const res = await fetch(apiUrl("/Contact/Send"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

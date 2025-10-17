@@ -1,6 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-useless-catch */
 import { useState } from "react";
+import { API_BASE } from "../../../utils/api";
 import { useNavigate } from "@tanstack/react-router";
 import { Mail, Lock } from "react-feather";
+import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
 import { useTranslation } from "react-i18next";
 
 // Tipo de usuario para el registro
@@ -17,7 +21,7 @@ type User = {
   fechaRegistro: string;
 };
 
-const API_URL = "https://localhost:7044/Users";
+const API_URL = `${API_BASE}/Users`;
 
 export default function Register() {
   // Controla el paso actual del formulario (1: credenciales, 2: datos personales)
@@ -29,6 +33,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [confirmError, setConfirmError] = useState("");
   const [passwordStrength, setPasswordStrength] = useState({
     length: false,
     upper: false,
@@ -66,11 +71,12 @@ export default function Register() {
 
   // Validate password confirmation
   const validateConfirmPassword = (value: string) => {
-    if (value !== password) {
-      setError("Passwords do not match");
+    // Only show mismatch when both fields have a value
+    if (value && password && value !== password) {
+      setConfirmError("register.errorPasswordsMismatch");
       return false;
     }
-    setError("");
+    setConfirmError("");
     return true;
   };
 
@@ -100,6 +106,7 @@ export default function Register() {
         password &&
         confirm &&
         !passwordError &&
+        !confirmError &&
         !error &&
         Object.values(passwordStrength).every(Boolean)
       );
@@ -126,37 +133,23 @@ export default function Register() {
    * @param user Objeto con los datos del usuario
    */
   async function apiRegister(user: User) {
-    // Try POST first (new flow). If 405, retry with PUT for backward compatibility.
-    // Also attempt HTTP fallback if HTTPS is unreachable.
-    const makeUrl = (proto: "https" | "http") => `${proto}://localhost:7044/Users/Save`;
+    // Use centralized API base; in dev Vite proxies /api -> target server (vite.config.ts)
+    // Try POST first; if 405, fallback to PUT for backward compatibility.
+    const url = `${API_BASE}/Users/Save`;
     const opts = (method: "POST" | "PUT") => ({
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user),
     } as RequestInit);
 
-    // Attempt HTTPS POST
-    try {
-      const res = await fetch(makeUrl("https"), opts("POST"));
-      if (res.status === 405) {
-        // Retry with PUT on HTTPS
-        const resPut = await fetch(makeUrl("https"), opts("PUT"));
-        return resPut;
-      }
-      return res;
-    } catch {
-      // HTTPS failed (connection refused, etc.) — try HTTP
-      try {
-        const res = await fetch(makeUrl("http"), opts("POST"));
-        if (res.status === 405) {
-          const resPut = await fetch(makeUrl("http"), opts("PUT"));
-          return resPut;
-        }
-        return res;
-      } catch (err) {
-        throw err;
-      }
+    const res = await fetch(url, opts("POST")).catch((e) => {
+      throw e;
+    });
+    if (res.status === 405) {
+      const resPut = await fetch(url, opts("PUT"));
+      return resPut;
     }
+    return res;
   }
 
   /**
@@ -198,7 +191,13 @@ export default function Register() {
 
     // Validación de contraseñas
     if (password !== confirm) {
-      setError("Passwords do not match");
+      setError("PASSWORD_MISMATCH");
+      setLoading(false);
+      return;
+    }
+
+    if (!validatePhone(phone)) {
+      setPhoneError("Phone number must be between 7 and 15 digits");
       setLoading(false);
       return;
     }
@@ -255,25 +254,22 @@ export default function Register() {
         {/* Stepper visual para mostrar el progreso del registro */}
         <div className="flex justify-center mb-8">
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-              step === 1
-                ? "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white"
-                : "bg-gray-200 text-gray-600"
-            }`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step === 1
+              ? "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white"
+              : "bg-gray-200 text-gray-600"
+              }`}
           >
             1
           </div>
           <div
-            className={`h-1 flex-1 mx-2 self-center ${
-              step === 2 ? "bg-indigo-600" : "bg-gray-200"
-            }`}
+            className={`h-1 flex-1 mx-2 self-center ${step === 2 ? "bg-indigo-600" : "bg-gray-200"
+              }`}
           />
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-              step === 2
-                ? "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white"
-                : "bg-gray-200 text-gray-600"
-            }`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step === 2
+              ? "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white"
+              : "bg-gray-200 text-gray-600"
+              }`}
           >
             2
           </div>
@@ -342,11 +338,10 @@ export default function Register() {
                   <input
                     type="password"
                     required
-                    className={`pl-10 bg-gray-50 border ${
-                      passwordError
-                        ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                        : "border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600"
-                    } block w-full py-3 rounded-md`}
+                    className={`pl-10 bg-gray-50 border ${passwordError
+                      ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                      : "border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600"
+                      } block w-full py-3 rounded-md`}
                     placeholder={t("register.placeholderPassword")}
                     value={password}
                     onChange={handlePasswordChange}
@@ -402,19 +397,19 @@ export default function Register() {
                   <input
                     type="password"
                     required
-                    className={`pl-10 bg-gray-50 border ${error && confirm ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'} block w-full py-3 rounded-md`}
+                    className={`pl-10 bg-gray-50 border ${confirmError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'} block w-full py-3 rounded-md`}
                     placeholder={t("register.placeholderConfirm")}
                     value={confirm}
                     onChange={handleConfirmChange}
                   />
                 </div>
-                {error && confirm && (
-                  <p className="mt-1 text-sm text-red-600">{t("register.errorPasswordsMismatch")}</p>
+                {confirmError && (
+                  <p className="mt-1 text-sm text-red-600">{t(confirmError)}</p>
                 )}
               </div>
 
               {/* Error message if any */}
-              {error && !confirm && (
+              {error && !confirmError && (
                 <p className="text-red-500 text-sm font-medium text-center">{t(errorKeyMapper(error))}</p>
               )}
 
@@ -434,8 +429,8 @@ export default function Register() {
                     return;
                   }
 
-                  if (password !== confirm) {
-                    setError("PASSWORD_MISMATCH");
+                  // Recheck confirm match explicitly before checking duplicates
+                  if (!validateConfirmPassword(confirm)) {
                     return;
                   }
 
@@ -443,6 +438,7 @@ export default function Register() {
                   const ok = await checkDuplicates(email, username);
                   if (ok) {
                     setError("");
+                    setConfirmError("");
                     setStep(2);
                   }
                 }}
@@ -485,38 +481,41 @@ export default function Register() {
 
               {/* Phone Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.phone">{t("register.phone")}</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone
+                </label>
                 <div>
                   <input
                     type="tel"
-                    className={`bg-gray-50 border ${phoneError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'} block w-full px-3 py-3 rounded-md`}
-                    placeholder={t("register.placeholderPhone")}
+                    className={`bg-gray-50 border ${phoneError
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'
+                      } block w-full px-3 py-3 rounded-md`}
+                    placeholder="+1 xxx xxx xxxx"
                     value={phone}
                     inputMode="numeric"
                     onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === '' || /^\d*$/.test(value)) {
-                        setPhone(value);
-                        if (value && (value.length < 8 || value.length > 15)) {
-                          setPhoneError(t("register.phoneRange"));
-                        } else {
-                          setPhoneError('');
-                        }
+                      const raw = e.target.value;
+                      const formatted = formatPhone(raw);
+                      setPhone(formatted);
+                      // Allow only numbers
+                      if (/^\d*$/.test(raw)) {
+                        const formatted = formatPhone(raw);
+                        setPhone(formatted);
+                        setPhoneError(validatePhone(formatted) ? '' : 'Phone number must be between 7 and 15 digits');
                       }
                     }}
                     onBlur={() => {
-                      if (phone && (phone.length < 8 || phone.length > 15)) {
-                        setPhoneError(t("register.phoneRange"));
-                      } else {
-                        setPhoneError('');
-                      }
+                      setPhoneError(validatePhone(phone) ? '' : 'Phone number must be between 7 and 15 digits');
                     }}
                   />
                 </div>
                 {phoneError ? (
                   <p className="mt-1 text-sm text-red-600">{phoneError}</p>
                 ) : (
-                  <p className="mt-1 text-xs text-gray-500">{t("register.phoneHint")}</p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Only numbers allowed. Must be 7-15 digits.
+                  </p>
                 )}
               </div>
 
@@ -550,7 +549,7 @@ export default function Register() {
 
               {/* Mensajes de error y éxito */}
               {error && (
-                <p className="text-red-500 text-sm font-medium text-center">{error}</p>
+                <p className="text-red-500 text-sm font-medium text-center">{t(errorKeyMapper(error))}</p>
               )}
               {success && (
                 <div className="text-center space-y-2">

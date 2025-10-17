@@ -13,18 +13,18 @@ type IncidentTableProps = {
 
 export function IncidentTable({ incidents }: IncidentTableProps) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
+  <div className="rounded-2xl border border-gray-200 bg-gray-50 p-3 sm:p-5">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">Incidents</h2>
       <div className="overflow-x-auto">
-        <table className="min-w-full text-left text-sm table-fixed border border-gray-200 rounded-lg overflow-hidden">
-          <thead className="bg-gray-100">
+        <table className="min-w-full text-left text-sm border border-gray-200 rounded-lg overflow-hidden">
+          <thead className="bg-gray-100 text-xs sm:text-sm">
             <tr className="text-gray-700 border-b border-gray-300">
-              <th className="px-4 py-3 w-32 border-r border-gray-200">Type</th>
-              <th className="px-4 py-3 w-64 border-r border-gray-200">Description</th>
-              <th className="px-4 py-3 w-48 border-r border-gray-200">Location</th>
-              <th className="px-4 py-3 w-32 border-r border-gray-200">Date</th>
-              <th className="px-4 py-3 w-32 border-r border-gray-200">Status</th>
-              <th className="px-4 py-3 w-32 text-center">Action</th>
+              <th className="px-3 sm:px-4 py-3 w-24 sm:w-32 border-r border-gray-200">Type</th>
+              <th className="px-3 sm:px-4 py-3 border-r border-gray-200">Description</th>
+              <th className="px-3 sm:px-4 py-3 w-40 sm:w-48 border-r border-gray-200 hidden md:table-cell">Location</th>
+              <th className="px-3 sm:px-4 py-3 w-28 sm:w-32 border-r border-gray-200 hidden lg:table-cell">Date</th>
+              <th className="px-3 sm:px-4 py-3 w-28 sm:w-32 border-r border-gray-200 hidden md:table-cell">Status</th>
+              <th className="px-3 sm:px-4 py-3 w-28 sm:w-32 text-center">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -37,7 +37,7 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
                   }`}
                 >
                   {/* Tipo */}
-                  <td className="px-4 py-3 border-r border-gray-200">
+                  <td className="px-3 sm:px-4 py-3 border-r border-gray-200 align-top">
                     <span
                       className={`${tagColors[incident.type]} px-2 py-1 rounded-full text-xs font-semibold`}
                     >
@@ -46,9 +46,9 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
                   </td>
 
                   {/* Descripción con tooltip dinámico */}
-                  <td className="px-4 py-3 text-gray-900 max-w-[250px] border-r border-gray-200 relative overflow-visible">
+                  <td className="px-3 sm:px-4 py-3 text-gray-900 max-w-[220px] sm:max-w-[250px] border-r border-gray-200 relative overflow-visible">
                     <div className="group relative">
-                      <span className="block truncate whitespace-nowrap cursor-help">
+                      <span className="block truncate whitespace-nowrap cursor-help text-xs sm:text-sm">
                         {incident.title}
                       </span>
                       {/* Tooltip */}
@@ -67,17 +67,17 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
                   </td>
 
                   {/* Ubicación */}
-                  <td className="px-4 py-3 text-gray-900 max-w-[200px] truncate whitespace-nowrap border-r border-gray-200">
+                  <td className="px-3 sm:px-4 py-3 text-gray-900 max-w-[200px] truncate whitespace-nowrap border-r border-gray-200 hidden md:table-cell">
                     {incident.location}
                   </td>
 
                   {/* Fecha */}
-                  <td className="px-4 py-3 text-gray-900 border-r border-gray-200">
+                  <td className="px-3 sm:px-4 py-3 text-gray-900 border-r border-gray-200 hidden lg:table-cell">
                     {incident.date}
                   </td>
 
                   {/* Estado */}
-                  <td className="px-4 py-3 border-r border-gray-200">
+                  <td className="px-3 sm:px-4 py-3 border-r border-gray-200 hidden md:table-cell">
                     {incident.verified ? (
                       <span className="text-green-600 flex items-center gap-1">
                         ✅ Verified
@@ -90,7 +90,7 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
                   </td>
 
                   {/* Acción */}
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-3 sm:px-4 py-3 text-center">
                     <button
                       className="text-indigo-600 hover:underline font-medium"
                       onClick={
@@ -107,7 +107,7 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
             ) : (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={3}
                   className="px-4 py-3 text-center text-gray-500"
                 >
                   No incidents available

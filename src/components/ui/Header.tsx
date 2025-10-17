@@ -60,7 +60,7 @@ export default function Header({ cartCount, cartItems, total }: HeaderProps) {
               {/* Dropdown */}
               {isCartOpen && (
                 <div
-                  className="absolute right-0 top-full mt-2 w-96 bg-white border border-gray-200 rounded-lg shadow-sm p-4 z-20"
+                  className="absolute right-0 top-full mt-2 w-[90vw] max-w-96 bg-white border border-gray-200 rounded-lg shadow-sm p-4 z-20"
                   role="menu"
                 >
                   {cartItems.length === 0 ? (

@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Mail, Lock } from "react-feather";
 import { notifyError, notifySuccess } from "../../../utils/notify";
+import { API_BASE } from "../../../utils/api";
 import { useTranslation } from "react-i18next";
 
-const API_BASE = "https://localhost:7044";
-const API_BASE_HTTP = "http://localhost:7044";
+// Using centralized API_BASE from utils/api
 
 export default function Login() {
   // Estados para los campos del formulario y mensajes
@@ -27,7 +27,7 @@ export default function Login() {
 
     try {
       // Realiza la petición al endpoint de login
-      let res = await fetch(`${API_BASE}/Users/Login`, {
+  let res = await fetch(`${API_BASE}/Users/Login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -37,13 +37,7 @@ export default function Login() {
       }
       if (res.status === 0) {
         // network error, attempt HTTP fallback
-        try {
-          res = await fetch(`${API_BASE_HTTP}/Users/Login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-          });
-        } catch {}
+        // already using same base
       }
 
       // Si las credenciales son incorrectas
@@ -94,19 +88,13 @@ export default function Login() {
       return;
     }
     try {
-      let res = await fetch(`${API_BASE}/Users/ResendVerification`, {
+  let res = await fetch(`${API_BASE}/Users/ResendVerification`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
       if (!res.ok) {
-        try {
-          res = await fetch(`${API_BASE_HTTP}/Users/ResendVerification`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email }),
-          });
-        } catch {}
+        // already using same base
       }
       if (res.ok) {
         const text = await res.text().catch(() => "");

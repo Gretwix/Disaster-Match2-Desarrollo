@@ -2,6 +2,7 @@
 import { createFileRoute, useRouter, useNavigate } from '@tanstack/react-router'
 import * as React from 'react'
 import { getCart, getLoggedUser, CART_KEY } from '../../utils/storage'
+import apiUrl from '../../utils/api'
 
 export const Route = createFileRoute('/checkout/success')({
   component: SuccessPage,
@@ -53,8 +54,7 @@ function SuccessPage() {
         const purchase = { user_id: userId, amount: total }
 
         const token = localStorage.getItem('authToken')
-        const base = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7044'
-        const resp = await fetch(`${base}/Purchase/Create?${query}`, {
+    const resp = await fetch(`${apiUrl('/Purchase/Create')}?${query}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

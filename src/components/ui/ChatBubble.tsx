@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import apiUrl from "../../utils/api";
 import { MessageCircle, X, Send } from "lucide-react";
 
 type Message = { sender: "user" | "bot"; text: string };
@@ -30,15 +31,41 @@ export default function ChatBubble() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://localhost:7044/Chat/Ask", {
+      const token = localStorage.getItem("authToken");
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      };
+
+      const res = await fetch(apiUrl("/Chat/Ask"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ message: input, userId: 1 }),
       });
 
-      const data = await res.json();
+      const raw = await res.text().catch(() => "");
+      if (!res.ok) {
+        const brief = raw?.slice(0, 300) || `${res.status} ${res.statusText}`;
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            text: `Sorry, I couldn't process that right now (${res.status}).${brief ? `\n\nDetails: ${brief}` : ""}`,
+          },
+        ]);
+        return;
+      }
 
-      if (data.escalate) {
+      let data: any = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch {
+        // Fallback: treat as plain text reply
+        data = { reply: raw };
+      }
+
+      if (data?.escalate) {
         setMessages((prev) => [
           ...prev,
           { sender: "bot", text: data.reply },
@@ -55,7 +82,7 @@ export default function ChatBubble() {
       } else {
         const botMsg: Message = {
           sender: "bot",
-          text: data.reply || "No response received.",
+          text: (data && (data.reply || data.message)) || raw || "No response received.",
         };
         setMessages((prev) => [...prev, botMsg]);
       }

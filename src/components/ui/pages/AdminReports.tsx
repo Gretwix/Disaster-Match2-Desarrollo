@@ -16,6 +16,7 @@ import {
   Legend,
 } from "recharts";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "../../../utils/api";
 
 // ======================= TYPES ========================
 type FilterMode = "current" | "all" | "custom";
@@ -62,21 +63,21 @@ export default function AdminReports() {
         return { data: fallback, ok: false };
       }
     };
-
+//nada
     const run = async () => {
       if (filterMode === "all") {
         const usersRes = await safeFetchJson<{ totalUsers: number }>(
-          "https://localhost:7044/Users/TotalUsers",
+          `${API_BASE}/Users/TotalUsers`,
           { totalUsers: 0 },
           "Failed to load total users"
         );
         const histRes = await safeFetchJson<any[]>(
-          "https://localhost:7044/Users/History",
+          `${API_BASE}/Users/History`,
           [],
           "Failed to load activity history"
         );
         const statsRes = await safeFetchJson<{ totalSales: number; totalRevenue: number }>(
-          "https://localhost:7044/Purchase/Stats",
+          `${API_BASE}/Purchase/Stats`,
           { totalSales: 0, totalRevenue: 0 },
           "Failed to load stats"
         );
@@ -94,23 +95,23 @@ export default function AdminReports() {
         const m = filterMode === "current" ? now.getMonth() + 1 : month;
 
         const usersMonth = await safeFetchJson<{ totalUsers: number }>(
-          `https://localhost:7044/Users/TotalUsersByMonth?year=${y}&month=${m}`,
+          `${API_BASE}/Users/TotalUsersByMonth?year=${y}&month=${m}`,
           { totalUsers: 0 }
         );
         const histMonth = await safeFetchJson<any[]>(
-          `https://localhost:7044/Users/HistoryByMonth?year=${y}&month=${m}`,
+          `${API_BASE}/Users/HistoryByMonth?year=${y}&month=${m}`,
           []
         );
         const statsMonth = await safeFetchJson<{ totalSales: number; totalRevenue: number }>(
-          `https://localhost:7044/Purchase/StatsByMonth?year=${y}&month=${m}`,
+          `${API_BASE}/Purchase/StatsByMonth?year=${y}&month=${m}`,
           { totalSales: 0, totalRevenue: 0 }
         );
         const salesByDayRes = await safeFetchJson<{ day: number; total: number }[]>(
-          `https://localhost:7044/Purchase/StatsByDay?year=${y}&month=${m}`,
+          `${API_BASE}/Purchase/StatsByDay?year=${y}&month=${m}`,
           []
         );
         const usersByDayRes = await safeFetchJson<{ day: number; total: number }[]>(
-          `https://localhost:7044/Users/NewUsersByDay?year=${y}&month=${m}`,
+          `${API_BASE}/Users/NewUsersByDay?year=${y}&month=${m}`,
           []
         );
 
@@ -121,19 +122,19 @@ export default function AdminReports() {
         const usersAll = usersMonth.ok
           ? usersMonth
           : await safeFetchJson<{ totalUsers: number }>(
-              "https://localhost:7044/Users/TotalUsers",
+              `${API_BASE}/Users/TotalUsers`,
               { totalUsers: 0 }
             );
         const histAll = histMonth.ok
           ? histMonth
           : await safeFetchJson<any[]>(
-              "https://localhost:7044/Users/History",
+              `${API_BASE}/Users/History`,
               []
             );
         const statsAll = statsMonth.ok
           ? statsMonth
           : await safeFetchJson<{ totalSales: number; totalRevenue: number }>(
-              "https://localhost:7044/Purchase/Stats",
+              `${API_BASE}/Purchase/Stats`,
               { totalSales: 0, totalRevenue: 0 }
             );
 
@@ -354,32 +355,35 @@ export default function AdminReports() {
     }
   };
 
-  const sidebarLinkBase = "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-800/60 transition";
-  const sidebarActiveClass = "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300";
+  // Match Profile page sidebar styles for consistent contrast in light mode
+  const sidebarLinkBase =
+    "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-800/60 transition";
+  const sidebarActiveClass =
+    "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300";
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100">
       <Toaster position="top-right" />
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
-        <div className="rounded-2xl bg-white shadow-sm border border-gray-200">
+        <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
             {/* ========== SIDEBAR ========== */}
-            <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50/60 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
+            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
                 <Link to="/" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <Home className="h-5 w-5" />
+                  <Home className="h-5 w-5 text-gray-900 dark:text-slate-300" />
                   <span className="font-medium" data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
                 </Link>
                 <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <BarChart className="h-5 w-5" />
+                  <BarChart className="h-5 w-5 text-gray-900 dark:text-slate-300" />
                   <span className="font-medium" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
                 </Link>
                 <Link to="/Profile" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <User className="h-5 w-5" />
+                  <User className="h-5 w-5 text-gray-900 dark:text-slate-300" />
                   <span className="font-medium" data-i18n="nav.profile">{t("nav.profile")}</span>
                 </Link>
                 <Link to="/AdminUsers" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <Users className="h-5 w-5" />
+                  <Users className="h-5 w-5 text-gray-900 dark:text-slate-300" />
                   <span className="font-medium" data-i18n="nav.users">{t("nav.users")}</span>
                 </Link>
               </nav>
@@ -389,12 +393,12 @@ export default function AdminReports() {
             <section className="p-6 md:p-8" id="report-content">
               {/* ======= HEADER ======= */}
               <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-semibold text-gray-900" data-i18n="reports.overview">{t("reports.overview")}</h1>
+                <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 force-light-text" data-i18n="reports.overview">{t("reports.overview")}</h1>
                 <button onClick={handleExportPDF} className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition" data-i18n="reports.exportPDF">{t("reports.exportPDF")}</button>
               </div>
 
               {/* ======= FILTER TOOLBAR ======= */}
-              <div className="mt-6 bg-white border border-gray-200 rounded-xl shadow-sm px-6 py-5">
+              <div className="mt-6 bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm px-6 py-5 force-light-bg-white">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                   <div className="flex gap-2">
                     {(["current", "all", "custom"] as FilterMode[]).map((mode) => (
@@ -445,17 +449,17 @@ export default function AdminReports() {
 
               {/* ======= SUMMARY CARDS ======= */}
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
+                <div className="rounded-xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm text-center force-light-bg-white">
                   <h2 className="text-lg font-semibold text-gray-800" data-i18n="reports.totalUsers">{t("reports.totalUsers")}</h2>
                   <p className="mt-2 text-3xl font-bold text-indigo-600">{totalUsers !== null ? totalUsers : "Loading..."}</p>
                   <p className="text-sm text-gray-500">Registered users</p>
                 </div>
-                <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
+                <div className="rounded-xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm text-center force-light-bg-white">
                   <h2 className="text-lg font-semibold text-gray-800" data-i18n="reports.purchases">{t("reports.purchases")}</h2>
                   <p className="mt-2 text-3xl font-bold text-indigo-600">{totalSales !== null ? totalSales : "Loading..."}</p>
                   <p className="text-sm text-gray-500">Completed orders</p>
                 </div>
-                <div className="rounded-xl bg-white border border-gray-200 p-6 shadow-sm text-center">
+                <div className="rounded-xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm text-center force-light-bg-white">
                   <h2 className="text-lg font-semibold text-gray-800" data-i18n="reports.revenue">{t("reports.revenue")}</h2>
                   <p className="mt-2 text-3xl font-bold text-green-600">{totalRevenue !== null ? `$${totalRevenue.toFixed(2)}` : "Loading..."}</p>
                   <p className="text-sm text-gray-500">Total earnings</p>
@@ -465,7 +469,7 @@ export default function AdminReports() {
               {/* ======= CHARTS ======= */}
               <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Sales by Day */}
-                <div className="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
+                <div className="rounded-2xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm force-light-bg-white">
                   <h2 className="text-lg font-semibold text-gray-800 mb-4">
                     Purchase Progress
                   </h2>
@@ -489,7 +493,7 @@ export default function AdminReports() {
                   </div>
                 </div>
                 {/* New Users by Day */}
-                <div className="rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
+                <div className="rounded-2xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm force-light-bg-white">
                   <h2 className="text-lg font-semibold text-gray-800 mb-4">
                     New Users Progress
                   </h2>
@@ -515,7 +519,7 @@ export default function AdminReports() {
               </div>
 
               {/* ======= ACTIVITY TABLE ======= */}
-              <div className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
+              <div className="mt-8 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0b1220] p-4 sm:p-5">
                 <div className="flex flex-wrap justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold text-gray-800">
                     Recent Activity

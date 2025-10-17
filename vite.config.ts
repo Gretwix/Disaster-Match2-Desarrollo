@@ -20,4 +20,13 @@ export default defineConfig({
       '@lib': path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src/lib'),
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://apidisastermatch.somee.com',
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/api/, ''),
+      },
+    },
+  },
 })

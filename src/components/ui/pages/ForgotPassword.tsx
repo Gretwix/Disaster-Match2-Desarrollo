@@ -1,4 +1,5 @@
 import { useState } from "react";
+import apiUrl from "../../../utils/api";
 import { Link, useNavigate } from "@tanstack/react-router";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
@@ -12,7 +13,7 @@ export default function ForgotPassword() {
     e.preventDefault();
 
     try {
-      const res = await fetch("https://localhost:7044/Users/ForgotPassword", {
+  const res = await fetch(apiUrl("/Users/ForgotPassword"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: `"${email}"`, // el backend espera string plano

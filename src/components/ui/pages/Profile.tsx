@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Home, User, Users, BarChart } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
+import apiUrl, { API_BASE } from "../../../utils/api";
+import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
 import toast, { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
@@ -19,41 +21,7 @@ type User = {
   user_address?: string;
 };
 
-const API_URL = "https://localhost:7044/Users";
-
-const phoneFormats: Record<string, string> = {
-  "+506": "xxxx xxxx",
-  "+1": "xxx xxx xxxx",
-  "+44": "xxxx xxx xxxx",
-  "+34": "xxx xxx xxx",
-};
-
-const detectCountryFormat = (phone: string) => {
-  const codes = Object.keys(phoneFormats).sort((a, b) => b.length - a.length);
-  for (const code of codes) {
-    if (phone.startsWith(code)) return { code, format: phoneFormats[code] };
-  }
-  return { code: "", format: "xxxx xxxx xxxx" };
-};
-
-const formatPhone = (phone: string) => {
-  const cleaned = phone.replace(/[^\d+]/g, "");
-  const { code, format } = detectCountryFormat(cleaned);
-  const countryCode = code;
-  let digitsOnly = cleaned.replace(/\D/g, "");
-  if (countryCode) {
-    const codeDigits = countryCode.replace("+", "");
-    if (digitsOnly.startsWith(codeDigits)) {
-      digitsOnly = digitsOnly.slice(codeDigits.length);
-    }
-  }
-  let i = 0;
-  const formattedNational = format.replace(/x/g, () => digitsOnly[i++] || "");
-  const result = countryCode
-    ? `${countryCode} ${formattedNational.trim()}`
-    : formattedNational.trim();
-  return result;
-};
+const API_URL = `${API_BASE}/Users`;
 
 export default function Profile() {
   const { t } = useTranslation();
@@ -81,7 +49,6 @@ export default function Profile() {
   const [formData, setFormData] = useState<User | null>();
   const [userPasswordRaw, setUserPasswordRaw] = useState<string | undefined>(undefined);
   const loggedUser = getLoggedUser();
-  const phoneInputRef = useRef<HTMLInputElement | null>(null);
 
   // Validate password in real-time
   const validatePassword = (value: string) => {
@@ -149,7 +116,7 @@ export default function Profile() {
 
   const fetchUser = async () => {
     try {
-      const res = await fetch(`${API_URL}/${getLoggedUser()?.id}`);
+  const res = await fetch(`${API_URL}/${getLoggedUser()?.id}`);
       const data = await res.json();
       const userData: User = {
         ID: data.ID ?? data.id,
@@ -176,59 +143,17 @@ export default function Profile() {
     fetchUser();
   }, []);
 
-  const countSignificantBefore = (raw: string, cursorPos: number) => {
-    const slice = raw.slice(0, cursorPos);
-    const arr = slice.match(/[0-9+]/g);
-    return arr ? arr.length : 0;
-  };
-
-  const findCursorPosInFormatted = (
-    formatted: string,
-    significantTarget: number
-  ) => {
-    let count = 0;
-    for (let i = 0; i < formatted.length; i++) {
-      if (/[0-9+]/.test(formatted[i])) count++;
-      if (count >= significantTarget) return i + 1;
-    }
-    return formatted.length;
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (!formData) return;
     let newValue = value;
     if (name === "phone") {
-      const inputEl = e.target as HTMLInputElement;
-      const cursorPos = inputEl.selectionStart ?? newValue.length;
-      newValue = newValue.replace(/[^0-9+\-\s]/g, "");
-      newValue = newValue.replace(/(?!^)\+/g, "");
-      const cleanedForCount = newValue.replace(/[-\s]/g, "");
-      const significantBefore = countSignificantBefore(
-        cleanedForCount,
-        cursorPos
-      );
-      const formatted = formatPhone(newValue);
-      const newCursorPos = findCursorPosInFormatted(
-        formatted,
-        significantBefore
-      );
-      setFormData({ ...formData, [name]: formatted });
-      window.requestAnimationFrame(() => {
-        const el = phoneInputRef.current;
-        if (el) {
-          const pos = Math.min(newCursorPos, el.value.length);
-          el.setSelectionRange(pos, pos);
-        }
-      });
+      // use external util for formatting
+      newValue = formatPhone(newValue);
+      setFormData({ ...formData, [name]: newValue });
       return;
     }
     setFormData({ ...formData, [name]: newValue });
-  };
-
-  const validatePhone = (phone: string) => {
-    const digits = phone.replace(/[\s-]/g, "").replace(/^\+/, "");
-    return /^\d{7,15}$/.test(digits);
   };
 
   const handleSave = async () => {
@@ -254,7 +179,7 @@ export default function Profile() {
     };
     try {
       const token = localStorage.getItem("authToken");
-      let res = await fetch(`${API_URL}/Update`, {
+  let res = await fetch(`${API_URL}/Update`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -337,19 +262,19 @@ export default function Profile() {
     try {
       setPwdLoading(true);
       const userId = (user as any)?.ID ?? (getLoggedUser() as any)?.id;
-      
-      const res = await fetch(`${API_URL}/ChangePassword`, {
+
+  const res = await fetch(`${API_URL}/ChangePassword`, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          ...(localStorage.getItem("authToken") ? { 
-            'Authorization': `Bearer ${localStorage.getItem("authToken")}` 
+          ...(localStorage.getItem("authToken") ? {
+            'Authorization': `Bearer ${localStorage.getItem("authToken")}`
           } : {})
         },
-        body: JSON.stringify({ 
-          userId, 
-          currentPassword: pwdCurrent, 
-          newPassword: pwdNew 
+        body: JSON.stringify({
+          userId,
+          currentPassword: pwdCurrent,
+          newPassword: pwdNew
         }),
       });
 
@@ -389,7 +314,7 @@ export default function Profile() {
     const fetchPurchased = async () => {
       if (!loggedUser?.id) return setPurchasedIncidents([]);
       try {
-        const res = await fetch("https://localhost:7044/Purchase/List");
+  const res = await fetch(apiUrl("/Purchase/List"));
         const purchases = await res.json();
         const userPurchases = purchases.filter(
           (p: any) => p.user_id === loggedUser.id
@@ -422,7 +347,7 @@ export default function Profile() {
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
         <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
-            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50/60 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
+            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
                 <Link to="/" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <Home className="h-5 w-5 text-gray-900 dark:text-slate-300" />
@@ -527,7 +452,6 @@ export default function Profile() {
                         <label key={field.name} className="flex flex-col text-sm font-medium">
                           {field.label}
                           <input
-                            ref={field.name === "phone" ? phoneInputRef : undefined}
                             name={field.name}
                             type={field.inputType}
                             placeholder={field.placeHolder}
@@ -582,41 +506,36 @@ export default function Profile() {
 
             <div className="space-y-1 text-xs">
               <div className="flex items-center">
-                <div className={`w-2 h-2 rounded-full mr-2 ${
-                  pwdStrength.length ? 'bg-green-500' : 'bg-gray-200'
-                }`}></div>
+                <div className={`w-2 h-2 rounded-full mr-2 ${pwdStrength.length ? 'bg-green-500' : 'bg-gray-200'
+                  }`}></div>
                 <span className={pwdStrength.length ? 'text-green-600' : 'text-gray-500'} data-i18n="register.pwdLength">
                   {t("register.pwdLength")}
                 </span>
               </div>
               <div className="flex items-center">
-                <div className={`w-2 h-2 rounded-full mr-2 ${
-                  pwdStrength.upper ? 'bg-green-500' : 'bg-gray-200'
-                }`}></div>
+                <div className={`w-2 h-2 rounded-full mr-2 ${pwdStrength.upper ? 'bg-green-500' : 'bg-gray-200'
+                  }`}></div>
                 <span className={pwdStrength.upper ? 'text-green-600' : 'text-gray-500'} data-i18n="register.pwdUpper">
                   {t("register.pwdUpper")}
                 </span>
               </div>
               <div className="flex items-center">
-                <div className={`w-2 h-2 rounded-full mr-2 ${
-                  pwdStrength.lower ? 'bg-green-500' : 'bg-gray-200'
-                }`}></div>
+                <div className={`w-2 h-2 rounded-full mr-2 ${pwdStrength.lower ? 'bg-green-500' : 'bg-gray-200'
+                  }`}></div>
                 <span className={pwdStrength.lower ? 'text-green-600' : 'text-gray-500'} data-i18n="register.pwdLower">
                   {t("register.pwdLower")}
                 </span>
               </div>
               <div className="flex items-center">
-                <div className={`w-2 h-2 rounded-full mr-2 ${
-                  pwdStrength.number ? 'bg-green-500' : 'bg-gray-200'
-                }`}></div>
+                <div className={`w-2 h-2 rounded-full mr-2 ${pwdStrength.number ? 'bg-green-500' : 'bg-gray-200'
+                  }`}></div>
                 <span className={pwdStrength.number ? 'text-green-600' : 'text-gray-500'} data-i18n="register.pwdNumber">
                   {t("register.pwdNumber")}
                 </span>
               </div>
               <div className="flex items-center">
-                <div className={`w-2 h-2 rounded-full mr-2 ${
-                  pwdStrength.special ? 'bg-green-500' : 'bg-gray-200'
-                }`}></div>
+                <div className={`w-2 h-2 rounded-full mr-2 ${pwdStrength.special ? 'bg-green-500' : 'bg-gray-200'
+                  }`}></div>
                 <span className={pwdStrength.special ? 'text-green-600' : 'text-gray-500'} data-i18n="register.pwdSpecial">
                   {t("register.pwdSpecial")}
                 </span>
