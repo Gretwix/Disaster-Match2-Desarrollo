@@ -113,3 +113,5 @@
   box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1) !important; /* hover:shadow-md */
 }
 :root:not(.dark) .force-light-icon-contrast { color: #ffffff !important; }
+
+/* Removed force-white sidebar/text utilities to preserve dark mode styling */
