@@ -2,6 +2,14 @@
   command = "npm run build"
   publish = "dist"
 
+  # Configure secrets scanner to omit known public client-side tokens in bundle
+  [build.environment]
+    # Stripe publishable keys (pk_test_/pk_live_) and Stripe Price IDs (price_) are safe in client bundles
+    # to prevent false positives blocking deploys
+    SECRETS_SCAN_OMIT_KEYS = "pk_test_,pk_live_,price_"
+    # Optionally, you can fully disable scanning if needed (not recommended)
+    # SECRETS_SCAN_ENABLED = "false"
+
 # Proxy API requests securely to the backend (prevents mixed content & CORS)
 [[redirects]]
   from = "/api/*"

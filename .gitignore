@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Env files (do not commit)
+.env
+.env.*
+!.env.example
+
+# OS noise
+Thumbs.db
