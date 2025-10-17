@@ -198,12 +198,12 @@ export default function Navigation() {
       </div>
 
       {/* Centro: Logo Disaster Match */}
-      <div className="absolute left-1/2 transform -translate-x-1/2 hidden sm:block">
+      <div className="absolute left-1/2 transform -translate-x-1/2 block">
         <Link to="/" className="flex items-center" aria-label={t("nav.disasterMatch")}>
           <img
             src="/Logo DM.png"
             alt={t("nav.disasterMatch")}
-            className="h-10 sm:h-12 md:h-16 lg:h-20 w-auto drop-shadow-sm hover:opacity-90 transition-opacity"
+            className="h-8 sm:h-12 md:h-16 lg:h-20 w-auto drop-shadow-sm hover:opacity-90 transition-opacity"
             data-i18n="nav.disasterMatch"
           />
         </Link>
@@ -220,7 +220,7 @@ export default function Navigation() {
               <>
                 <Link
                   to="/HomePage"
-                  className="text-gray-700 dark:text-gray-300 hover:text-lime-600 dark:hover:text-lime-400 transition-colors duration-200"
+                  className="hidden sm:inline-block text-gray-700 dark:text-gray-300 hover:text-lime-600 dark:hover:text-lime-400 transition-colors duration-200"
                 >
                   <span data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
                 </Link>
