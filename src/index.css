@@ -6,6 +6,11 @@
 	font-size: 130%;
 }
 
+/* Cap font size on very narrow screens to prevent overflow */
+@media (max-width: 400px) {
+  :root { font-size: 112.5%; } /* ~18px */
+}
+
 /* Some third-party or component styles may use px values. Provide a helper to scale everything as a fallback.
 	 Use this only if you notice elements not scaling (apply the class on the body in index.html or at runtime). */
 .dm-scale-140 {

@@ -18,6 +18,8 @@ export default function Navigation() {
   const [isTouch, setIsTouch] = useState(false);
   const closeTimerRef = useRef<number | null>(null);
   const [isDark, setIsDark] = useState<boolean>(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
@@ -137,54 +139,78 @@ export default function Navigation() {
   // Cleanup timer on unmount
   useEffect(() => () => clearCloseTimer(), []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [routerState.location.pathname]);
+
+  // Close mobile menu on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (!mobileMenuRef.current) return;
+      if (!mobileMenuRef.current.contains(e.target as Node)) {
+        setIsMobileOpen(false);
+      }
+    }
+    if (isMobileOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMobileOpen]);
+
   return (
-    <nav className="relative z-40 flex items-center justify-between bg-white/90 dark:bg-gray-900/95 text-gray-800 dark:text-gray-100 border-b border-gray-200/60 dark:border-gray-800/60 backdrop-blur-md px-6 py-3 shadow-md">
-      {/* Izquierda: Logo empresa */}
-      <img
-        src="/logo apollo.png"
-        alt=""
-        aria-hidden="true"
-        role="presentation"
-        className="h-4 md:h-6 lg:h-8 w-auto opacity-90"
-      />
+  <nav className="sticky top-0 inset-x-0 z-40 flex items-center justify-between bg-white/90 dark:bg-gray-900/95 text-gray-800 dark:text-gray-100 border-b border-gray-200/60 dark:border-gray-800/60 backdrop-blur-md px-3 sm:px-6 py-2.5 sm:py-3 shadow-md">
+      {/* Left: Brand or mobile menu */}
+      <div className="flex items-center gap-2">
+        {/* Mobile: Hamburger */}
+        <button
+          type="button"
+          className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-gray-700 bg-white/70 dark:bg-slate-800/60 text-gray-700 dark:text-gray-200 sm:hidden"
+          aria-label={isMobileOpen ? t("nav.closeMenu") : t("nav.openMenu")}
+          aria-expanded={isMobileOpen}
+          aria-controls="mobile-menu"
+          onClick={() => setIsMobileOpen((v) => !v)}
+        >
+          <span className="sr-only">{isMobileOpen ? t("nav.closeMenu") : t("nav.openMenu")}</span>
+          {/* simple hamburger icon */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5"
+          >
+            {isMobileOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+            )}
+          </svg>
+        </button>
+
+        {/* Brand mark (hide on very small if needed) */}
+        <img
+          src="/logo apollo.png"
+          alt=""
+          aria-hidden="true"
+          role="presentation"
+          className="h-4 md:h-6 lg:h-8 w-auto opacity-90 hidden sm:block"
+        />
+      </div>
 
       {/* Centro: Logo Disaster Match */}
-      <div className="absolute left-1/2 transform -translate-x-1/2">
+      <div className="absolute left-1/2 transform -translate-x-1/2 hidden sm:block">
         <Link to="/" className="flex items-center" aria-label={t("nav.disasterMatch")}>
           <img
             src="/Logo DM.png"
             alt={t("nav.disasterMatch")}
-            className="h-12 md:h-16 lg:h-20 w-auto drop-shadow-sm hover:opacity-90 transition-opacity"
+            className="h-10 sm:h-12 md:h-16 lg:h-20 w-auto drop-shadow-sm hover:opacity-90 transition-opacity"
             data-i18n="nav.disasterMatch"
           />
         </Link>
       </div>
 
       {/* Derecha: Tema + Auth-aware actions */}
-      <div className="flex items-center gap-3 md:gap-4">
-        {/* Theme toggle */}
-        <button
-          type="button"
-          onClick={toggleTheme}
-          aria-label={isDark ? t("nav.themeLight") : t("nav.themeDark")}
-          className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-700/60 bg-black/30 text-gray-200 hover:bg-black/50 transition-colors"
-          title={isDark ? t("nav.themeLight") : t("nav.themeDark")}
-        >
-          {isDark ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
-
-        {/* Language selector */}
-        <select
-          value={i18n.language}
-          onChange={(e) => changeLanguage(e.target.value)}
-          className="rounded-md border px-2 py-1 text-sm"
-          aria-label={t("nav.language")}
-          data-i18n="nav.language"
-        >
-          <option value="en">EN</option>
-          <option value="es">ES</option>
-        </select>
-
+      <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
         {(() => {
           const path = routerState.location.pathname.toLowerCase();
           const isLanding = path === "/" || path === "/landingpage";
@@ -192,15 +218,6 @@ export default function Navigation() {
           if (loggedUser) {
             return (
               <>
-                {loggedUser.role === "admin" && (
-                  <Link
-                    to="/AdminReports"
-                    className="text-gray-700 dark:text-gray-300 hover:text-lime-600 dark:hover:text-lime-400 transition-colors duration-200"
-                  >
-                    <span data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
-                  </Link>
-                )}
-
                 <Link
                   to="/HomePage"
                   className="text-gray-700 dark:text-gray-300 hover:text-lime-600 dark:hover:text-lime-400 transition-colors duration-200"
@@ -235,6 +252,47 @@ export default function Navigation() {
                       onMouseEnter={!isTouch ? openProfile : undefined}
                       onMouseLeave={!isTouch ? () => closeProfileWithDelay() : undefined}
                     >
+                      {/* Quick settings: theme & language */}
+                      <div className="flex items-center gap-2 px-2 pb-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsProfileOpen(false);
+                            toggleTheme();
+                          }}
+                          aria-label={isDark ? t("nav.themeLight") : t("nav.themeDark")}
+                          title={isDark ? t("nav.themeLight") : t("nav.themeDark")}
+                          className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200"
+                        >
+                          {isDark ? <Sun size={16} /> : <Moon size={16} />}
+                        </button>
+                        <select
+                          value={i18n.language}
+                          onChange={(e) => {
+                            changeLanguage(e.target.value);
+                            setIsProfileOpen(false);
+                          }}
+                          aria-label={t("nav.language")}
+                          className="flex-1 rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-[#0f172a] text-sm px-2 py-1"
+                        >
+                          <option value="en">EN</option>
+                          <option value="es">ES</option>
+                        </select>
+                      </div>
+                      <div className="h-px bg-gray-200 dark:bg-slate-700 my-1" />
+
+                      {/* Admin Panel (if admin) */}
+                      {loggedUser?.role === "admin" && (
+                        <Link
+                          to="/AdminReports"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-slate-200 rounded-md hover:bg-gray-200 dark:hover:bg-slate-800/60"
+                        >
+                          <span data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
+                        </Link>
+                      )}
+                      <div className="h-px bg-gray-200 dark:bg-slate-700 my-1" />
+
                       <Link
                         to="/Profile"
                         onClick={() => setIsProfileOpen(false)}
@@ -261,7 +319,7 @@ export default function Navigation() {
 
           // Not logged in
           return isLanding ? (
-            <div className="flex items-center gap-3 md:gap-4">
+            <div className="hidden sm:flex items-center gap-3 md:gap-4">
               <Link
                 to="/Login"
                 className="px-4 py-2 text-sm md:text-base border border-indigo-500 text-indigo-600 dark:text-indigo-400 hover:text-white hover:bg-indigo-600 rounded-lg transition-colors duration-200"
@@ -277,6 +335,64 @@ export default function Navigation() {
             </div>
           ) : null;
         })()}
+      </div>
+
+      {/* Mobile Menu Panel */}
+      <div
+        id="mobile-menu"
+        aria-hidden={!isMobileOpen}
+        className={`sm:hidden ${isMobileOpen ? "block" : "hidden"}`}
+      >
+        {/* Backdrop */}
+        <div className="fixed inset-0 bg-black/30" onClick={() => setIsMobileOpen(false)} />
+        {/* Panel */}
+        <div ref={mobileMenuRef} className="fixed top-[56px] left-2 right-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-4 z-50">
+          {loggedUser ? (
+            <div className="flex flex-col gap-2">
+              {loggedUser.role === "admin" && (
+                <Link to="/AdminReports" className="px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800" onClick={() => setIsMobileOpen(false)}>
+                  {t("nav.adminPanel")}
+                </Link>
+              )}
+              <Link to="/HomePage" className="px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800" onClick={() => setIsMobileOpen(false)}>
+                {t("nav.disasterMatch")}
+              </Link>
+              <Link to="/Profile" className="px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800" onClick={() => setIsMobileOpen(false)}>
+                {t("nav.profile")}
+              </Link>
+              <button type="button" className="px-3 py-2 text-left text-red-600 rounded-md hover:bg-red-50 dark:hover:bg-red-600/20" onClick={() => { setIsMobileOpen(false); handleLogout(); }}>
+                {t("nav.logout")}
+              </button>
+              <div className="mt-2 flex items-center gap-2">
+                <button type="button" onClick={toggleTheme} className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-gray-700">
+                  {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                </button>
+                <select value={i18n.language} onChange={(e) => changeLanguage(e.target.value)} className="rounded-md border px-2 py-1 text-sm">
+                  <option value="en">EN</option>
+                  <option value="es">ES</option>
+                </select>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <Link to="/Login" className="px-3 py-2 rounded-md border border-indigo-500 text-indigo-600 hover:bg-indigo-50" onClick={() => setIsMobileOpen(false)}>
+                {t("nav.login")}
+              </Link>
+              <Link to="/Register" className="px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700" onClick={() => setIsMobileOpen(false)}>
+                {t("nav.register")}
+              </Link>
+              <div className="mt-2 flex items-center gap-2">
+                <button type="button" onClick={toggleTheme} className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-gray-700">
+                  {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                </button>
+                <select value={i18n.language} onChange={(e) => changeLanguage(e.target.value)} className="rounded-md border px-2 py-1 text-sm">
+                  <option value="en">EN</option>
+                  <option value="es">ES</option>
+                </select>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );

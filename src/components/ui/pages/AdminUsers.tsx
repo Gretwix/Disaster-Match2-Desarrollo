@@ -203,46 +203,50 @@ export default function AdminUsers() {
                 {loading ? (
                   <p className="text-gray-500 text-center" data-i18n="admin.loadingUsers">{t("admin.loadingUsers")}</p>
                 ) : !isEditing ? (
-                  // Tabla
-                  <table className="min-w-full text-left text-sm">
-                    <thead>
-                      <tr className="text-gray-700">
-                        <th className="w-16 px-4 py-3 font-semibold">ID</th>
-                        <th className="px-4 py-3 font-semibold">{t("profile.username")}</th>
-                        <th className="px-4 py-3 font-semibold">{t("profile.email")}</th>
-                        <th className="px-4 py-3 font-semibold">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.map((u, idx) => (
-                        <tr
-                          key={u.id ?? idx}
-                          className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                        >
-                          <td className="px-4 py-3">{u.id}</td>
-                          <td className="px-4 py-3">{u.username}</td>
-                          <td className="px-4 py-3">{u.email}</td>
-                          <td className="px-4 py-3 flex gap-2">
-                            <button
-                              onClick={() => {
-                                setIsEditing(u);
-                                setFormData(u);
-                              }}
-                              className="flex items-center gap-2 px-3 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600"
-                            >
-                              {t("admin.edit")}
-                            </button>
-                            <button
-                              onClick={() => handleDelete(u.id)}
-                              className="flex items-center gap-2 px-3 py-1 rounded-md bg-red-500 text-white hover:bg-red-600"
-                            >
-                              {t("admin.delete")}
-                            </button>
-                          </td>
+                  // Tabla responsive
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-left text-xs sm:text-sm">
+                      <thead>
+                        <tr className="text-gray-700">
+                          <th className="w-16 px-3 sm:px-4 py-3 font-semibold">ID</th>
+                          <th className="px-3 sm:px-4 py-3 font-semibold">{t("profile.username")}</th>
+                          <th className="px-3 sm:px-4 py-3 font-semibold">{t("profile.email")}</th>
+                          <th className="px-3 sm:px-4 py-3 font-semibold">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {users.map((u, idx) => (
+                          <tr
+                            key={u.id ?? idx}
+                            className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                          >
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{u.id}</td>
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{u.username}</td>
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{u.email}</td>
+                            <td className="px-3 sm:px-4 py-3">
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  onClick={() => {
+                                    setIsEditing(u);
+                                    setFormData(u);
+                                  }}
+                                  className="flex items-center gap-2 px-3 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                                >
+                                  {t("admin.edit")}
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(u.id)}
+                                  className="flex items-center gap-2 px-3 py-1 rounded-md bg-red-500 text-white hover:bg-red-600"
+                                >
+                                  {t("admin.delete")}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 ) : (
                   // Formulario
                   <div className="p-6 bg-white dark:bg-[#0f172a] rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
