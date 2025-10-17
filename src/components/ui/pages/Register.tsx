@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-useless-catch */
 import { useState } from "react";
+import { API_BASE } from "../../../utils/api";
 import { useNavigate } from "@tanstack/react-router";
 import { Mail, Lock } from "react-feather";
 import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
@@ -20,7 +21,7 @@ type User = {
   fechaRegistro: string;
 };
 
-const API_URL = "https://localhost:7044/Users";
+const API_URL = `${API_BASE}/Users`;
 
 export default function Register() {
   // Controla el paso actual del formulario (1: credenciales, 2: datos personales)

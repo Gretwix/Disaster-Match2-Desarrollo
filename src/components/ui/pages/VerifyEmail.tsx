@@ -2,9 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { CheckCircle, AlertCircle, Mail } from "react-feather";
 import { notifyError, notifySuccess } from "../../../utils/notify";
-
-const API_BASE = "https://localhost:7044";
-const API_BASE_HTTP = "http://localhost:7044";
+import { API_BASE } from "../../../utils/api";
 
 export default function VerifyEmail() {
   const navigate = useNavigate();
@@ -30,14 +28,7 @@ export default function VerifyEmail() {
         let res = await fetch(`${API_BASE}/Users/VerifyEmail?token=${encodeURIComponent(token)}`, {
           method: "GET",
         });
-        if (!res.ok) {
-          // If network error or HTTPS refused, try HTTP
-          try {
-            res = await fetch(`${API_BASE_HTTP}/Users/VerifyEmail?token=${encodeURIComponent(token)}`, {
-              method: "GET",
-            });
-          } catch {}
-        }
+        // no secondary fallback: API_BASE is authoritative
 
         if (res.ok) {
           const text = await res.text().catch(() => "");
@@ -76,15 +67,7 @@ export default function VerifyEmail() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      if (!res.ok) {
-        try {
-          res = await fetch(`${API_BASE_HTTP}/Users/ResendVerification`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email }),
-          });
-        } catch {}
-      }
+      // single base only
       if (res.ok) {
         const text = await res.text().catch(() => "");
         notifySuccess(text || "Verification email resent. Check your inbox.");

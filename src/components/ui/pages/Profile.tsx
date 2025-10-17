@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { Home, User, Users, BarChart } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
+import apiUrl, { API_BASE } from "../../../utils/api";
 import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
 import toast, { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -20,7 +21,7 @@ type User = {
   user_address?: string;
 };
 
-const API_URL = "https://localhost:7044/Users";
+const API_URL = `${API_BASE}/Users`;
 
 export default function Profile() {
   const { t } = useTranslation();
@@ -115,7 +116,7 @@ export default function Profile() {
 
   const fetchUser = async () => {
     try {
-      const res = await fetch(`${API_URL}/${getLoggedUser()?.id}`);
+  const res = await fetch(`${API_URL}/${getLoggedUser()?.id}`);
       const data = await res.json();
       const userData: User = {
         ID: data.ID ?? data.id,
@@ -178,7 +179,7 @@ export default function Profile() {
     };
     try {
       const token = localStorage.getItem("authToken");
-      let res = await fetch(`${API_URL}/Update`, {
+  let res = await fetch(`${API_URL}/Update`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -262,7 +263,7 @@ export default function Profile() {
       setPwdLoading(true);
       const userId = (user as any)?.ID ?? (getLoggedUser() as any)?.id;
 
-      const res = await fetch(`${API_URL}/ChangePassword`, {
+  const res = await fetch(`${API_URL}/ChangePassword`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -313,7 +314,7 @@ export default function Profile() {
     const fetchPurchased = async () => {
       if (!loggedUser?.id) return setPurchasedIncidents([]);
       try {
-        const res = await fetch("https://localhost:7044/Purchase/List");
+  const res = await fetch(apiUrl("/Purchase/List"));
         const purchases = await res.json();
         const userPurchases = purchases.filter(
           (p: any) => p.user_id === loggedUser.id

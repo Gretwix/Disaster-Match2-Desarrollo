@@ -16,6 +16,7 @@ import {
   Legend,
 } from "recharts";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "../../../utils/api";
 
 // ======================= TYPES ========================
 type FilterMode = "current" | "all" | "custom";
@@ -66,17 +67,17 @@ export default function AdminReports() {
     const run = async () => {
       if (filterMode === "all") {
         const usersRes = await safeFetchJson<{ totalUsers: number }>(
-          "https://localhost:7044/Users/TotalUsers",
+          `${API_BASE}/Users/TotalUsers`,
           { totalUsers: 0 },
           "Failed to load total users"
         );
         const histRes = await safeFetchJson<any[]>(
-          "https://localhost:7044/Users/History",
+          `${API_BASE}/Users/History`,
           [],
           "Failed to load activity history"
         );
         const statsRes = await safeFetchJson<{ totalSales: number; totalRevenue: number }>(
-          "https://localhost:7044/Purchase/Stats",
+          `${API_BASE}/Purchase/Stats`,
           { totalSales: 0, totalRevenue: 0 },
           "Failed to load stats"
         );
@@ -94,23 +95,23 @@ export default function AdminReports() {
         const m = filterMode === "current" ? now.getMonth() + 1 : month;
 
         const usersMonth = await safeFetchJson<{ totalUsers: number }>(
-          `https://localhost:7044/Users/TotalUsersByMonth?year=${y}&month=${m}`,
+          `${API_BASE}/Users/TotalUsersByMonth?year=${y}&month=${m}`,
           { totalUsers: 0 }
         );
         const histMonth = await safeFetchJson<any[]>(
-          `https://localhost:7044/Users/HistoryByMonth?year=${y}&month=${m}`,
+          `${API_BASE}/Users/HistoryByMonth?year=${y}&month=${m}`,
           []
         );
         const statsMonth = await safeFetchJson<{ totalSales: number; totalRevenue: number }>(
-          `https://localhost:7044/Purchase/StatsByMonth?year=${y}&month=${m}`,
+          `${API_BASE}/Purchase/StatsByMonth?year=${y}&month=${m}`,
           { totalSales: 0, totalRevenue: 0 }
         );
         const salesByDayRes = await safeFetchJson<{ day: number; total: number }[]>(
-          `https://localhost:7044/Purchase/StatsByDay?year=${y}&month=${m}`,
+          `${API_BASE}/Purchase/StatsByDay?year=${y}&month=${m}`,
           []
         );
         const usersByDayRes = await safeFetchJson<{ day: number; total: number }[]>(
-          `https://localhost:7044/Users/NewUsersByDay?year=${y}&month=${m}`,
+          `${API_BASE}/Users/NewUsersByDay?year=${y}&month=${m}`,
           []
         );
 
@@ -121,19 +122,19 @@ export default function AdminReports() {
         const usersAll = usersMonth.ok
           ? usersMonth
           : await safeFetchJson<{ totalUsers: number }>(
-              "https://localhost:7044/Users/TotalUsers",
+              `${API_BASE}/Users/TotalUsers`,
               { totalUsers: 0 }
             );
         const histAll = histMonth.ok
           ? histMonth
           : await safeFetchJson<any[]>(
-              "https://localhost:7044/Users/History",
+              `${API_BASE}/Users/History`,
               []
             );
         const statsAll = statsMonth.ok
           ? statsMonth
           : await safeFetchJson<{ totalSales: number; totalRevenue: number }>(
-              "https://localhost:7044/Purchase/Stats",
+              `${API_BASE}/Purchase/Stats`,
               { totalSales: 0, totalRevenue: 0 }
             );
 

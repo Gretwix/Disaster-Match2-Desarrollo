@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import apiUrl from "../../../utils/api";
 import { useNavigate, Link } from "@tanstack/react-router";
 
 export default function ResetPassword() {
@@ -45,7 +46,7 @@ export default function ResetPassword() {
     }
 
     try {
-      const res = await fetch("https://localhost:7044/Users/VerifyResetCode", {
+  const res = await fetch(apiUrl("/Users/VerifyResetCode"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code }),
@@ -76,7 +77,7 @@ export default function ResetPassword() {
     }
 
     try {
-      const res = await fetch("https://localhost:7044/Users/ResetPassword", {
+  const res = await fetch(apiUrl("/Users/ResetPassword"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, newPassword }),

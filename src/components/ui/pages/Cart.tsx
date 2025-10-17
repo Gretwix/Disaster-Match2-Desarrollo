@@ -10,6 +10,7 @@ import {
 import { formatCurrency } from "../../../utils/format";
 import { createCheckout } from "../../../utils/stripe";
 import { useTranslation } from "react-i18next";
+import apiUrl from "../../../utils/api";
 
 type CartItem = {
   id: number;
@@ -64,7 +65,7 @@ export default function CartPage() {
     const migrateTitles = async () => {
       if (!cartItems.length) return;
       try {
-        const res = await fetch("https://localhost:7044/Leads/List");
+  const res = await fetch(apiUrl("/Leads/List"));
         const leads: Array<{ id: number; event_type: string }> = await res.json();
         const byId = new Map(leads.map((l) => [l.id, l.event_type]));
         let changed = false;
@@ -180,7 +181,7 @@ export default function CartPage() {
                 };
 
                 const token = localStorage.getItem("authToken");
-                const response = await fetch(`https://localhost:7044/Purchase/Create?${query}`, {
+                const response = await fetch(`${apiUrl("/Purchase/Create")}?${query}`, {
                   method: "PUT",
                   headers: {
                     "Content-Type": "application/json",

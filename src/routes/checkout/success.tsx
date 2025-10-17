@@ -53,7 +53,7 @@ function SuccessPage() {
         const purchase = { user_id: userId, amount: total }
 
         const token = localStorage.getItem('authToken')
-        const base = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7044'
+  const base = import.meta.env.VITE_API_BASE_URL || 'http://apidisastermatch.somee.com'
         const resp = await fetch(`${base}/Purchase/Create?${query}`, {
           method: 'PUT',
           headers: {

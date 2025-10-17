@@ -7,6 +7,7 @@ import {
   getLoggedUser,
   type LoggedUser,
 } from "../../utils/storage";
+import apiUrl from "../../utils/api";
 
 export default function Navigation() {
   const navigate = useNavigate();
@@ -80,11 +81,8 @@ export default function Navigation() {
             },
           });
           try {
-            await doRequest("https://localhost:7044/Users/Logout");
-          } catch {
-            // try HTTP fallback
-            try { await doRequest("http://localhost:7044/Users/Logout"); } catch {}
-          }
+            await doRequest(apiUrl("/Users/Logout"));
+          } catch {}
         }
       } catch (err) {
         // Ignore network errors on logout

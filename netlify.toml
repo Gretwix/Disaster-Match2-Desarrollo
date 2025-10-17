@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Ensure SPA routing works (TanStack Router)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

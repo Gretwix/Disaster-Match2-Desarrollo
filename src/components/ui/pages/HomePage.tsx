@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import apiUrl from "../../../utils/api";
 import Header from "../Header";
 import IncidentCard, { type IncidentCardProps } from "../IncidentCard";
 import { IncidentTable } from "../IncidentTable";
@@ -10,7 +11,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 // URL base de tu API
-const API_URL = "https://localhost:7044/Leads/List";
+const API_URL = `${apiUrl("/Leads/List")}`;
 
 // Tipado de lo que viene del backend
 type Lead = {
@@ -66,7 +67,7 @@ export default function HomePage() {
         setLeads(dataLeads);
 
         // Cargar compras (global) y ocultar todos los leads ya comprados
-        const resPurchases = await fetch("https://localhost:7044/Purchase/List");
+  const resPurchases = await fetch(apiUrl("/Purchase/List"));
         const purchases = await resPurchases.json();
         let allLeadIds: number[] = [];
         for (const purchase of purchases) {

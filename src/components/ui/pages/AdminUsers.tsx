@@ -7,6 +7,7 @@ import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
 import Swal from "sweetalert2";
 import toast, { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "../../../utils/api";
 
 type UserRecord = {
   id: number;
@@ -19,7 +20,7 @@ type UserRecord = {
   user_password?: string;
 };
 
-const API_URL = "https://localhost:7044/Users";
+const API_URL = `${API_BASE}/Users`;
 
 export default function AdminUsers() {
   const { t } = useTranslation();
