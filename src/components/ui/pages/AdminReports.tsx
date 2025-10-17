@@ -356,7 +356,7 @@ export default function AdminReports() {
   };
 
   const sidebarLinkBase = "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-800/60 transition";
-  const sidebarActiveClass = "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300";
+  const sidebarActiveClass = "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900 dark:text-indigo-300";
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -365,7 +365,7 @@ export default function AdminReports() {
         <div className="rounded-2xl bg-white shadow-sm border border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
             {/* ========== SIDEBAR ========== */}
-            <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50/60 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
+            <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
                 <Link to="/" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <Home className="h-5 w-5" />
