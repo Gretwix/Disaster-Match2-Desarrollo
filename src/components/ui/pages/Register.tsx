@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-useless-catch */
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Mail, Lock } from "react-feather";
+import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
 import { useTranslation } from "react-i18next";
 
 // Tipo de usuario para el registro
@@ -203,6 +206,12 @@ export default function Register() {
       return;
     }
 
+    if (!validatePhone(phone)) {
+      setPhoneError("Phone number must be between 7 and 15 digits");
+      setLoading(false);
+      return;
+    }
+
     // Construye el objeto usuario
     const newUser: User = {
       f_name,
@@ -255,25 +264,22 @@ export default function Register() {
         {/* Stepper visual para mostrar el progreso del registro */}
         <div className="flex justify-center mb-8">
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-              step === 1
-                ? "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white"
-                : "bg-gray-200 text-gray-600"
-            }`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step === 1
+              ? "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white"
+              : "bg-gray-200 text-gray-600"
+              }`}
           >
             1
           </div>
           <div
-            className={`h-1 flex-1 mx-2 self-center ${
-              step === 2 ? "bg-indigo-600" : "bg-gray-200"
-            }`}
+            className={`h-1 flex-1 mx-2 self-center ${step === 2 ? "bg-indigo-600" : "bg-gray-200"
+              }`}
           />
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-              step === 2
-                ? "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white"
-                : "bg-gray-200 text-gray-600"
-            }`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step === 2
+              ? "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white"
+              : "bg-gray-200 text-gray-600"
+              }`}
           >
             2
           </div>
@@ -342,11 +348,10 @@ export default function Register() {
                   <input
                     type="password"
                     required
-                    className={`pl-10 bg-gray-50 border ${
-                      passwordError
-                        ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                        : "border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600"
-                    } block w-full py-3 rounded-md`}
+                    className={`pl-10 bg-gray-50 border ${passwordError
+                      ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                      : "border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600"
+                      } block w-full py-3 rounded-md`}
                     placeholder={t("register.placeholderPassword")}
                     value={password}
                     onChange={handlePasswordChange}
@@ -485,38 +490,41 @@ export default function Register() {
 
               {/* Phone Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.phone">{t("register.phone")}</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone
+                </label>
                 <div>
                   <input
                     type="tel"
-                    className={`bg-gray-50 border ${phoneError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'} block w-full px-3 py-3 rounded-md`}
-                    placeholder={t("register.placeholderPhone")}
+                    className={`bg-gray-50 border ${phoneError
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600'
+                      } block w-full px-3 py-3 rounded-md`}
+                    placeholder="+1 xxx xxx xxxx"
                     value={phone}
                     inputMode="numeric"
                     onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === '' || /^\d*$/.test(value)) {
-                        setPhone(value);
-                        if (value && (value.length < 8 || value.length > 15)) {
-                          setPhoneError(t("register.phoneRange"));
-                        } else {
-                          setPhoneError('');
-                        }
+                      const raw = e.target.value;
+                      const formatted = formatPhone(raw);
+                      setPhone(formatted);
+                      // Allow only numbers
+                      if (/^\d*$/.test(raw)) {
+                        const formatted = formatPhone(raw);
+                        setPhone(formatted);
+                        setPhoneError(validatePhone(formatted) ? '' : 'Phone number must be between 7 and 15 digits');
                       }
                     }}
                     onBlur={() => {
-                      if (phone && (phone.length < 8 || phone.length > 15)) {
-                        setPhoneError(t("register.phoneRange"));
-                      } else {
-                        setPhoneError('');
-                      }
+                      setPhoneError(validatePhone(phone) ? '' : 'Phone number must be between 7 and 15 digits');
                     }}
                   />
                 </div>
                 {phoneError ? (
                   <p className="mt-1 text-sm text-red-600">{phoneError}</p>
                 ) : (
-                  <p className="mt-1 text-xs text-gray-500">{t("register.phoneHint")}</p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Only numbers allowed. Must be 7-15 digits.
+                  </p>
                 )}
               </div>
 

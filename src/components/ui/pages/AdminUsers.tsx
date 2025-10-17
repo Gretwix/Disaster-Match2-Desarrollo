@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Home, User, Users, BarChart, Trash, Edit } from "lucide-react";
+import { Home, User, Users, BarChart } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
+import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
 import Swal from "sweetalert2";
 import toast, { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -12,7 +14,7 @@ type UserRecord = {
   l_name?: string;
   username: string;
   email: string;
-  phone?: string;
+  phone: string;
   company?: string;
   user_password?: string;
 };
@@ -37,7 +39,7 @@ export default function AdminUsers() {
         l_name: u.l_name ?? u.L_Name ?? "",
         username: u.username ?? u.Username ?? "",
         email: u.email ?? u.Email ?? "",
-        phone: u.phone ?? u.Phone ?? "",
+        phone: u.phone ?? u.formatPhone(String(data.phone || "")) ?? "",
         company: u.company ?? u.Company ?? "",
         user_password: "*******",
       }));
@@ -86,13 +88,26 @@ export default function AdminUsers() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (formData) {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (!formData) return;
+    let newValue = value;
+    if (name === "phone") {
+      // use external util for formatting
+      newValue = formatPhone(newValue);
+      setFormData({ ...formData, [name]: newValue });
+      return;
     }
   };
 
   const handleSave = async () => {
     if (!formData) return;
+    if (!validatePhone(formData.phone)) {
+      toast.error("Please enter a valid phone number (7–15 digits)");
+      return;
+    }
+    const cleanPhone = formData.phone.startsWith("+")
+      ? "+" + formData.phone.slice(1).replace(/[\s-]/g, "")
+      : formData.phone.replace(/[\s-]/g, "");
 
     const payload = {
       ID: formData.id,
@@ -104,7 +119,7 @@ export default function AdminUsers() {
         formData.user_password && formData.user_password !== "*******"
           ? formData.user_password
           : "1234",
-      Phone: formData.phone || "",
+      Phone: cleanPhone,
       User_Address: "",
       Company: formData.company || "",
       Remember_Token: "",
@@ -150,7 +165,7 @@ export default function AdminUsers() {
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
         <div className="rounded-2xl bg-white shadow-sm border border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
-            
+
             {/* Sidebar con mismo diseño de Profile */}
             <aside className="border-b md:border-b-0 md:border-r border-gray-200 p-5 md:p-6 bg-gray-50/60 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
@@ -159,10 +174,10 @@ export default function AdminUsers() {
                   <span className="font-medium" data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
                 </Link>
 
-                 <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                   <BarChart className="h-5 w-5" />
-                   <span className="font-medium" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
-                 </Link>
+                <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
+                  <BarChart className="h-5 w-5" />
+                  <span className="font-medium" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
+                </Link>
 
                 <Link to="/Profile" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <User className="h-5 w-5" />
@@ -234,7 +249,7 @@ export default function AdminUsers() {
                         { name: "l_name", label: "Last Name" },
                         { name: "username", label: "Username" },
                         { name: "email", label: "Email" },
-                        { name: "phone", label: "Phone" },
+                        { name: "phone", label: "Phone", inputType: "tel", placeHolder: "+1 xxx xxx xxxx" },
                         { name: "company", label: "Company" },
                       ].map((field) => (
                         <label
@@ -244,6 +259,8 @@ export default function AdminUsers() {
                           {field.label}
                           <input
                             name={field.name}
+                            type={field.inputType}
+                            placeholder={field.placeHolder}
                             value={(formData as any)?.[field.name] || ""}
                             onChange={handleChange}
                             className="mt-1 border rounded-lg px-3 py-2 shadow-sm 
