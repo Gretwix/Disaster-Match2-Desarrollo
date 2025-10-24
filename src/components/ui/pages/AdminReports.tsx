@@ -394,7 +394,6 @@ export default function AdminReports() {
               {/* ======= HEADER ======= */}
               <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 force-light-text" data-i18n="reports.overview">{t("reports.overview")}</h1>
-                <button onClick={handleExportPDF} className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition" data-i18n="reports.exportPDF">{t("reports.exportPDF")}</button>
               </div>
 
               {/* ======= FILTER TOOLBAR ======= */}
@@ -518,6 +517,8 @@ export default function AdminReports() {
                 </div>
               </div>
 
+              
+
               {/* ======= ACTIVITY TABLE ======= */}
               <div className="mt-8 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0b1220] p-4 sm:p-5">
                 <div className="flex flex-wrap justify-between items-center mb-4">
@@ -599,6 +600,7 @@ export default function AdminReports() {
                     </tbody>
                   </table>
                 </div>
+                
                 {/* Pagination */}
                 <Pagination
                   currentPage={page}
@@ -607,8 +609,19 @@ export default function AdminReports() {
                   onPageChange={setPage}
                 />
               </div>
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={handleExportPDF}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
+                  data-i18n="reports.exportPDF"
+                >
+                  {t("reports.exportPDF")}
+                </button>
+              </div>
             </section>
+            
           </div>
+          
         </div>
       </div>
     </div>
