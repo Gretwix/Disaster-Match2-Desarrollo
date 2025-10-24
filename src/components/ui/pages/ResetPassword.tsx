@@ -66,9 +66,77 @@ export default function ResetPassword() {
     }
   };
 
+  // Estado para la fortaleza de la contraseña
+  const [passwordStrength, setPasswordStrength] = useState({
+    length: false,
+    upper: false,
+    lower: false,
+    number: false,
+    special: false,
+  });
+
+  // Validación de contraseña en tiempo real
+  const validatePassword = (value: string) => {
+    const validations = {
+      length: value.length >= 8,
+      upper: /[A-Z]/.test(value),
+      lower: /[a-z]/.test(value),
+      number: /[0-9]/.test(value),
+      special: /[@#$%&*!?]/.test(value),
+    };
+    setPasswordStrength(validations);
+
+    if (value === "") {
+      setMessage("");
+      setIsSuccess(false);
+      return false;
+    }
+
+    if (!Object.values(validations).every(Boolean)) {
+      setMessage("Password does not meet requirements");
+      setIsSuccess(false);
+      return false;
+    }
+
+    setMessage("");
+    return true;
+  };
+
+  // Validar confirmación de contraseña
+  const validateConfirmPassword = (value: string) => {
+    if (value !== newPassword) {
+      setMessage("Passwords do not match");
+      setIsSuccess(false);
+      return false;
+    }
+    setMessage("");
+    return true;
+  };
+
+  // Manejar cambio de contraseña
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNewPassword(value);
+    validatePassword(value);
+    if (confirmPassword) {
+      validateConfirmPassword(confirmPassword);
+    }
+  };
+
+  // Manejar cambio en confirmación
+  const handleConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+    validateConfirmPassword(value);
+  };
+
   // Cambio de contraseña
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validatePassword(newPassword)) {
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
       setMessage("Passwords do not match");
@@ -131,25 +199,111 @@ export default function ResetPassword() {
         ) : (
           // Paso 2: nueva contraseña
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
-            <input
-              type="password"
-              placeholder="New password"
-              required
-              className="w-full border rounded-md px-3 py-3 bg-gray-50 focus:ring-2 focus:ring-indigo-600"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
+            <div>
+              <input
+                type="password"
+                placeholder="New password"
+                required
+                className="w-full border rounded-md px-3 py-3 bg-gray-50 focus:ring-2 focus:ring-indigo-600"
+                value={newPassword}
+                onChange={handlePasswordChange}
+              />
+
+              {/* Indicadores de fortaleza de contraseña */}
+              <div className="mt-2 space-y-1">
+                <div className="flex items-center">
+                  <div
+                    className={`w-2 h-2 rounded-full mr-2 ${
+                      passwordStrength.length ? "bg-green-500" : "bg-gray-200"
+                    }`}
+                  ></div>
+                  <span
+                    className={`text-xs ${
+                      passwordStrength.length ? "text-green-600" : "text-gray-500"
+                    }`}
+                  >
+                    At least 8 characters
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <div
+                    className={`w-2 h-2 rounded-full mr-2 ${
+                      passwordStrength.upper ? "bg-green-500" : "bg-gray-200"
+                    }`}
+                  ></div>
+                  <span
+                    className={`text-xs ${
+                      passwordStrength.upper ? "text-green-600" : "text-gray-500"
+                    }`}
+                  >
+                    At least one uppercase letter
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <div
+                    className={`w-2 h-2 rounded-full mr-2 ${
+                      passwordStrength.lower ? "bg-green-500" : "bg-gray-200"
+                    }`}
+                  ></div>
+                  <span
+                    className={`text-xs ${
+                      passwordStrength.lower ? "text-green-600" : "text-gray-500"
+                    }`}
+                  >
+                    At least one lowercase letter
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <div
+                    className={`w-2 h-2 rounded-full mr-2 ${
+                      passwordStrength.number ? "bg-green-500" : "bg-gray-200"
+                    }`}
+                  ></div>
+                  <span
+                    className={`text-xs ${
+                      passwordStrength.number ? "text-green-600" : "text-gray-500"
+                    }`}
+                  >
+                    At least one number
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <div
+                    className={`w-2 h-2 rounded-full mr-2 ${
+                      passwordStrength.special ? "bg-green-500" : "bg-gray-200"
+                    }`}
+                  ></div>
+                  <span
+                    className={`text-xs ${
+                      passwordStrength.special ? "text-green-600" : "text-gray-500"
+                    }`}
+                  >
+                    At least one special character (@, #, $, %, &, *, !, ?)
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <input
               type="password"
               placeholder="Confirm password"
               required
               className="w-full border rounded-md px-3 py-3 bg-gray-50 focus:ring-2 focus:ring-indigo-600"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={handleConfirmChange}
             />
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-md text-white font-medium shadow-sm bg-gradient-to-r from-indigo-600 to-indigo-800 hover:scale-[1.02] hover:shadow-lg transition-all duration-200"
+              disabled={
+                !Object.values(passwordStrength).every(Boolean) ||
+                newPassword !== confirmPassword
+              }
+              className={`w-full py-3 px-4 rounded-md text-white font-medium shadow-sm transition-all duration-200 ${
+                Object.values(passwordStrength).every(Boolean) &&
+                newPassword === confirmPassword
+                  ? "bg-gradient-to-r from-indigo-600 to-indigo-800 hover:scale-[1.02] hover:shadow-lg"
+                  : "bg-gray-400 cursor-not-allowed"
+              }`}
             >
               Change Password
             </button>
