@@ -40,31 +40,53 @@ export default function CartPage() {
 
   // (Removed) Saved payment methods are no longer used; Stripe-only flow.
 
-  // Migrar títulos existentes del carrito a event_type
+  // Lead metadata captured from API to resolve verified/sold for price mapping
+  const [leadMetaById, setLeadMetaById] = useState<Map<number, { verified: boolean; sold: boolean }>>(new Map());
+
+  // Migrar títulos existentes del carrito a event_type y capturar metadatos (verified/sold)
   useEffect(() => {
-    const migrateTitles = async () => {
-      if (!cartItems.length) return;
+    const migrateTitlesAndMeta = async () => {
       try {
-  const res = await fetch(apiUrl("/Leads/List"));
-        const leads: Array<{ id: number; event_type: string }> = await res.json();
-        const byId = new Map(leads.map((l) => [l.id, l.event_type]));
-        let changed = false;
-        const next = cartItems.map((ci) => {
-          const et = byId.get(ci.id);
-          if (et && ci.title !== et) {
-            changed = true;
-            return { ...ci, title: et };
+        const res = await fetch(apiUrl("/Leads/List"));
+        const leads: Array<{
+          id: number;
+          event_type: string;
+          home_owner_email?: string | null;
+          home_owner_phone?: string | null;
+          times_purchased?: number | null;
+        }> = await res.json();
+
+        const titleById = new Map(leads.map((l) => [l.id, l.event_type]));
+        const metaById = new Map(
+          leads.map((l) => [
+            l.id,
+            {
+              verified: !!l.home_owner_email && !!l.home_owner_phone,
+              sold: ((l.times_purchased ?? 0) as number) > 0,
+            },
+          ])
+        );
+        setLeadMetaById(metaById);
+
+        if (cartItems.length) {
+          let changed = false;
+          const next = cartItems.map((ci) => {
+            const et = titleById.get(ci.id);
+            if (et && ci.title !== et) {
+              changed = true;
+              return { ...ci, title: et };
+            }
+            return ci;
+          });
+          if (changed) {
+            saveCart(next);
           }
-          return ci;
-        });
-        if (changed) {
-          saveCart(next);
         }
       } catch {
-        // ignore migration failures
+        // ignore migration/meta failures
       }
     };
-    migrateTitles();
+    migrateTitlesAndMeta();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -133,12 +155,16 @@ export default function CartPage() {
                 // Map your cart items to Stripe Price IDs.
                 // Replace this logic with real mapping from your backend or SKU table.
                 const PRICE_VERIFIED = import.meta.env.VITE_PRICE_VERIFIED || "price_123";
+                const PRICE_VERIFIED_SOLD = import.meta.env.VITE_PRICE_VERIFIED_SOLD || "price_124";
                 const PRICE_INCOMPLETE = import.meta.env.VITE_PRICE_INCOMPLETE || "price_456";
+                const PRICE_INCOMPLETE_SOLD = import.meta.env.VITE_PRICE_INCOMPLETE_SOLD || "price_457";
 
                 // Guard against placeholder IDs to avoid 500s from backend
                 const usingPlaceholders =
                   !PRICE_VERIFIED || PRICE_VERIFIED === "price_123" ||
-                  !PRICE_INCOMPLETE || PRICE_INCOMPLETE === "price_456";
+                  !PRICE_VERIFIED_SOLD || PRICE_VERIFIED_SOLD === "price_124" ||
+                  !PRICE_INCOMPLETE || PRICE_INCOMPLETE === "price_456" ||
+                  !PRICE_INCOMPLETE_SOLD || PRICE_INCOMPLETE_SOLD === "price_457";
                 if (usingPlaceholders) {
                   setModalTitle(t("cart.stripeSetupTitle"));
                   setModalMessage(t("cart.stripeSetupMessage"));
@@ -146,10 +172,23 @@ export default function CartPage() {
                   setIsStripeRedirecting(false);
                   return;
                 }
-                const items = cartItems.map((ci) => ({
-                  priceId: ci.price >= 200 ? PRICE_VERIFIED : PRICE_INCOMPLETE,
-                  quantity: ci.quantity || 1,
-                }));
+                const items = cartItems.map((ci) => {
+                  const meta = leadMetaById.get(ci.id);
+                  const inferredVerified = meta?.verified ?? (ci.price >= 200);
+                  // Detect sold via metadata; fallback: price < 100 => sold incomplete; price === 100 ambiguous
+                  const inferredSold = meta?.sold ?? (ci.price < 100 ? true : ci.price === 100 ? undefined : false);
+
+                  let priceId = PRICE_INCOMPLETE; // default
+                  if (inferredVerified && inferredSold) priceId = PRICE_VERIFIED_SOLD;
+                  else if (inferredVerified && inferredSold === false) priceId = PRICE_VERIFIED;
+                  else if (!inferredVerified && inferredSold) priceId = PRICE_INCOMPLETE_SOLD;
+                  else priceId = PRICE_INCOMPLETE;
+
+                  return {
+                    priceId,
+                    quantity: ci.quantity || 1,
+                  };
+                });
                 await createCheckout({
                   items,
                   customerEmail: (loggedUser as any)?.email,
