@@ -24,6 +24,8 @@ type Lead = {
   details: string;
   home_owner_email?: string;
   home_owner_phone?: string;
+  sold?: boolean;
+  times_purchased?: number;
 };
 
 type CartItem = {
@@ -88,9 +90,16 @@ export default function HomePage() {
   }, []);
 
   // Precio según verificado
-  const getPrice = (lead: Lead) =>
-    lead.home_owner_email && lead.home_owner_phone ? 200 : 100;
+  const getPrice = (lead: Lead) => {
+  let basePrice = lead.home_owner_email && lead.home_owner_phone ? 200 : 100;
 
+  // Si el lead ya fue comprado , baja el precio 50%
+ if ((lead.times_purchased ?? 0) > 0) {
+  basePrice *= 0.5;
+}
+
+  return basePrice;
+};
   // Carrito
   const addToCart = (lead: Lead) => {
     const price = getPrice(lead);
@@ -184,6 +193,7 @@ export default function HomePage() {
     checked: cart.some((i) => i.id === lead.id),
     onAddToCart: () => addToCart(lead),
     onRemoveFromCart: () => removeFromCart(lead.id),
+    sold: (lead.times_purchased ?? 0) > 0,
   }));
 
   // Render
@@ -196,25 +206,70 @@ export default function HomePage() {
           <div className="flex flex-col min-h-[calc(100vh-56px-88px)]">
             {/* Título e información */}
             <div className="mb-6">
-              <div className="flex flex-col md:flex-row md:items-start gap-0 w-full">
-                <div className="flex-1">
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-0 leading-tight" data-i18n="home.availableReports">
-                    {t("home.availableReports")}
-                  </h2>
-                  <p className="text-gray-600 leading-snug mt-0">{t("home.browse")}</p>
-                </div>
-                <div className="w-full md:w-72 max-w-md bg-white border border-gray-300 rounded-lg shadow-sm p-1 text-sm text-gray-700 md:ml-2">
-                  <div className="mb-1">
-                    <span className="font-semibold text-green-600" data-i18n="home.verifiedLabel">{t("home.verifiedLabel")}</span>
-                    <span className="ml-1 text-gray-700" data-i18n="home.verifiedDetail">{t("home.verifiedDetail")}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-yellow-600" data-i18n="home.incompleteLabel">{t("home.incompleteLabel")}</span>
-                    <span className="ml-1 text-gray-700" data-i18n="home.incompleteDetail">{t("home.incompleteDetail")}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+  <div className="flex flex-col md:flex-row md:items-start gap-0 w-full">
+    <div className="flex-1">
+      <h2
+        className="text-2xl font-semibold text-gray-800 mb-0 leading-tight"
+        data-i18n="home.availableReports"
+      >
+        {t("home.availableReports")}
+      </h2>
+      <p className="text-gray-600 leading-snug mt-0">
+        {t("home.browse")}
+      </p>
+    </div>
+
+    {/* Cuadro informativo con las etiquetas de estado */}
+    <div className="w-full md:w-72 max-w-md bg-white border border-gray-300 rounded-lg shadow-sm p-1 text-sm text-gray-700 md:ml-2">
+      <div className="mb-1">
+        <span
+          className="font-semibold text-green-600"
+          data-i18n="home.verifiedLabel"
+        >
+          {t("home.verifiedLabel")}
+        </span>
+        <span
+          className="ml-1 text-gray-700"
+          data-i18n="home.verifiedDetail"
+        >
+          {t("home.verifiedDetail")}
+        </span>
+      </div>
+
+      <div className="mb-1">
+        <span
+          className="font-semibold text-yellow-600"
+          data-i18n="home.incompleteLabel"
+        >
+          {t("home.incompleteLabel")}
+        </span>
+        <span
+          className="ml-1 text-gray-700"
+          data-i18n="home.incompleteDetail"
+        >
+          {t("home.incompleteDetail")}
+        </span>
+      </div>
+
+      {/* Nuevo estado: Sold */}
+      <div>
+        <span
+          className="font-semibold text-red-600"
+          data-i18n="home.soldLabel"
+        >
+          {t("home.soldLabel")}
+        </span>
+        <span
+          className="ml-1 text-gray-700"
+          data-i18n="home.soldDetail"
+        >
+          {t("home.soldDetail")}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
 
             {/* Filtros */}
             <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">

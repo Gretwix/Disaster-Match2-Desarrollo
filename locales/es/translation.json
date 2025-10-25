@@ -41,7 +41,9 @@
     "incidentsSelected": "{{count}} incidentes seleccionados",
     "total": "Total:",
     "verifiedDetail": "Incluye dirección completa, número de teléfono y correo electrónico.",
-    "incompleteDetail": "Falta uno o más datos clave, como teléfono, correo electrónico o dirección."
+    "incompleteDetail": "Falta uno o más datos clave, como teléfono, correo electrónico o dirección.",
+    "soldLabel": "Vendido ($100 → $50)",
+    "soldDetail": "Este lead ya fue comprado y su precio se redujo en un 50%."
   },
   "login": {
     "welcome": "Bienvenido de nuevo",
