@@ -42,7 +42,7 @@
     "total": "Total:",
     "verifiedDetail": "Incluye dirección completa, número de teléfono y correo electrónico.",
     "incompleteDetail": "Falta uno o más datos clave, como teléfono, correo electrónico o dirección.",
-    "soldLabel": "Vendido ($100 → $50)",
+    "soldLabel": "Vendido:",
     "soldDetail": "Este lead ya fue comprado y su precio se redujo en un 50%."
   },
   "login": {

@@ -14,10 +14,12 @@ export type IncidentCardProps = {
   date: string;
   price: number;
   verified: boolean;
-  sold?: boolean; // 👈 Nuevo estado: determina si el lead ya fue comprado
+  sold?: boolean; 
   checked?: boolean; // Valor booleano que determina si ya está en el carrito.
   onAddToCart: () => void; // Función que se ejecuta al agregar al carrito.
   onRemoveFromCart: () => void; // Función que se ejecuta al quitar del carrito.
+  is_promo?: boolean;
+  promo_percent?: number | null;
 };
 
 // Asignamos clases de color para los tags según el tipo de incidente.
@@ -41,23 +43,47 @@ export default function IncidentCard({
   checked = false,
   onAddToCart,
   onRemoveFromCart,
+  is_promo,
+  promo_percent,
 }: IncidentCardProps) {
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg ${
-        sold ? "opacity-80" : ""
-      }`}
+      className={`relative bg-white rounded-lg shadow-sm overflow-hidden border transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg 
+      ${
+        is_promo
+          ? "border-indigo-400 ring-1 ring-indigo-300 shadow-indigo-100"
+          : "border-gray-100"
+      }
+      ${sold ? "opacity-80" : ""}
+    `}
     >
-      <div className="p-6 flex flex-col gap-2">
-        {/* Fila superior: tipo de incidente y checkbox de selección */}
-        <div className="flex justify-between items-start">
-          <span
-            className={`${tagColors[type]} px-3 py-1 rounded-full text-xs font-semibold`}
-          >
-            {type}
-          </span>
+      {/* 🔹 Cinta superior para promociones */}
+      {is_promo && (
+        <div className="absolute top-0 left-0 w-full bg-gradient-to-r from-indigo-600/90 to-indigo-400/80 text-white text-xs font-semibold text-center py-1 shadow-sm">
+           Limited-Time Promotion – {Math.round((promo_percent ?? 0.4) * 100)}% OFF
+        </div>
+      )}
 
-          {/* Checkbox para marcar como seleccionado en el carrito */}
+      <div className="p-6 flex flex-col gap-2 mt-2">
+        {/* Tipo de incidente, etiqueta y checkbox */}
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-2 flex-1">
+            {/* Tipo de incidente */}
+            <span
+              className={`${tagColors[type]} px-3 py-1 rounded-full text-xs font-semibold`}
+            >
+              {type}
+            </span>
+
+            {/* 🔵 Etiqueta de descuento (justo al lado del tipo) */}
+            {is_promo && (
+              <span className="bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-indigo-200 shadow-sm">
+                {Math.round((promo_percent ?? 0.4) * 100)}% OFF
+              </span>
+            )}
+          </div>
+
+          {/* Checkbox */}
           <input
             type="checkbox"
             className="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500"
@@ -68,13 +94,13 @@ export default function IncidentCard({
           />
         </div>
 
-        {/* Título del incidente */}
+        {/* Título */}
         <h3 className="mt-3 text-lg font-medium text-gray-800">{title}</h3>
 
-        {/* Ubicación del incidente */}
+        {/* Ubicación */}
         <p className="text-sm text-gray-500">{location}</p>
 
-        {/* Fecha con ícono de calendario */}
+        {/* Fecha */}
         <div className="mt-2 flex items-center text-sm text-gray-500 gap-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -93,10 +119,10 @@ export default function IncidentCard({
           <span>{date}</span>
         </div>
 
-        {/* Estado verificado, ya comprado y botón, alineados en la misma fila */}
+        {/* Estado + Botón */}
         <div className="mt-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            {/* Icono verificado / incompleto */}
+            {/* Verificado / incompleto */}
             {verified ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -124,27 +150,15 @@ export default function IncidentCard({
               {verified ? "Verified" : "Incomplete"}
             </span>
 
-            {/* Icono + texto del estado Sold */}
+            {/* Estado sold */}
             {sold && (
               <span className="flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-semibold ml-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3.5 w-3.5 text-red-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
-                </svg>
                 Sold
               </span>
             )}
           </div>
 
-          {/* Botón de agregar/quitar del carrito */}
+          {/* Botón */}
           <button
             className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
             onClick={checked ? onRemoveFromCart : onAddToCart}

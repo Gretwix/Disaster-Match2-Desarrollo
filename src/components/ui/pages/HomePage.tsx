@@ -26,6 +26,10 @@ type Lead = {
   home_owner_phone?: string;
   sold?: boolean;
   times_purchased?: number;
+  is_promo?: boolean | string | number | null;
+  promo_percent?: number | string | null;
+  promo_start_date?: string | null;
+  fecha_registro?: string | null;
 };
 
 type CartItem = {
@@ -55,51 +59,117 @@ export default function HomePage() {
   const [page, setPage] = useState(1);
   const [purchasedLeadIds, setPurchasedLeadIds] = useState<number[]>([]);
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
+const [eligible, setEligible] = useState<Lead[]>([]);
+const [eligPage, setEligPage] = useState(1);
 
-  // Constantes
-  const itemsPerPage = 9;
 
-  // Cargar datos del backend y compras del usuario
-  useEffect(() => {
-    const fetchLeadsAndPurchases = async () => {
-      try {
-        // Cargar leads
-        const resLeads = await fetch(API_URL);
-        const dataLeads: Lead[] = await resLeads.json();
-        setLeads(dataLeads);
+const loggedUser = getLoggedUser();
 
-        // Cargar compras (global) y ocultar todos los leads ya comprados
-  const resPurchases = await fetch(apiUrl("/Purchase/List"));
-        const purchases = await resPurchases.json();
-        let allLeadIds: number[] = [];
-        for (const purchase of purchases) {
-          if (purchase.leads && Array.isArray(purchase.leads)) {
-            allLeadIds = allLeadIds.concat(
-              purchase.leads.map((l: any) => l.lead_id ?? l.leadId)
-            );
-          }
+
+
+
+
+const applyPromotion = async (id: number) => {
+  try {
+    const res = await fetch(apiUrl("/Leads/ApplyPromotionToLead"), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, promoPercent: 0.4 }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      alert(text || "Error applying promotion");
+      return;
+    }
+
+    const data = await res.json();
+    console.log("✅ Promotion successfully applied:", data);
+
+    // Mark the lead as promoted in the main list
+    setLeads((prev) =>
+      prev.map((l) =>
+        l.id === id ? { ...l, is_promo: true, promo_percent: 0.4 } : l
+      )
+    );
+
+    //  Remove the lead from the eligible list
+    setEligible((prev) => prev.filter((l) => l.id !== id));
+  } catch (e) {
+    console.error("Error applying promotion:", e);
+    alert("Failed to apply the promotion.");
+  }
+};
+
+// Constants
+const itemsPerPage = 9;
+
+// Load data from backend and user purchases
+useEffect(() => {
+  const fetchLeadsAndPurchases = async () => {
+    try {
+      // Load leads
+      const resLeads = await fetch(API_URL);
+      const dataLeads: Lead[] = await resLeads.json();
+      setLeads(dataLeads);
+
+      // Load global purchases
+      const resPurchases = await fetch(apiUrl("/Purchase/List"));
+      const purchases = await resPurchases.json();
+
+      let allLeadIds: number[] = [];
+      for (const purchase of purchases) {
+        if (purchase.leads && Array.isArray(purchase.leads)) {
+          allLeadIds = allLeadIds.concat(
+            purchase.leads.map((l: any) => l.lead_id ?? l.leadId)
+          );
         }
-        setPurchasedLeadIds(
-          Array.from(new Set(allLeadIds.filter((id) => typeof id === "number")))
-        );
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchLeadsAndPurchases();
-  }, []);
+
+      setPurchasedLeadIds(
+        Array.from(new Set(allLeadIds.filter((id) => typeof id === "number")))
+      );
+
+      // If admin, also load eligible leads for promotions
+      if (loggedUser?.role === "admin") {
+        try {
+          const resEligible = await fetch(apiUrl("/Leads/EligibleLeadsForPromotion"));
+          const dataEligible = await resEligible.json();
+          setEligible(Array.isArray(dataEligible) ? dataEligible : []);
+        } catch (err) {
+          console.error("Error loading eligible leads:", err);
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchLeadsAndPurchases();
+}, []);
+
+
 
   // Precio según verificado
-  const getPrice = (lead: Lead) => {
+ // Precio según verificado
+const getPrice = (lead: Lead) => {
   let basePrice = lead.home_owner_email && lead.home_owner_phone ? 200 : 100;
 
-  // Si el lead ya fue comprado , baja el precio 50%
- if ((lead.times_purchased ?? 0) > 0) {
-  basePrice *= 0.5;
-}
+  // 🔹 Si el lead ya fue comprado, baja el precio un 50%
+  if ((lead.times_purchased ?? 0) > 0) {
+    basePrice *= 0.5;
+  }
 
-  return basePrice;
+  // 🔹 Si el lead tiene promoción activa (y no ha sido comprado)
+  const promoActive = lead.is_promo === true && (lead.times_purchased ?? 0) === 0;
+  if (promoActive) {
+    const pct = Number(lead.promo_percent ?? 0.4);
+    basePrice *= 1 - pct;
+  }
+
+  return Math.round(basePrice);
 };
+
   // Carrito
   const addToCart = (lead: Lead) => {
     const price = getPrice(lead);
@@ -194,6 +264,9 @@ export default function HomePage() {
     onAddToCart: () => addToCart(lead),
     onRemoveFromCart: () => removeFromCart(lead.id),
     sold: (lead.times_purchased ?? 0) > 0,
+    is_promo: !!lead.is_promo,
+    promo_percent: Number(lead.promo_percent ?? 0.4),
+
   }));
 
   // Render
@@ -269,6 +342,131 @@ export default function HomePage() {
     </div>
   </div>
 </div>
+
+
+{loggedUser?.role === "admin" && (
+  <div className="mb-8">
+    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-3 sm:p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800">
+            Eligible Leads for Promotion (40% OFF)
+          </h3>
+          <p className="text-sm text-gray-500 mt-1">
+            Automatically generated list of leads that have been unsold for more than 7 days.
+          </p>
+        </div>
+        <span className="text-sm text-gray-600 mt-2 sm:mt-0">
+          Total: {eligible.length}
+        </span>
+      </div>
+
+      {eligible.length === 0 ? (
+        <p className="text-gray-500 text-sm">No eligible leads available.</p>
+      ) : (
+        <>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm border border-gray-200 rounded-lg overflow-hidden">
+              <thead className="bg-gray-100 text-xs sm:text-sm">
+                <tr className="text-gray-700 border-b border-gray-300">
+                  <th className="px-3 sm:px-4 py-3 w-24 sm:w-32 border-r border-gray-200">
+                    Type
+                  </th>
+                  <th className="px-3 sm:px-4 py-3 border-r border-gray-200">
+                    Description
+                  </th>
+                  <th className="px-3 sm:px-4 py-3 w-40 sm:w-48 border-r border-gray-200 hidden md:table-cell">
+                    City / State
+                  </th>
+                  <th className="px-3 sm:px-4 py-3 w-32 sm:w-40 border-r border-gray-200 hidden lg:table-cell">
+                    Registration Date
+                  </th>
+                  <th className="px-3 sm:px-4 py-3 w-32 sm:w-40 text-center">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {eligible
+                  .slice((eligPage - 1) * itemsPerPage, eligPage * itemsPerPage)
+                  .map((lead, index) => (
+                    <tr
+                      key={lead.id}
+                      className={`hover:bg-gray-50 transition-colors border-b border-gray-200 ${
+                        index % 2 === 0 ? "bg-white" : "bg-gray-50/60"
+                      }`}
+                    >
+                      {/* Type */}
+                      <td className="px-3 sm:px-4 py-3 border-r border-gray-200 text-gray-900 align-top">
+                        {lead.event_type}
+                      </td>
+
+                      {/* Description with tooltip */}
+                      <td className="px-3 sm:px-4 py-3 text-gray-900 max-w-[220px] sm:max-w-[250px] border-r border-gray-200 relative overflow-visible">
+                        <div className="group relative">
+                          <span className="block truncate whitespace-nowrap cursor-help text-xs sm:text-sm">
+                            {lead.details || "No description available"}
+                          </span>
+
+                          {/* Tooltip */}
+                          <div
+                            className={`absolute hidden group-hover:block bg-gray-900 text-white text-xs rounded px-2 py-1 
+                              left-1/2 -translate-x-1/2 z-50 max-w-sm whitespace-normal shadow-lg
+                              ${
+                                index >= eligible.length - 2
+                                  ? "bottom-full mb-2"
+                                  : "top-full mt-2"
+                              }`}
+                          >
+                            {lead.details || "No description available"}
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* City / State */}
+                      <td className="px-3 sm:px-4 py-3 text-gray-900 truncate whitespace-nowrap border-r border-gray-200 hidden md:table-cell">
+                        {lead.city}, {lead.lead_state}
+                      </td>
+
+                      {/* Registration Date */}
+                      <td className="px-3 sm:px-4 py-3 text-gray-900 border-r border-gray-200 hidden lg:table-cell">
+                        {new Date(
+                          lead.fecha_registro ?? lead.lead_date ?? ""
+                        ).toLocaleDateString()}
+                      </td>
+
+                      {/* Action */}
+                      <td className="px-3 sm:px-4 py-3 text-center">
+                        <button
+                          className="px-4 py-1.5 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition"
+                          onClick={() => applyPromotion(lead.id)}
+                        >
+                          Apply 40%
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-4">
+            <Pagination
+              currentPage={eligPage}
+              totalItems={eligible.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setEligPage}
+            />
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+)}
+
+
 
 
             {/* Filtros */}
