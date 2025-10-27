@@ -192,10 +192,10 @@ export default function HomePage() {
   try {
     console.log("Applying promotion to lead ID:", id);
 
-const res = await fetch("https://localhost:7044/Leads/ApplyPromotionToLead", {
-  method: "PUT",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ id, promoPercent: 0.4 }),
+const res = await fetch(apiUrl("/Leads/ApplyPromotionToLead"), {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, promoPercent: 0.4 }),
 });
 
 
