@@ -75,12 +75,7 @@ export default function IncidentCard({
               {type}
             </span>
 
-            {/* 🔵 Etiqueta de descuento (justo al lado del tipo) */}
-            {is_promo && (
-              <span className="bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-indigo-200 shadow-sm">
-                {Math.round((promo_percent ?? 0.4) * 100)}% OFF
-              </span>
-            )}
+            
           </div>
 
           {/* Checkbox */}
