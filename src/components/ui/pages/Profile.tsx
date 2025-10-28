@@ -382,7 +382,7 @@ export default function Profile() {
               </h1>
               {user && (
                 <div className="mt-6 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0b1220] p-6 shadow-sm hover:shadow-md transition duration-200 force-light-bg-gray-50">
-                  <div className="flex items-center mb-4 gap-6">
+                  <div className="flex flex-wrap items-center justify-between gap-4 sm:gap-4 text-center sm:text-left md:justify-start md:gap-8">
                     <div className="relative w-32 h-32 flex-shrink-0">
                       <img
                         src="/avatars/default1.png"

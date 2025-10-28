@@ -447,10 +447,30 @@ const removePromotion = async (id: number) => {
                     <option value="other">Other</option>
                   </select>
 
-                  <div className="inline-flex rounded-md border border-gray-300 overflow-hidden text-sm">
-                    <button onClick={() => setViewMode("cards")} className={`px-3 py-1.5 transition font-medium ${viewMode === "cards" ? "bg-indigo-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"}`}>{t("home.cards")}</button>
-                    <button onClick={() => setViewMode("table")} className={`px-3 py-1.5 transition font-medium ${viewMode === "table" ? "bg-indigo-600 text-white" : "bg-white text-gray-700 hover:bg-gray-50"}`}>{t("home.table")}</button>
-                  </div>
+                  <div className="flex flex-wrap sm:inline-flex justify-center sm:justify-start w-full sm:w-auto rounded-xl border border-gray-300 overflow-hidden text-sm shadow-sm gap-2 sm:gap-0 mt-2 sm:mt-0">
+                  <button
+                    onClick={() => setViewMode("cards")}
+                    className={`flex-1 sm:flex-none px-4 py-2 font-semibold text-sm transition-all duration-200 ${
+                      viewMode === "cards"
+                        ? "bg-indigo-600 text-white"
+                        : "bg-white text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    {t("home.cards")}
+                  </button>
+                  <button
+                    onClick={() => setViewMode("table")}
+                    className={`flex-1 sm:flex-none px-4 py-2 font-semibold text-sm transition-all duration-200 ${
+                      viewMode === "table"
+                        ? "bg-indigo-600 text-white"
+                        : "bg-white text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    {t("home.table")}
+                  </button>
+                </div>
+
+
                 </div>
               </div>
             </div>
@@ -474,29 +494,32 @@ const removePromotion = async (id: number) => {
             {/* Barra inferior con resumen y checkout */}
             <div className="mt-auto">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-6 py-4 flex justify-between items-center">
+                <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6 text-center sm:text-left">
                   <div className="flex items-center gap-2">
                     <span className="text-gray-700 font-medium">{t("home.incidentsSelected", { count: cart.length })}</span>
                   </div>
                   <div className="flex items-center gap-6">
                     <span className="text-lg font-semibold text-gray-900">{t("home.total")} {formatCurrency(total)}</span>
-                    <button type="button" className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled={cart.length === 0} onClick={() => {
-                      const user = getLoggedUser();
-                      if (!user?.username) {
-                        alert("No user logged in");
-                        return;
-                      }
-                      const key = purchasedIncidentsKey(user.username);
-                      const prev = JSON.parse(localStorage.getItem(key) || "[]");
-                      const updated = [
-                        ...prev,
-                        ...cart.filter((c) => !prev.some((p: any) => p.id === c.id)),
-                      ];
-                      localStorage.setItem(key, JSON.stringify(updated));
-                      navigate({ to: "/Cart" });
-                    }}>
-                      {t("home.proceedToCheckout")}
+                    <button
+                      type="button"
+                      className="w-full sm:w-auto px-8 py-3 text-base sm:text-lg bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={cart.length === 0}
+                      onClick={() => {
+                        const user = getLoggedUser();
+                        if (!user?.username) {
+                          alert('No user logged in');
+                          return;
+                        }
+                        const key = purchasedIncidentsKey(user.username);
+                        const prev = JSON.parse(localStorage.getItem(key) || '[]');
+                        const updated = [...prev, ...cart.filter((c) => !prev.some((p: any) => p.id === c.id))];
+                        localStorage.setItem(key, JSON.stringify(updated));
+                        navigate({ to: '/Cart' });
+                      }}
+                    >
+                      {t('home.proceedToCheckout')}
                     </button>
+
                   </div>
                 </div>
               </div>

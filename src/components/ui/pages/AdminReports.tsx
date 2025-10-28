@@ -398,7 +398,7 @@ export default function AdminReports() {
 
               {/* ======= FILTER TOOLBAR ======= */}
               <div className="mt-6 bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm px-6 py-5 force-light-bg-white">
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-3 mb-4 overflow-x-auto pb-2">
                   <div className="flex gap-2">
                     {(["current", "all", "custom"] as FilterMode[]).map((mode) => (
                       <button key={mode} onClick={() => setFilterMode(mode)} className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${filterMode === mode ? "bg-indigo-600 text-white border-indigo-600" : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"}`}>
@@ -525,7 +525,8 @@ export default function AdminReports() {
                   <h2 className="text-lg font-semibold text-gray-800">
                     Recent Activity
                   </h2>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2 justify-center sm:justify-end overflow-x-auto pb-2">
+
                     {(["all", "purchases", "users"] as const).map((type) => (
                       <button
                         key={type}
