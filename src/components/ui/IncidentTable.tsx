@@ -1,4 +1,5 @@
 import type { IncidentCardProps, IncidentType } from "./IncidentCard";
+import { getLoggedUser,} from "../../utils/storage";
 
 const tagColors: Record<IncidentType, string> = {
   ROBBERY: "bg-red-100 text-red-700",
@@ -151,20 +152,37 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
                       <span className="text-gray-400 text-xs">—</span>
                     )}
                   </td>
+                      {/* Action */}
+                      <td className="px-3 sm:px-4 py-3 text-center">
+                        {/* Botón Add/Remove from Cart */}
+                        <button
+                          className="text-indigo-600 hover:underline font-medium block mx-auto"
+                          onClick={
+                            incident.checked
+                              ? incident.onRemoveFromCart
+                              : incident.onAddToCart
+                          }
+                        >
+                          {incident.checked ? "Remove" : "Add to cart"}
+                        </button>
 
-                  {/* Action */}
-                  <td className="px-3 sm:px-4 py-3 text-center">
-                    <button
-                      className="text-indigo-600 hover:underline font-medium"
-                      onClick={
-                        incident.checked
-                          ? incident.onRemoveFromCart
-                          : incident.onAddToCart
-                      }
-                    >
-                      {incident.checked ? "Remove" : "Add to cart"}
-                    </button>
-                  </td>
+                        {/* 🔹 Botón Remove Promo (igual al de IncidentCard) */}
+                        {getLoggedUser()?.role === "admin" && incident.is_promo && (
+                          <button
+                            onClick={() => {
+                              const confirmRemove = window.confirm(
+                                "Are you sure you want to remove the 40% discount promotion?"
+                              );
+                              if (confirmRemove) {
+                                incident.onRemovePromotion?.(incident.id);
+                              }
+                            }}
+                            className="mt-1 px-3 py-1.5 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition"
+                          >
+                            Remove Promo
+                          </button>
+                        )}
+                      </td>
                 </tr>
               ))
             ) : (

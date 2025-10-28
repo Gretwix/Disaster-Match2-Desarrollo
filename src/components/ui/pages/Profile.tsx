@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Home, User, Users, BarChart } from "lucide-react";
+import { LayoutGrid, User, Users, BarChart } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
 import apiUrl, { API_BASE } from "../../../utils/api";
@@ -339,7 +339,7 @@ export default function Profile() {
     fetchPurchased();
   }, [loggedUser?.id]);
 
-  if (loading) return <p className="text-center mt-10">{t("home.loadingIncidents")}</p>;
+  if (loading) return <p className="text-center mt-10">{t("home.loadingProfile")}</p>;
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100">
@@ -349,10 +349,10 @@ export default function Profile() {
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
             <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
-                <Link to="/" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <Home className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                  <span className="font-medium" data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
-                </Link>
+                <Link to="/HomePage" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
+                  <LayoutGrid className="h-5 w-5 text-gray-900 dark:text-slate-300" />
+                  <span className="font-medium" data-i18n="nav.disasterMatch"> {t("nav.disasterMatch")}</span>
+                  </Link>
 
                 {loggedUser?.role === "admin" && (
                   <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>

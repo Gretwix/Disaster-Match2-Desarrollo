@@ -74,13 +74,19 @@ export default function Login() {
     localStorage.removeItem('pendingCart');
   }
 
+
+
   // Redirigir a la ruta especificada o a la página principal
+ if (data.role === "admin") {
+  navigate({ to: "/AdminReports" }); 
+} else {
   navigate({ to: redirectTo });
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("Server connection error");
-    }
-  };
+}
+} catch (err) {
+  console.error("Login error:", err);
+  setError("Server connection error");
+}
+};
 
   const resendVerification = async () => {
     if (!email) {

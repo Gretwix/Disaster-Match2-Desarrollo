@@ -234,6 +234,44 @@ const res = await fetch(apiUrl("/Leads/ApplyPromotionToLead"), {
   }
 };
 
+//Eliminar promoción de un lead
+const removePromotion = async (id: number) => {
+  try {
+    console.log("Removing promotion from lead ID:", id);
+
+    const res = await fetch(apiUrl("/Leads/RemovePromotionFromLead"), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+
+    const text = await res.text();
+
+    if (!res.ok) {
+      alert(text || "Error removing promotion");
+      console.error(" Promotion removal failed:", text);
+      return;
+    }
+
+    console.log(" Promotion removed:", text);
+
+    // Actualiza el lead en la lista principal
+    setLeads((prev) =>
+      prev.map((l) =>
+        l.id === id
+          ? { ...l, is_promo: false, promo_percent: null, promo_start_date: null }
+          : l
+      )
+    );
+
+    alert("Promotion successfully removed!");
+  } catch (e) {
+    console.error("Error removing promotion:", e);
+    alert("Failed to remove promotion.");
+  }
+};
+
+
 
   // Filtrado, búsqueda y ordenamiento
   const filteredLeads = useMemo(() => {
@@ -275,6 +313,7 @@ const res = await fetch(apiUrl("/Leads/ApplyPromotionToLead"), {
     checked: cart.some((i) => i.id === lead.id),
     onAddToCart: () => addToCart(lead),
     onRemoveFromCart: () => removeFromCart(lead.id),
+    onRemovePromotion: (id) => removePromotion(id), 
     sold: (lead.times_purchased ?? 0) > 0,
     is_promo: !!lead.is_promo,
     promo_percent: Number(lead.promo_percent ?? 0.4),
@@ -362,7 +401,20 @@ const res = await fetch(apiUrl("/Leads/ApplyPromotionToLead"), {
                                 <td className="px-3 sm:px-4 py-3 text-gray-900 truncate whitespace-nowrap border-r border-gray-200 hidden md:table-cell">{lead.city}, {lead.lead_state}</td>
                                 <td className="px-3 sm:px-4 py-3 text-gray-900 border-r border-gray-200 hidden lg:table-cell">{new Date(lead.fecha_registro ?? lead.lead_date ?? "").toLocaleDateString()}</td>
                                 <td className="px-3 sm:px-4 py-3 text-center">
-                                  <button className="px-4 py-1.5 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition" onClick={() => applyPromotion(lead.id)}>Apply 40%</button>
+                                  <button
+                                    className="px-4 py-1.5 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition"
+                                    onClick={() => {
+                                      const confirmApply = window.confirm(
+                                        "Are you sure you want to apply a 40% discount promotion to this lead?"
+                                      );
+                                      if (confirmApply) {
+                                        applyPromotion(lead.id);
+                                      }
+                                    }}
+                                  >
+                                    Apply 40%
+                                  </button>
+
                                 </td>
                               </tr>
                             ))}

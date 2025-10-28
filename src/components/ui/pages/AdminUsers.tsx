@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Home, User, Users, BarChart } from "lucide-react";
+import { LayoutGrid, User, Users, BarChart } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
 import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
 import Swal from "sweetalert2";
@@ -173,10 +173,10 @@ export default function AdminUsers() {
             {/* Sidebar con mismo diseño de Profile */}
             <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
-                <Link to="/" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <Home className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                  <span className="font-medium" data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
-                </Link>
+                 <Link to="/HomePage" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
+                  <LayoutGrid className="h-5 w-5 text-gray-900 dark:text-slate-300" />
+                  <span className="font-medium" data-i18n="nav.disasterMatch"> {t("nav.disasterMatch")}</span>
+                  </Link>
 
                 <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <BarChart className="h-5 w-5 text-gray-900 dark:text-slate-300" />
