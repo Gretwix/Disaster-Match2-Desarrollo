@@ -15,7 +15,7 @@ export type CreateCheckoutParams = {
 
 export async function createCheckout(params: CreateCheckoutParams) {
   // Route through our API helper to respect env overrides and proxies
-  const res = await fetch(apiUrl('/payments/create-checkout-session'), {
+ const res = await fetch(apiUrl('/api/Payments/create-checkout-session'), { 
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
