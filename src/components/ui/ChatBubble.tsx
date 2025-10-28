@@ -114,85 +114,90 @@ export default function ChatBubble() {
       </button>
 
       {/* Ventana del chat */}
-      {open && (
-        <div className="fixed bottom-24 right-6 w-80 sm:w-96 bg-white rounded-2xl border border-gray-200 shadow-2xl flex flex-col overflow-hidden animate-fadeIn z-[9999]">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-[#2B1F65] via-[#3B29A3] to-[#5B3DFD] text-white px-4 py-3 flex justify-between items-center">
-            <span className="font-semibold text-sm tracking-wide">
-              DisasterMatch Assistant
-            </span>
-            <button
-              onClick={() => setOpen(false)}
-              className="text-white/80 hover:text-white transition"
-            >
-              <X size={18} />
-            </button>
-          </div>
+{open && (
+  <div
+    className="
+      fixed bg-white border border-gray-200 shadow-2xl flex flex-col overflow-hidden animate-fadeIn z-[9999]
+      rounded-t-2xl sm:rounded-2xl
 
-          {/* Mensajes */}
-          <div className="flex-1 overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3 max-h-96 scroll-smooth">
-            {messages.length === 0 && (
-              <p className="text-gray-400 text-center text-sm mt-10">
-                Hi! How can I assist you today?
-              </p>
-            )}
+      /* 📱 Ajustes responsive */
+      w-[95vw] sm:w-80 md:w-96
+      h-[70vh] sm:h-auto sm:max-h-[90vh]
+      bottom-0 sm:bottom-24
+      left-1/2 sm:left-auto sm:right-6
+      -translate-x-1/2 sm:translate-x-0
+    "
+  >
+    {/* Header */}
+    <div className="bg-gradient-to-r from-[#2B1F65] via-[#3B29A3] to-[#5B3DFD] text-white px-4 py-3 flex justify-between items-center">
+      <span className="font-semibold text-sm tracking-wide">DisasterMatch Assistant</span>
+      <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white transition">
+        <X size={18} />
+      </button>
+    </div>
 
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                className={`flex ${
-                  m.sender === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                <div
-                  className={`px-4 py-2 rounded-2xl text-sm max-w-[80%] leading-relaxed ${
-                    m.sender === "user"
-                      ? "bg-gradient-to-br from-[#5B3DFD] to-[#6E4BFF] text-white rounded-br-sm"
-                      : "bg-gray-200 text-gray-800 rounded-bl-sm"
-                  }`}
-                  dangerouslySetInnerHTML={{
-                    __html: m.text
-                      .replace(/\n/g, "<br>")
-                      .replace(
-                        /\[(.*?)\]\((.*?)\)/g,
-                        '<a href="$2" target="_blank" class="text-blue-600 underline hover:text-blue-800">$1</a>'
-                      ),
-                  }}
-                />
-              </div>
-            ))}
+    {/* Mensajes */}
+    <div className="flex-1 overflow-y-auto p-4 bg-gray-50 flex flex-col gap-3 scroll-smooth">
+      {messages.length === 0 && (
+        <p className="text-gray-400 text-center text-sm mt-10">
+          Hi! How can I assist you today?
+        </p>
+      )}
 
-            {loading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-200 text-gray-600 px-3 py-2 rounded-2xl text-sm animate-pulse">
-                  Typing...
-                </div>
-              </div>
-            )}
+      {messages.map((m, i) => (
+        <div
+          key={i}
+          className={`flex ${m.sender === "user" ? "justify-end" : "justify-start"}`}
+        >
+          <div
+            className={`px-4 py-2 rounded-2xl text-sm max-w-[80%] leading-relaxed ${
+              m.sender === "user"
+                ? "bg-gradient-to-br from-[#5B3DFD] to-[#6E4BFF] text-white rounded-br-sm"
+                : "bg-gray-200 text-gray-800 rounded-bl-sm"
+            }`}
+            dangerouslySetInnerHTML={{
+              __html: m.text
+                .replace(/\n/g, "<br>")
+                .replace(
+                  /\[(.*?)\]\((.*?)\)/g,
+                  '<a href="$2" target="_blank" class="text-blue-600 underline hover:text-blue-800">$1</a>'
+                ),
+            }}
+          />
+        </div>
+      ))}
 
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input */}
-          <div className="border-t bg-white p-3 flex gap-2 items-center">
-            <input
-              type="text"
-              value={input}
-              placeholder="Type a message..."
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-              className="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#5B3DFD] outline-none transition"
-            />
-            <button
-              onClick={sendMessage}
-              disabled={loading}
-              className="bg-gradient-to-br from-[#5B3DFD] to-[#472CBA] text-white p-2 rounded-xl hover:opacity-90 transition flex items-center justify-center disabled:opacity-50"
-            >
-              <Send size={16} />
-            </button>
+      {loading && (
+        <div className="flex justify-start">
+          <div className="bg-gray-200 text-gray-600 px-3 py-2 rounded-2xl text-sm animate-pulse">
+            Typing...
           </div>
         </div>
       )}
+      <div ref={messagesEndRef} />
+    </div>
+
+    {/* Input */}
+    <div className="border-t bg-white p-3 flex gap-2 items-center">
+      <input
+        type="text"
+        value={input}
+        placeholder="Type a message..."
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+        className="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#5B3DFD] outline-none transition"
+      />
+      <button
+        onClick={sendMessage}
+        disabled={loading}
+        className="bg-gradient-to-br from-[#5B3DFD] to-[#472CBA] text-white p-2 rounded-xl hover:opacity-90 transition flex items-center justify-center disabled:opacity-50"
+      >
+        <Send size={16} />
+      </button>
+    </div>
+  </div>
+)}
+
     </>
   );
 }
