@@ -4,12 +4,14 @@ import { useNavigate } from "@tanstack/react-router";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import apiUrl from "../../../utils/api";
+import { useTranslation } from "react-i18next";
 
 export default function ContactForm() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,7 +27,7 @@ export default function ContactForm() {
     };
 
     try {
-  const res = await fetch(apiUrl("/Contact/Send"), {
+      const res = await fetch(apiUrl("/Contact/Send"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -33,12 +35,12 @@ export default function ContactForm() {
 
       if (!res.ok) {
         const text = await res.text();
-        toast.error(" Error: " + text);
+        toast.error(t("contactForm.error") + ": " + text);
         return;
       }
 
       const result = await res.json();
-      toast.success(result.message || "Message sent successfully!");
+      toast.success(result.message || t("contactForm.successToast"));
 
       if (formRef.current) {
         formRef.current.reset();
@@ -46,15 +48,15 @@ export default function ContactForm() {
 
       Swal.fire({
         icon: "success",
-        title: "Message Sent!",
-        text: "We will get back to you soon.",
+        title: t("contactForm.successTitle"),
+        text: t("contactForm.successText"),
         confirmButtonColor: "#4f46e5",
       }).then(() => {
         navigate({ to: "/" });
       });
     } catch (err) {
       console.error("Fetch error:", err);
-      toast.error("Server not available");
+      toast.error(t("contactForm.serverError"));
     } finally {
       setLoading(false);
     }
@@ -73,7 +75,7 @@ export default function ContactForm() {
           className="flex items-center text-indigo-600 hover:text-indigo-800 mb-4"
         >
           <ArrowLeft className="w-5 h-5 mr-1" />
-          
+          <span>{t("contactForm.back")}</span>
         </button>
 
         <div className="flex justify-center mb-6">
@@ -83,15 +85,17 @@ export default function ContactForm() {
         </div>
 
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Contact Us</h1>
-          <p className="text-gray-500">Send us a message and we will reply soon</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {t("contactForm.title")}
+          </h1>
+          <p className="text-gray-500">{t("contactForm.subtitle")}</p>
         </div>
 
         {/* Formulario */}
         <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Your Name
+              {t("contactForm.name")}
             </label>
             <div className="relative">
               <User className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
@@ -100,14 +104,14 @@ export default function ContactForm() {
                 name="name"
                 required
                 className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full pl-10 py-3 rounded-md transition"
-                placeholder="John Doe"
+                placeholder={t("contactForm.namePlaceholder")}
               />
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Your Email
+              {t("contactForm.email")}
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
@@ -116,21 +120,21 @@ export default function ContactForm() {
                 name="email"
                 required
                 className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full pl-10 py-3 rounded-md transition"
-                placeholder="you@example.com"
+                placeholder={t("contactForm.emailPlaceholder")}
               />
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Your Message
+              {t("contactForm.message")}
             </label>
             <textarea
               name="message"
               rows={4}
               required
               className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full px-3 py-3 rounded-md transition"
-              placeholder="Write your message..."
+              placeholder={t("contactForm.messagePlaceholder")}
             ></textarea>
           </div>
 
@@ -149,7 +153,7 @@ export default function ContactForm() {
             disabled={loading}
             className="w-full py-3 px-4 rounded-md text-white font-medium shadow-sm bg-gradient-to-r from-indigo-600 to-indigo-800 hover:scale-[1.02] hover:shadow-lg transition-all duration-200 disabled:opacity-50"
           >
-            {loading ? "Sending..." : "Send Message"}
+            {loading ? t("contactForm.sending") : t("contactForm.send")}
           </button>
         </form>
       </div>

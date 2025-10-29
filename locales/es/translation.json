@@ -182,7 +182,59 @@
   "terms": {
     "title": "Términos de uso",
     "lastUpdated": "Última actualización: {{date}}",
-    "contactIntro": "Contacto."
+    "intro": "Bienvenido a DisasterMatch. Estos Términos de Uso (\"Términos\") regulan tu acceso y uso del sitio web, productos y servicios de DisasterMatch. Al acceder o utilizar nuestra plataforma, aceptas estar sujeto a estos Términos.",
+    "section1": {
+      "title": "1. Quién puede usar el servicio",
+      "p1": "Debes tener al menos 18 años para registrarte o comprar contenido en DisasterMatch. Al usar el Servicio, declaras y garantizas que tienes al menos 18 años y la capacidad legal para aceptar estos Términos.",
+      "p2": "El Servicio está disponible para cualquier persona o empresa. El público objetivo de DisasterMatch incluye contratistas que trabajan con aseguradoras, pero cualquier persona puede crear una cuenta y comprar tarjetas de datos de incidentes."
+    },
+    "section2": {
+      "title": "2. Descripción del servicio",
+      "p1": "DisasterMatch recopila y presenta datos de incidentes (\"Tarjetas de Incidente\" o \"Tarjetas\") que se obtienen de fuentes de terceros, incluyendo sitios web de pago y registros públicos de llamadas de emergencia. Cada Tarjeta muestra información como estado, ciudad, una breve descripción, fecha y hora, e indica si la Tarjeta está \"completa\" o \"incompleta\".",
+      "p2": "Cuando compras una Tarjeta, DisasterMatch envía la información asociada a esa Tarjeta al correo electrónico que proporcionas durante la compra (por ejemplo, confirmación de compra y detalles del incidente como en el correo de muestra incluido en nuestro sitio).",
+      "p3": "Una Tarjeta marcada como completa indica que DisasterMatch ha capturado todos los campos clave para ese incidente. Una Tarjeta marcada como incompleta significa que falta uno o más datos clave (por ejemplo: teléfono, correo electrónico o dirección); las Tarjetas incompletas tienen un precio menor."
+    },
+    "section3": {
+      "title": "3. Registro de cuenta y seguridad",
+      "p1": "Para usar ciertas funciones debes crear una cuenta. Aceptas proporcionar información precisa, actual y completa, y actualizarla según sea necesario. Eres responsable de mantener la confidencialidad de tus credenciales y de toda la actividad que ocurra bajo tu cuenta. Notifícanos inmediatamente cualquier uso no autorizado de tu cuenta.",
+      "p2": "No puedes compartir tus credenciales y aceptas no transferir ni vender tu cuenta sin el consentimiento previo por escrito de DisasterMatch."
+    },
+    "section4": {
+      "title": "4. Compras, pagos y facturación",
+      "p1": "Todas las compras son únicas para las Tarjetas específicas adquiridas. No ofrecemos suscripciones ni acuerdos basados en comisiones por defecto.",
+      "p2": "Al comprar una Tarjeta autorizas a DisasterMatch a cobrar el método de pago proporcionado. Eres responsable de los impuestos aplicables. Tras la compra, DisasterMatch enviará un correo de confirmación y una factura (cuando corresponda) al correo que proporciones. El correo de confirmación contendrá los detalles de los incidentes adquiridos.",
+      "p3": "No hay reembolsos. Todas las compras son finales y no reembolsables una vez que los detalles del incidente se entregan. En la máxima medida permitida por la ley, las compras no son reembolsables incluso si la información resulta ser inexacta o incompleta."
+    },
+    "section5": {
+      "title": "5. Uso de los datos de incidentes y restricciones",
+      "p1": "Los datos que compras están licenciados solo para tu uso comercial legítimo. No puedes:\n- Afirmar que DisasterMatch garantiza la exactitud, integridad o actualidad de los datos de incidentes.\n- Reproducir, revender, redistribuir o publicar públicamente los datos adquiridos para beneficio de terceros, salvo permiso expreso por escrito de DisasterMatch.\n- Usar el Servicio para acosar\n- Usar el Servicio para violar cualquier ley o regulación.\n- Interferir o afectar la integridad o el rendimiento del Servicio.\n- Intentar acceder a cuentas, sistemas o redes sin autorización.\n- Realizar ingeniería inversa o intentar extraer el código fuente o los datos del Servicio.\nNos reservamos el derecho de suspender o cancelar cuentas que violen estos Términos."
+    },
+    "section11": {
+      "title": "11. Terminación",
+      "p1": "Podemos suspender o cancelar tu acceso al Servicio en cualquier momento y por cualquier motivo, incluyendo incumplimiento de estos Términos o sospecha de actividad ilegal. La terminación no te libera de obligaciones previas, incluyendo pagos e indemnizaciones."
+    },
+    "section12": {
+      "title": "12. Indemnización",
+      "p1": "Aceptas indemnizar y mantener indemne a DisasterMatch y sus directivos, empleados y agentes frente a cualquier reclamación, daño, pérdida y gasto (incluyendo honorarios razonables de abogados) derivados de tu uso del Servicio, tu incumplimiento de estos Términos o tu violación de cualquier ley o derecho de terceros."
+    },
+    "section13": {
+      "title": "13. Exenciones y limitación de responsabilidad",
+      "p1": "EXENCIÓN DE GARANTÍAS. EN LA MÁXIMA MEDIDA PERMITIDA POR LA LEY, DISASTERMATCH RECHAZA TODA GARANTÍA, EXPRESA O IMPLÍCITA, INCLUYENDO GARANTÍAS IMPLÍCITAS DE COMERCIABILIDAD, IDONEIDAD PARA UN PROPÓSITO PARTICULAR, TITULARIDAD Y NO INFRACCIÓN.",
+      "p2": "LIMITACIÓN DE RESPONSABILIDAD. EN LA MÁXIMA MEDIDA PERMITIDA POR LA LEY, LA RESPONSABILIDAD AGREGADA DE DISASTERMATCH DERIVADA DE ESTOS TÉRMINOS O DEL USO DEL SERVICIO NO EXCEDERÁ EL MONTO PAGADO POR TI A DISASTERMATCH POR LA COMPRA QUE DIO LUGAR A LA RECLAMACIÓN. EN NINGÚN CASO DISASTERMATCH SERÁ RESPONSABLE DE DAÑOS INDIRECTOS, INCIDENTALES, ESPECIALES, CONSECUENTES O PUNITIVOS."
+    },
+    "section14": {
+      "title": "14. Ley aplicable y jurisdicción",
+      "p1": "Estos Términos se rigen por las leyes de Estados Unidos y las leyes estatales aplicables, sin considerar principios de conflicto de leyes. En la medida en que una reclamación no pueda ser sometida a arbitraje obligatorio, tú y DisasterMatch acuerdan someterse a la jurisdicción exclusiva de los tribunales estatales y federales de Estados Unidos para la resolución de disputas, salvo que la ley exija lo contrario."
+    },
+    "section15": {
+      "title": "15. Cambios en estos Términos",
+      "p1": "Podemos modificar estos Términos ocasionalmente. Cuando lo hagamos, publicaremos los Términos actualizados en el Servicio con la fecha de \"Última actualización\" revisada. El uso continuado del Servicio tras los cambios implica tu aceptación de los Términos revisados."
+    },
+    "section16": {
+      "title": "16. Misceláneos",
+      "p1": "Si alguna disposición de estos Términos se considera inaplicable, dicha disposición se limitará o eliminará en la medida mínima necesaria para que el resto de los Términos permanezcan en vigor. Estos Términos constituyen el acuerdo completo entre tú y DisasterMatch respecto al Servicio.",
+      "p2": "Contacto. Si tienes preguntas sobre estos Términos, contáctanos en: support@disastermatch.com"
+    }
   },
   "footer": {
     "terms": "Términos",
@@ -192,5 +244,72 @@
     "contact": "Contacto",
     "contactForm": "Formulario de contacto",
     "copyright": "© {{year}} {{name}}. Todos los derechos reservados."
+  },
+  "faq": {
+    "title": "Preguntas frecuentes (FAQ)",
+    "q1": {
+      "question": "1. ¿Qué es Disaster Match?",
+      "answer1": "Disaster Match es una plataforma que conecta a personas afectadas por desastres con contratistas o profesionales que ofrecen sus servicios para ayudarles."
+    },
+    "q2": {
+      "question": "2. ¿Cómo funciona el sistema de compra de información?",
+      "answer1": "Cuando un contratista desea conocer más sobre un incidente específico (por ejemplo, una propiedad afectada por incendio), puede comprar acceso completo a la información de la persona afectada. Esto incluye datos de contacto, descripción del daño y ubicación aproximada."
+    },
+    "q3": {
+      "question": "3. ¿Quién puede registrarse en Disaster Match?",
+      "answer1": "Cualquier persona puede registrarse en la plataforma:",
+      "answer2": "- Contratistas o empresas que buscan ofrecer sus servicios a personas afectadas.\n- Personas que desean solicitar ayuda tras un desastre."
+    },
+    "q4": {
+      "question": "4. ¿Es seguro comprar información en la plataforma?",
+      "answer1": "Sí. Disaster Match protege los datos personales de los usuarios mediante protocolos de seguridad robustos y solo comparte información con contratistas verificados que compran acceso a los detalles del incidente."
+    },
+    "q5": {
+      "question": "5. ¿Cómo puedo comprar información de una persona afectada?",
+      "answer1": "Ve a la sección “Incidentes disponibles”, selecciona el caso de tu interés y haz clic en “Agregar al carrito”. El sistema mostrará el precio en tu carrito. Una vez confirmado el pago, tendrás acceso completo a los datos de la persona afectada y la información del incidente."
+    },
+    "q6": {
+      "question": "6. ¿Qué métodos de pago acepta Disaster Match?",
+      "answer1": "Actualmente aceptamos pagos con tarjetas de crédito y débito, así como otras opciones electrónicas según la región del usuario."
+    },
+    "q7": {
+      "question": "7. ¿Qué sucede después de comprar la información?",
+      "answer1": "Una vez completada la compra, podrás ver todos los detalles del incidente y los datos de contacto de la persona afectada para ofrecer tus servicios o coordinar la ayuda directamente."
+    },
+    "q8": {
+      "question": "8. ¿Puedo modificar o eliminar mi cuenta?",
+      "answer1": "Sí. En la sección “Perfil” puedes actualizar tu información personal o solicitar la eliminación permanente de tu cuenta en cualquier momento."
+    },
+    "q9": {
+      "question": "9. ¿Qué hago si tengo un problema con el pago o al ver un incidente?",
+      "answer1": "Puedes contactar a nuestro equipo de soporte a través del chat en vivo para recibir asistencia inmediata con cualquier problema de pago o acceso."
+    },
+    "q10": {
+      "question": "10. ¿Puedo usar Disaster Match desde mi teléfono?",
+      "answer1": "Sí. Disaster Match es totalmente compatible con dispositivos móviles y puede accederse desde cualquier navegador web moderno."
+    },
+    "q11": {
+      "question": "11. ¿Cómo puedo buscar un desastre específico?",
+      "answer1": "En la sección “Incidentes disponibles” puedes usar filtros avanzados para encontrar casos específicos o generales.",
+      "answer2": "Los filtros te permiten buscar por tipo de desastre (incendio, inundación, terremoto, etc.), ubicación, fecha del incidente o nivel de daño reportado."
+    }
+  },
+  "contactForm": {
+    "title": "Contáctanos",
+    "subtitle": "Envíanos un mensaje y te responderemos pronto",
+    "name": "Tu nombre",
+    "namePlaceholder": "Juan Pérez",
+    "email": "Tu correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "message": "Tu mensaje",
+    "messagePlaceholder": "Escribe tu mensaje...",
+    "send": "Enviar mensaje",
+    "sending": "Enviando...",
+    "successToast": "¡Mensaje enviado correctamente!",
+    "successTitle": "¡Mensaje enviado!",
+    "successText": "Nos pondremos en contacto contigo pronto.",
+    "error": "Error",
+    "serverError": "Servidor no disponible",
+    "back": "Volver"
   }
 }

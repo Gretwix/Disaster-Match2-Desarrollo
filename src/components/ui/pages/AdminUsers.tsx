@@ -18,6 +18,7 @@ type UserRecord = {
   phone: string;
   company?: string;
   user_password?: string;
+  role?: string;
 };
 
 const API_URL = `${API_BASE}/Users`;
@@ -205,16 +206,17 @@ export default function AdminUsers() {
                 ) : !isEditing ? (
                   // Tabla responsive
                   <div className="overflow-x-auto">
-                    <table className="min-w-full text-left text-xs sm:text-sm">
-                      <thead>
-                        <tr className="text-gray-700">
-                          <th className="w-16 px-3 sm:px-4 py-3 font-semibold">ID</th>
-                          <th className="px-3 sm:px-4 py-3 font-semibold">{t("profile.username")}</th>
-                          <th className="px-3 sm:px-4 py-3 font-semibold">{t("profile.email")}</th>
-                          <th className="px-3 sm:px-4 py-3 font-semibold">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
+                  <table className="min-w-full text-left text-sm table-fixed bg-white">
+                    <thead>
+                      <tr className="text-gray-700 bg-white">
+                        <th className="px-4 py-3 w-24">ID</th>
+                        <th className="px-4 py-3 w-40">Username</th>
+                        <th className="px-4 py-3 w-56">Email</th>
+                        <th className="px-4 py-3 w-32">Role</th>
+                        <th className="px-4 py-3 w-32">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white rounded-xl overflow-hidden">
                         {users.map((u, idx) => (
                           <tr
                             key={u.id ?? idx}
@@ -223,6 +225,7 @@ export default function AdminUsers() {
                             <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{u.id}</td>
                             <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{u.username}</td>
                             <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{u.email}</td>
+                            <td className="px-3 sm:px-4 py-3 whitespace-nowrap">{u.role}</td>
                             <td className="px-3 sm:px-4 py-3">
                               <div className="flex flex-wrap gap-2">
                                 <button
@@ -244,9 +247,9 @@ export default function AdminUsers() {
                             </td>
                           </tr>
                         ))}
-                      </tbody>
-                    </table>
-                  </div>
+                    </tbody>
+                  </table>
+                </div>
                 ) : (
                   // Formulario
                   <div className="p-6 bg-white dark:bg-[#0f172a] rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">

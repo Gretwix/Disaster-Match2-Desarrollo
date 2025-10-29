@@ -1,10 +1,22 @@
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "@tanstack/react-router";
+import { ArrowLeft } from "react-feather";
 
 export default function TermsOfUsePage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#f9fafb] flex justify-center py-12 px-6">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-md border border-gray-200 p-8">
+        {/* Botón volver */}
+        <button
+          onClick={() => navigate({ to: "/" })}
+          className="flex items-center text-indigo-600 hover:text-indigo-800 mb-4"
+        >
+          <ArrowLeft className="w-5 h-5 mr-1" />
+          <span>{t("contactForm.back")}</span>
+        </button>
+
         <header className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
             {t("terms.title")}
@@ -16,172 +28,95 @@ export default function TermsOfUsePage() {
 
         <div className="h-[70vh] overflow-y-auto pr-2 text-gray-700 leading-relaxed space-y-8">
           <section>
-            <p>
-              Welcome to DisasterMatch. These Terms of Use ("Terms") govern your
-              access to and use of the DisasterMatch website, products, and
-              services. By accessing or using our platform, you agree to be bound
-              by these Terms.
-            </p>
+            <p>{t("terms.intro")}</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-2 text-indigo-600">
-              1. Who May Use the Service
+              {t("terms.section1.title")}
             </h2>
-            <p>
-              You must be at least 18 years old to register for an account or
-              purchase content on DisasterMatch. By using the Service you
-              represent and warrant that you are at least 18 and have legal
-              capacity to enter into these Terms.
-            </p>
-            <p className="mt-3">
-              The Service is available to any individual or business.
-              DisasterMatch’s intended audience includes contractors working with
-              insurance companies, but anyone may create an account and purchase
-              incident data cards.
-            </p>
+            <p>{t("terms.section1.p1")}</p>
+            <p className="mt-3">{t("terms.section1.p2")}</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-2 text-indigo-600">
-              2. Description of Service
+              {t("terms.section2.title")}
             </h2>
-            <p>
-              DisasterMatch aggregates and presents incident data ("Incident Cards"
-              or "Cards") that are compiled from third-party sources, including
-              paid third‑party websites and public emergency call records. Each
-              Card displays information such as state, city, a short description,
-              date and time, and an indication whether the Card is “complete” or
-              “incomplete.”
-            </p>
-            <p className="mt-3">
-              When you purchase a Card, DisasterMatch delivers the information
-              associated with that Card to the email address you provide during
-              checkout (for example, purchase confirmation and incident details as
-              in the sample email included on our site).
-            </p>
-            <p className="mt-3">
-              A Card marked complete indicates DisasterMatch has captured all key
-              fields for that incident. A Card marked incomplete means one or more
-              key data fields (for example: phone, email, or address) are
-              missing; incomplete Cards are priced lower.
-            </p>
+            <p>{t("terms.section2.p1")}</p>
+            <p className="mt-3">{t("terms.section2.p2")}</p>
+            <p className="mt-3">{t("terms.section2.p3")}</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-2 text-indigo-600">
-              3. Account Registration and Security
+              {t("terms.section3.title")}
             </h2>
-            <p>
-              To use certain features you must create an account. You agree to
-              provide accurate, current, and complete information and to update it
-              as needed. You are responsible for maintaining the confidentiality
-              of your account credentials and for all activity that occurs under
-              your account. Notify us immediately of any unauthorized use of your
-              account.
-            </p>
-            <p className="mt-3">
-              You may not share account credentials, and you agree not to transfer
-              or sell your account without DisasterMatch’s prior written consent.
-            </p>
+            <p>{t("terms.section3.p1")}</p>
+            <p className="mt-3">{t("terms.section3.p2")}</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-2 text-indigo-600">
-              4. Purchases, Payment, and Invoicing
+              {t("terms.section4.title")}
             </h2>
-            <p>
-              All purchases are one‑time purchases for the specific Card(s)
-              bought. We do not offer subscriptions or commission-based
-              arrangements by default.
-            </p>
-            <p className="mt-3">
-              By purchasing a Card you authorize DisasterMatch to charge the
-              payment method provided. You are responsible for any applicable
-              taxes. After purchase, DisasterMatch will send a confirmation email
-              and an invoice (when applicable) to the email address you supply.
-              The confirmation email will contain the details of the purchased
-              incidents.
-            </p>
-            <p className="mt-3">
-              No refunds. All purchases are final and non-refundable once the
-              incident details are delivered to you. To the fullest extent
-              permitted by law, purchases are non-refundable even if the
-              information later proves to be inaccurate or incomplete.
-            </p>
+            <p>{t("terms.section4.p1")}</p>
+            <p className="mt-3">{t("terms.section4.p2")}</p>
+            <p className="mt-3">{t("terms.section4.p3")}</p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+              {t("terms.section5.title")}
+            </h2>
+            <p>{t("terms.section5.p1")}</p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+              {t("terms.section11.title")}
+            </h2>
+            <p>{t("terms.section11.p1")}</p>
           </section>
           <section>
             <h2 className="text-xl font-semibold mb-2 text-indigo-600">
-              5. Use of Incident Data and Restrictions
+              {t("terms.section12.title")}
             </h2>
-            <p>
-              The data you purchase is licensed to you for your lawful business
-              use only. You may not:
-              <br />- Represent that DisasterMatch guarantees the accuracy,
-              completeness, or timeliness of any incident data.
-              <br />- Reproduce, resell, redistribute, or publicly publish
-              purchased incident data for the benefit of third parties, except as
-              expressly permitted in writing by DisasterMatch.
-              <br />- Use the Service to stalk
-<br />
-- Use the Service to violate any law or regulation.
-<br />
-- Interfere with or disrupt the integrity or performance of the Service.
-<br />
-- Attempt to access accounts, systems, or networks without authorization.
-<br />
-- Reverse engineer or attempt to extract the source code or data from the Service.
-<br />
-We reserve the right to suspend or terminate accounts that violate these Terms.
-            </p>
+            <p>{t("terms.section12.p1")}</p>
           </section>
           <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">11. Termination</h2>
-            <p>
-                We may suspend or terminate your access to the Service at any time for any reason, including for breach of these Terms or for suspected unlawful activity. Termination does not relieve you of obligations that accrued prior to termination, including payment obligations and indemnity obligations.
-            </p>
+            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+              {t("terms.section13.title")}
+            </h2>
+            <p>{t("terms.section13.p1")}</p>
+            <p className="mt-3">{t("terms.section13.p2")}</p>
           </section>
           <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">12. Indemnification</h2>
-            <p>
-                You agree to indemnify and hold DisasterMatch and its officers, directors, employees and agents harmless from any claims, liabilities, damages, losses, and expenses (including reasonable attorneys’ fees and costs) arising from or related to your use of the Service, your breach of these Terms, or your violation of any law or the rights of a third party.
-            </p>
+            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+              {t("terms.section14.title")}
+            </h2>
+            <p>{t("terms.section14.p1")}</p>
           </section>
           <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">13. Disclaimers and Limitation of Liability</h2>
-            <p>
-                DISCLAIMER OF WARRANTIES. TO THE MAXIMUM EXTENT PERMITTED BY LAW, DISASTERMATCH DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON‑INFRINGEMENT.
-            </p>
-            <p className="mt-3">
-            LIMITATION OF LIABILITY. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, DISASTERMATCH’S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THESE TERMS OR YOUR USE OF THE SERVICE SHALL NOT EXCEED THE AMOUNT PAID BY YOU TO DISASTERMATCH FOR THE PURCHASE GIVING RISE TO THE CLAIM. IN NO EVENT SHALL DISASTERMATCH BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES.
-            </p>
-            
+            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+              {t("terms.section15.title")}
+            </h2>
+            <p>{t("terms.section15.p1")}</p>
           </section>
           <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">14. Governing Law and Venue</h2>
-            <p>
-                These Terms are governed by the laws of the United States and applicable state laws, without regard to conflict‑of‑law principles. To the extent a claim cannot be subject to mandatory arbitration under applicable law, you and DisasterMatch agree to submit to the exclusive jurisdiction and venue of the state and federal courts located in the United States for resolution of disputes, unless otherwise required by applicable law.
-            </p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">15. Changes to These Terms</h2>
-            <p>
-                We may modify these Terms from time to time. When we make changes we will post the updated Terms on the Service with a revised "Last updated" date. Your continued use of the Service after changes become effective constitutes your acceptance of the revised Terms.
-            </p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">16. Miscellaneous</h2>
-            <p>
-                If any provision of these Terms is found to be unenforceable, that provision will be limited or eliminated to the minimum extent necessary so that these Terms will otherwise remain in full force and effect. These Terms constitute the entire agreement between you and DisasterMatch regarding the Service.
-            </p>
-            <p className="mt-3">
-    Contact. If you have questions about these Terms, please contact us at: support@disastermatch.com
-            </p>
+            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+              {t("terms.section16.title")}
+            </h2>
+            <p>{t("terms.section16.p1")}</p>
+            <p className="mt-3">{t("terms.section16.p2")}</p>
           </section>
         </div>
 
         <footer className="text-center text-gray-500 text-sm mt-8 border-t pt-4">
-          © {new Date().getFullYear()} DisasterMatch. All rights reserved.
+          {t("footer.copyright", {
+            year: new Date().getFullYear(),
+            name: "DisasterMatch",
+          })}
         </footer>
       </div>
     </div>

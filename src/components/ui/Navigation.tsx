@@ -211,6 +211,37 @@ export default function Navigation() {
 
       {/* Derecha: Tema + Auth-aware actions */}
       <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+        {/* Show theme/language switchers only if NOT logged in */}
+        {!loggedUser && (
+          <>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={isDark ? t("nav.themeLight") : t("nav.themeDark")}
+              title={isDark ? t("nav.themeLight") : t("nav.themeDark")}
+              className={`inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-slate-600 ${
+                isDark
+                  ? "bg-[#1e293b] text-gray-100 hover:bg-[#334155]"
+                  : "bg-white text-black hover:bg-gray-100"
+              } transition`}
+            >
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+            <select
+              value={i18n.language}
+              onChange={(e) => changeLanguage(e.target.value)}
+              aria-label={t("nav.language")}
+              className={`rounded-md border border-gray-300 dark:border-slate-600 px-2 py-1 text-sm transition
+                ${isDark
+                  ? "bg-[#1e293b] text-gray-100 hover:bg-[#334155]"
+                  : "bg-white text-black hover:bg-gray-100"
+                }`}
+            >
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+            </select>
+          </>
+        )}
         {(() => {
           const path = routerState.location.pathname.toLowerCase();
           const isLanding = path === "/" || path === "/landingpage";
@@ -248,7 +279,11 @@ export default function Navigation() {
                   {isProfileOpen && (
                     <div
                       role="menu"
-                      className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm p-2 z-50"
+                      className={`absolute right-0 top-full mt-2 w-48 border rounded-lg shadow-sm p-2 z-50 transition
+                        ${isDark
+                          ? "bg-[#1e293b] border-slate-700 text-gray-100"
+                          : "bg-white border-gray-200 text-black"
+                        }`}
                       onMouseEnter={!isTouch ? openProfile : undefined}
                       onMouseLeave={!isTouch ? () => closeProfileWithDelay() : undefined}
                     >
@@ -262,7 +297,12 @@ export default function Navigation() {
                           }}
                           aria-label={isDark ? t("nav.themeLight") : t("nav.themeDark")}
                           title={isDark ? t("nav.themeLight") : t("nav.themeDark")}
-                          className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200"
+                          className={`inline-flex items-center justify-center w-9 h-9 rounded-md border transition
+                            border-gray-300 dark:border-slate-600
+                            ${isDark
+                              ? "bg-[#1e293b] text-gray-100 hover:bg-[#334155]"
+                              : "bg-white text-black hover:bg-gray-100"
+                            }`}
                         >
                           {isDark ? <Sun size={16} /> : <Moon size={16} />}
                         </button>
@@ -273,30 +313,43 @@ export default function Navigation() {
                             setIsProfileOpen(false);
                           }}
                           aria-label={t("nav.language")}
-                          className="flex-1 rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-[#0f172a] text-sm px-2 py-1"
+                          className={`flex-1 rounded-md border px-2 py-1 text-sm transition
+                            border-gray-300 dark:border-slate-600
+                            ${isDark
+                              ? "bg-[#1e293b] text-gray-100 hover:bg-[#334155]"
+                              : "bg-white text-black hover:bg-gray-100"
+                            }`}
                         >
                           <option value="en">EN</option>
                           <option value="es">ES</option>
                         </select>
                       </div>
-                      <div className="h-px bg-gray-200 dark:bg-slate-700 my-1" />
+                      <div className={`h-px my-1 ${isDark ? "bg-slate-700" : "bg-gray-200"}`} />
 
                       {/* Admin Panel (if admin) */}
                       {loggedUser?.role === "admin" && (
                         <Link
                           to="/AdminReports"
                           onClick={() => setIsProfileOpen(false)}
-                          className="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-slate-200 rounded-md hover:bg-gray-200 dark:hover:bg-slate-800/60"
+                          className={`block w-full text-left px-3 py-2 text-sm rounded-md transition
+                            ${isDark
+                              ? "text-gray-100 hover:bg-slate-800/60"
+                              : "text-black hover:bg-gray-200"
+                            }`}
                         >
                           <span data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
                         </Link>
                       )}
-                      <div className="h-px bg-gray-200 dark:bg-slate-700 my-1" />
+                      <div className={`h-px my-1 ${isDark ? "bg-slate-700" : "bg-gray-200"}`} />
 
                       <Link
                         to="/Profile"
                         onClick={() => setIsProfileOpen(false)}
-                        className="block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-slate-200 rounded-md hover:bg-gray-200 dark:hover:bg-slate-800/60"
+                        className={`block w-full text-left px-3 py-2 text-sm rounded-md transition
+                          ${isDark
+                            ? "text-gray-100 hover:bg-slate-800/60"
+                            : "text-black hover:bg-gray-200"
+                          }`}
                       >
                         <span data-i18n="nav.profile">{t("nav.profile")}</span>
                       </Link>
@@ -306,7 +359,11 @@ export default function Navigation() {
                           setIsProfileOpen(false);
                           handleLogout();
                         }}
-                        className="block w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 rounded-md hover:bg-red-500 hover:text-white dark:hover:bg-red-600/30 dark:hover:text-red-200"
+                        className={`block w-full text-left px-3 py-2 text-sm rounded-md transition
+                          ${isDark
+                            ? "text-red-400 hover:bg-red-600/30 hover:text-red-200"
+                            : "text-red-600 hover:bg-red-500 hover:text-white"
+                          }`}
                       >
                         <span data-i18n="nav.logout">{t("nav.logout")}</span>
                       </button>
@@ -347,6 +404,34 @@ export default function Navigation() {
         <div className="fixed inset-0 bg-black/30" onClick={() => setIsMobileOpen(false)} />
         {/* Panel */}
         <div ref={mobileMenuRef} className="fixed top-[56px] left-2 right-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-4 z-50">
+          {/* Show theme/language switchers only if NOT logged in */}
+          {!loggedUser && (
+            <div className="mb-2 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className={`inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-gray-700 transition
+                  ${isDark
+                    ? "bg-[#1e293b] text-gray-100 hover:bg-[#334155]"
+                    : "bg-white text-black hover:bg-gray-100"
+                  }`}
+              >
+                {isDark ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+              <select
+                value={i18n.language}
+                onChange={(e) => changeLanguage(e.target.value)}
+                className={`rounded-md border px-2 py-1 text-sm transition
+                  ${isDark
+                    ? "bg-[#1e293b] text-gray-100 hover:bg-[#334155]"
+                    : "bg-white text-black hover:bg-gray-100"
+                  }`}
+              >
+                <option value="en">EN</option>
+                <option value="es">ES</option>
+              </select>
+            </div>
+          )}
           {loggedUser ? (
             <div className="flex flex-col gap-2">
               {loggedUser.role === "admin" && (
@@ -363,15 +448,6 @@ export default function Navigation() {
               <button type="button" className="px-3 py-2 text-left text-red-600 rounded-md hover:bg-red-50 dark:hover:bg-red-600/20" onClick={() => { setIsMobileOpen(false); handleLogout(); }}>
                 {t("nav.logout")}
               </button>
-              <div className="mt-2 flex items-center gap-2">
-                <button type="button" onClick={toggleTheme} className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-gray-700">
-                  {isDark ? <Sun size={18} /> : <Moon size={18} />}
-                </button>
-                <select value={i18n.language} onChange={(e) => changeLanguage(e.target.value)} className="rounded-md border px-2 py-1 text-sm">
-                  <option value="en">EN</option>
-                  <option value="es">ES</option>
-                </select>
-              </div>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
@@ -381,15 +457,6 @@ export default function Navigation() {
               <Link to="/Register" className="px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700" onClick={() => setIsMobileOpen(false)}>
                 {t("nav.register")}
               </Link>
-              <div className="mt-2 flex items-center gap-2">
-                <button type="button" onClick={toggleTheme} className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-gray-700">
-                  {isDark ? <Sun size={18} /> : <Moon size={18} />}
-                </button>
-                <select value={i18n.language} onChange={(e) => changeLanguage(e.target.value)} className="rounded-md border px-2 py-1 text-sm">
-                  <option value="en">EN</option>
-                  <option value="es">ES</option>
-                </select>
-              </div>
             </div>
           )}
         </div>

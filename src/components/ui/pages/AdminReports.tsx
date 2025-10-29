@@ -520,7 +520,7 @@ export default function AdminReports() {
               
 
               {/* ======= ACTIVITY TABLE ======= */}
-              <div className="mt-8 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0b1220] p-4 sm:p-5">
+              <div className="mt-8 rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-[#0b1220] p-4 sm:p-5 force-light-bg-white">
                 <div className="flex flex-wrap justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold text-gray-800">
                     Recent Activity
@@ -548,7 +548,7 @@ export default function AdminReports() {
                   </div>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full text-left text-sm table-fixed">
+                  <table className="min-w-full text-left text-sm table-fixed bg-white">
                     <thead>
                       <tr className="text-gray-700">
                         <th className="px-4 py-3 w-32">Date</th>
@@ -563,7 +563,9 @@ export default function AdminReports() {
                           <tr
                             key={index}
                             className={
-                              index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                              index % 2 === 0
+                                ? "bg-white"
+                                : "bg-gray-50"
                             }
                           >
                             <td className="px-4 py-3 text-gray-900">
