@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import CustomModal from "../CustomModal";
+import { ArrowLeft } from "react-feather";
 import {
   getCart,
   saveCart as saveCartStorage,
@@ -103,6 +105,14 @@ export default function CartPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
+      {/* Botón volver */}
+                <button
+                  onClick={() => navigate({ to: "/HomePage" })}
+                  className="flex items-center text-indigo-600 hover:text-indigo-800 mb-4"
+                >
+                  <ArrowLeft className="w-5 h-5 mr-1" />
+                  <span>{t("contactForm.back")}</span>
+                </button>
       <h1 className="text-2xl font-bold text-gray-900 mb-8" data-i18n="cart.confirmPurchase">{t("cart.confirmPurchase")}</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

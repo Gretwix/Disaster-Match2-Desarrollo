@@ -260,7 +260,7 @@ export default function Navigation() {
 
                 {/* Profile dropdown */}
                 <div
-                  className="relative pb-2"
+                  className="relative p-4"
                   ref={profileRef}
                   onMouseEnter={!isTouch ? openProfile : undefined}
                   onMouseLeave={!isTouch ? () => closeProfileWithDelay() : undefined}

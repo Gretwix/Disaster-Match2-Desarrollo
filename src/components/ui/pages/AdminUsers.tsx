@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { LayoutGrid, User, Users, BarChart } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
 import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
+import { ArrowLeft } from "react-feather";
 import Swal from "sweetalert2";
 import toast, { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -29,6 +30,7 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState<UserRecord | null>(null);
   const [formData, setFormData] = useState<UserRecord | null>(null);
+  const navigate = useNavigate();
 
   const fetchUsers = async () => {
     try {
@@ -158,40 +160,51 @@ export default function AdminUsers() {
     return <p className="text-center mt-10 text-red-500">{t("admin.deleteConfirmTitle")}</p>;
   }
 
-  // Match Profile page sidebar styles for consistent contrast in light mode
+  // clases reutilizables para el sidebar
   const sidebarLinkBase =
-    "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition";
+    "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition";
   const sidebarActiveClass =
-    "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300";
+    "bg-indigo-600 text-indigo-600 ring-1 ring-indigo-600 dark:bg-indigo-600/60";
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100 overflow-x-hidden">
       <Toaster position="top-right" reverseOrder={false} />
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
         <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
 
             {/* Sidebar con mismo diseño de Profile */}
-            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
-              <nav className="space-y-2">
-                 <Link to="/HomePage" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <LayoutGrid className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                  <span className="font-medium" data-i18n="nav.disasterMatch"> {t("nav.disasterMatch")}</span>
-                  </Link>
+            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 
+                    p-4 sm:p-5 md:p-6 bg-gray-50 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
+              <nav className="p-1 md:block justify-center space-y-2 scrollbar-hide">
+
+                {/* Botón volver */}
+                <button
+                  onClick={() => navigate({ to: "/" })}
+                  className="flex items-center text-indigo-600 hover:text-indigo-800 mb-4"
+                >
+                  <ArrowLeft className="w-5 h-5 mr-1" />
+                  <span>{t("contactForm.back")}</span>
+                </button>
+
+                <Link to="/HomePage" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
+                  <LayoutGrid className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.disasterMatch"> {t("nav.disasterMatch")}</span>
+                </Link>
 
                 <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <BarChart className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                  <span className="font-medium" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
+                  <BarChart className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
                 </Link>
 
                 <Link to="/Profile" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <User className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                  <span className="font-medium" data-i18n="nav.profile">{t("nav.profile")}</span>
+                  <User className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.profile">{t("nav.profile")}</span>
                 </Link>
 
                 <Link to="/AdminUsers" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <Users className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                  <span className="font-medium" data-i18n="nav.users">{t("nav.users")}</span>
+                  <Users className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.users">{t("nav.users")}</span>
                 </Link>
               </nav>
             </aside>
@@ -200,23 +213,23 @@ export default function AdminUsers() {
             <section className="p-6 md:p-8">
               <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 mb-6 force-light-text" data-i18n="admin.manageUsers">{t("admin.manageUsers")}</h1>
 
-              <div className="mt-6 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0b1220] p-4 sm:p-5">
+              <div className="mt-6 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50  p-4 sm:p-5">
                 {loading ? (
                   <p className="text-gray-500 text-center" data-i18n="admin.loadingUsers">{t("admin.loadingUsers")}</p>
                 ) : !isEditing ? (
                   // Tabla responsive
                   <div className="overflow-x-auto">
-                  <table className="min-w-full text-left text-sm table-fixed bg-white">
-                    <thead>
-                      <tr className="text-gray-700 bg-white">
-                        <th className="px-4 py-3 w-24">ID</th>
-                        <th className="px-4 py-3 w-40">Username</th>
-                        <th className="px-4 py-3 w-56">Email</th>
-                        <th className="px-4 py-3 w-32">Role</th>
-                        <th className="px-4 py-3 w-32">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white rounded-xl overflow-hidden">
+                    <table className="min-w-full text-left text-sm table-fixed bg-white">
+                      <thead>
+                        <tr className="text-gray-700 bg-white">
+                          <th className="px-4 py-3 w-24">ID</th>
+                          <th className="px-4 py-3 w-40">Username</th>
+                          <th className="px-4 py-3 w-56">Email</th>
+                          <th className="px-4 py-3 w-32">Role</th>
+                          <th className="px-4 py-3 w-32">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white rounded-xl overflow-hidden">
                         {users.map((u, idx) => (
                           <tr
                             key={u.id ?? idx}
@@ -247,9 +260,9 @@ export default function AdminUsers() {
                             </td>
                           </tr>
                         ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </tbody>
+                    </table>
+                  </div>
                 ) : (
                   // Formulario
                   <div className="p-6 bg-white dark:bg-[#0f172a] rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">

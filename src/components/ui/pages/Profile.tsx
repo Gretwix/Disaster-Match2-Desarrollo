@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { LayoutGrid, User, Users, BarChart } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { ArrowLeft } from "react-feather";
 
 import apiUrl, { API_BASE } from "../../../utils/api";
 import { getLoggedUser } from "../../../utils/storage";
@@ -32,6 +33,7 @@ type User = {
 export default function Profile() {
   const { t } = useTranslation();
   const loggedUser = getLoggedUser();
+  const navigate = useNavigate();
 
   // clases reutilizables para el sidebar
   const sidebarLinkBase =
@@ -377,14 +379,25 @@ export default function Profile() {
   if (loading) return <p className="text-center mt-10">{t("home.loadingProfile")}</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100 overflow-x-hidden">
       <Toaster position="top-right" reverseOrder={false} />
-      <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 md:p-6 lg:p-8">
         <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
             {/* aside con navegación */}
-            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
-              <nav className="space-y-2">
+            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 
+                    p-4 sm:p-5 md:p-6 bg-gray-50 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
+              <nav className="p-1 md:block justify-center space-y-2 scrollbar-hide">
+
+                {/* Botón volver */}
+                <button
+                  onClick={() => navigate({ to: "/" })}
+                  className="flex items-center text-indigo-600 hover:text-indigo-800 mb-4"
+                >
+                  <ArrowLeft className="w-5 h-5 mr-1" />
+                  <span>{t("contactForm.back")}</span>
+                </button>
+
                 <Link to="/HomePage" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <LayoutGrid className="h-5 w-5 text-gray-900" />
                   <span className="font-medium text-gray-900" data-i18n="nav.disasterMatch"> {t("nav.disasterMatch")}</span>
@@ -420,8 +433,12 @@ export default function Profile() {
               {user && (
                 <div className="mt-6 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0b1220] p-6 shadow-sm hover:shadow-md transition duration-200 force-light-bg-gray-50">
                   <div className="flex flex-wrap items-center mb-6 justify-between gap-4 sm:gap-4 text-center sm:text-left md:justify-start md:gap-8">
-                    <div className="relative w-32 h-32 flex-shrink-0">
-                      <img src="/avatars/default1.png" alt="Default Avatar" className="w-full h-full rounded-full object-cover border-2 border-gray-300" />
+                    <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 mx-auto sm:mx-0">
+                      <img
+                        src="/avatars/default1.png"
+                        alt="Default Avatar"
+                        className="w-full h-full rounded-full object-cover border-2 border-gray-300"
+                      />
                     </div>
 
                     <h3 className="text-xl font-semibold text-gray-800 dark:text-slate-100 force-light-text">
@@ -471,7 +488,7 @@ export default function Profile() {
                             value={(formData as any)?.[field.name] || ""}
                             onChange={handleChange}
                             readOnly={field.readOnly || false}
-                            className={`mt-1 border rounded-lg px-3 py-2 shadow-sm transition duration-200
+                            className={`mt-1 border rounded-lg px-3 py-2 w-full shadow-sm transition duration-200
                               ${field.readOnly ? "bg-gray-100 text-gray-500 cursor-not-allowed" : "focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"}`}
                           />
                         </label>
@@ -490,19 +507,15 @@ export default function Profile() {
                         <p className="text-gray-500" data-i18n="profile.noPurchased">{t("profile.noPurchased")}</p>
                       ) : (
                         <>
-                          <ul className="list-disc pl-6 space-y-2">
+                          <ul className="pl-4 sm:pl-6 space-y-2 text-sm sm:text-base">
                             {purchasedIncidents.map((item: any) => (
                               <li
                                 key={item.id}
-                                onClick={() => {
-                                  setSelectedIncident(item);
-                                  setIsModalOpen(true);
-                                }}
+                                onClick={() => { setSelectedIncident(item); setIsModalOpen(true); }}
                                 className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800/60 transition duration-200 cursor-pointer"
                               >
-                                <span className="font-medium">{item.title}</span>
-                                {" — "}
-                                {formatCurrency(item.price)}
+                                <span className="font-medium block truncate">{item.title}</span>
+                                <span className="text-gray-500 sm:ml-1">{formatCurrency(item.price)}</span>
                               </li>
                             ))}
                           </ul>
@@ -525,7 +538,7 @@ export default function Profile() {
             {t("profile.changePassword")}
           </h2>
 
-          <div className="grid gap-4 max-w-md">
+          <div className="grid gap-4 max-w-full sm:max-w-md">
             <label className="flex flex-col text-sm font-medium" data-i18n="profile.currentPassword">
               {t("profile.currentPassword")}
               <input type="password" value={pwdCurrent} onChange={(e) => setPwdCurrent(e.target.value)} className="mt-1 border rounded-lg px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition duration-200" />
@@ -576,7 +589,7 @@ export default function Profile() {
             </label>
 
             <div>
-              <button onClick={handleChangePassword} disabled={pwdLoading || !isPasswordFormValid()} className={`w-full py-2 px-4 rounded-lg text-white font-medium shadow-sm transition ${isPasswordFormValid() && !pwdLoading ? "bg-indigo-600 hover:bg-indigo-700 hover:scale-[1.02] hover:shadow-md" : "bg-gray-400 cursor-not-allowed"}`} data-i18n="profile.updatePassword">
+              <button onClick={handleChangePassword} disabled={pwdLoading || !isPasswordFormValid()} className={`w-full py-2 px-4 rounded-lg text-white font-medium shadow-sm transition text-sm sm:text-base ${isPasswordFormValid() && !pwdLoading ? "bg-indigo-600 hover:bg-indigo-700 hover:scale-[1.02] hover:shadow-md" : "bg-gray-400 cursor-not-allowed"}`} data-i18n="profile.updatePassword">
                 {pwdLoading ? "Updating…" : t("profile.updatePassword")}
               </button>
             </div>

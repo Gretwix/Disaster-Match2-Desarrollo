@@ -6,6 +6,10 @@
 	font-size: 130%;
 }
 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Cap font size on very narrow screens to prevent overflow */
 @media (max-width: 400px) {
   :root { font-size: 112.5%; } /* ~18px */

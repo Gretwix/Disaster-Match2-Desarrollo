@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useState, useMemo } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { LayoutGrid, User, Users, BarChart } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
 import Pagination from "../Pagination";
 import toast, { Toaster } from "react-hot-toast";
+import { ArrowLeft } from "react-feather";
+
 import jsPDF from "jspdf";
 import {
   LineChart,
@@ -24,6 +28,7 @@ type DataType = "all" | "purchases" | "users";
 
 export default function AdminReports() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // ========== AUTH ==========
   const loggedUser = getLoggedUser();
@@ -63,7 +68,7 @@ export default function AdminReports() {
         return { data: fallback, ok: false };
       }
     };
-//nada
+    //nada
     const run = async () => {
       if (filterMode === "all") {
         const usersRes = await safeFetchJson<{ totalUsers: number }>(
@@ -122,21 +127,21 @@ export default function AdminReports() {
         const usersAll = usersMonth.ok
           ? usersMonth
           : await safeFetchJson<{ totalUsers: number }>(
-              `${API_BASE}/Users/TotalUsers`,
-              { totalUsers: 0 }
-            );
+            `${API_BASE}/Users/TotalUsers`,
+            { totalUsers: 0 }
+          );
         const histAll = histMonth.ok
           ? histMonth
           : await safeFetchJson<any[]>(
-              `${API_BASE}/Users/History`,
-              []
-            );
+            `${API_BASE}/Users/History`,
+            []
+          );
         const statsAll = statsMonth.ok
           ? statsMonth
           : await safeFetchJson<{ totalSales: number; totalRevenue: number }>(
-              `${API_BASE}/Purchase/Stats`,
-              { totalSales: 0, totalRevenue: 0 }
-            );
+            `${API_BASE}/Purchase/Stats`,
+            { totalSales: 0, totalRevenue: 0 }
+          );
 
         if (cancelled) return;
         setTotalUsers(usersAll.data.totalUsers ?? 0);
@@ -207,8 +212,8 @@ export default function AdminReports() {
         filterMode === "all"
           ? "All Time"
           : filterMode === "current"
-          ? "Current Month"
-          : `${new Date(0, month - 1).toLocaleString("en-US", {
+            ? "Current Month"
+            : `${new Date(0, month - 1).toLocaleString("en-US", {
               month: "long",
             })} ${year}`;
 
@@ -255,8 +260,8 @@ export default function AdminReports() {
         dataType === "purchases"
           ? "Recent Purchases"
           : dataType === "users"
-          ? "User Registrations"
-          : "Recent Activity",
+            ? "User Registrations"
+            : "Recent Activity",
         14,
         98
       );
@@ -285,8 +290,8 @@ export default function AdminReports() {
         dataType === "purchases"
           ? history.filter((item) => item.event === "Purchase")
           : dataType === "users"
-          ? history.filter((item) => item.event === "New Registration")
-          : history;
+            ? history.filter((item) => item.event === "New Registration")
+            : history;
 
       if (filteredForPDF.length === 0) {
         pdf.text("No activity found for this filter.", 18, y + 10);
@@ -343,8 +348,7 @@ export default function AdminReports() {
 
       // NOMBRE DEL ARCHIVO
       pdf.save(
-        `DisasterMatch_Report_${filterMode}_${dataType}_${now.getFullYear()}_${
-          now.getMonth() + 1
+        `DisasterMatch_Report_${filterMode}_${dataType}_${now.getFullYear()}_${now.getMonth() + 1
         }.pdf`
       );
 
@@ -355,11 +359,11 @@ export default function AdminReports() {
     }
   };
 
-  // Match Profile page sidebar styles for consistent contrast in light mode
+  // clases reutilizables para el sidebar
   const sidebarLinkBase =
-    "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-slate-800/60 transition";
+    "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition";
   const sidebarActiveClass =
-    "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300";
+    "bg-indigo-600 text-indigo-600 ring-1 ring-indigo-600 dark:bg-indigo-600/60";
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100">
@@ -368,24 +372,39 @@ export default function AdminReports() {
         <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
             {/* ========== SIDEBAR ========== */}
-            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
-              <nav className="space-y-2">
-               <Link to="/HomePage" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                <LayoutGrid className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                <span className="font-medium" data-i18n="nav.disasterMatch"> {t("nav.disasterMatch")}</span>
+            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 
+                    p-4 sm:p-5 md:p-6 bg-gray-50 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
+              <nav className="p-1 md:block justify-center space-y-2 scrollbar-hide">
+
+                {/* Botón volver */}
+                <button
+                  onClick={() => navigate({ to: "/" })}
+                  className="flex items-center text-indigo-600 hover:text-indigo-800 mb-4"
+                >
+                  <ArrowLeft className="w-5 h-5 mr-1" />
+                  <span>{t("contactForm.back")}</span>
+                </button>
+
+                <Link to="/HomePage" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
+                  <LayoutGrid className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.disasterMatch"> {t("nav.disasterMatch")}</span>
                 </Link>
+
                 <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <BarChart className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                  <span className="font-medium" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
+                  <BarChart className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
                 </Link>
+
                 <Link to="/Profile" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <User className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                  <span className="font-medium" data-i18n="nav.profile">{t("nav.profile")}</span>
+                  <User className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.profile">{t("nav.profile")}</span>
                 </Link>
+
                 <Link to="/AdminUsers" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <Users className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                  <span className="font-medium" data-i18n="nav.users">{t("nav.users")}</span>
+                  <Users className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.users">{t("nav.users")}</span>
                 </Link>
+
               </nav>
             </aside>
 
@@ -517,7 +536,7 @@ export default function AdminReports() {
                 </div>
               </div>
 
-              
+
 
               {/* ======= ACTIVITY TABLE ======= */}
               <div className="mt-8 rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-[#0b1220] p-4 sm:p-5 force-light-bg-white">
@@ -532,17 +551,16 @@ export default function AdminReports() {
                         key={type}
                         onClick={() => setDataType(type)}
                         className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition
-                          ${
-                            dataType === type
-                              ? "bg-indigo-600 text-white border-indigo-600"
-                              : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"
+                          ${dataType === type
+                            ? "bg-indigo-600 text-white border-indigo-600"
+                            : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"
                           }`}
                       >
                         {type === "all"
                           ? "All Activity"
                           : type === "purchases"
-                          ? "Only Purchases"
-                          : "Only Users"}
+                            ? "Only Purchases"
+                            : "Only Users"}
                       </button>
                     ))}
                   </div>
@@ -578,11 +596,10 @@ export default function AdminReports() {
                               {item.user}
                             </td>
                             <td
-                              className={`px-4 py-3 ${
-                                item.event === "Purchase"
-                                  ? "text-green-600 font-semibold"
-                                  : "text-gray-900"
-                              }`}
+                              className={`px-4 py-3 ${item.event === "Purchase"
+                                ? "text-green-600 font-semibold"
+                                : "text-gray-900"
+                                }`}
                             >
                               {item.amount}
                             </td>
@@ -603,7 +620,7 @@ export default function AdminReports() {
                     </tbody>
                   </table>
                 </div>
-                
+
                 {/* Pagination */}
                 <Pagination
                   currentPage={page}
@@ -622,9 +639,9 @@ export default function AdminReports() {
                 </button>
               </div>
             </section>
-            
+
           </div>
-          
+
         </div>
       </div>
     </div>
