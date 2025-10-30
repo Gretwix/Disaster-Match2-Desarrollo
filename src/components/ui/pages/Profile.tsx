@@ -35,9 +35,9 @@ export default function Profile() {
 
   // clases reutilizables para el sidebar
   const sidebarLinkBase =
-    "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800/60 transition";
+    "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition";
   const sidebarActiveClass =
-    "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300";
+    "bg-indigo-600 text-indigo-600 ring-1 ring-indigo-600 dark:bg-indigo-600/60";
 
   // estados de usuario y UI
   const [user, setUser] = useState<User | null>();
@@ -383,29 +383,29 @@ export default function Profile() {
         <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
             {/* aside con navegación */}
-            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50 dark:bg-[#0e1629] rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
+            <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 p-5 md:p-6 bg-gray-50 rounded-t-2xl md:rounded-tr-none md:rounded-l-2xl">
               <nav className="space-y-2">
                 <Link to="/HomePage" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <LayoutGrid className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                  <span className="font-medium" data-i18n="nav.disasterMatch"> {t("nav.disasterMatch")}</span>
+                  <LayoutGrid className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.disasterMatch"> {t("nav.disasterMatch")}</span>
                 </Link>
 
                 {loggedUser?.role === "admin" && (
                   <Link to="/AdminReports" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                    <BarChart className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                    <span className="font-medium" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
+                    <BarChart className="h-5 w-5 text-gray-900" />
+                    <span className="font-medium text-gray-900" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
                   </Link>
                 )}
 
                 <Link to="/Profile" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                  <User className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                  <span className="font-medium" data-i18n="nav.profile">{t("nav.profile")}</span>
+                  <User className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.profile">{t("nav.profile")}</span>
                 </Link>
 
                 {loggedUser?.role === "admin" && (
                   <Link to="/AdminUsers" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
-                    <Users className="h-5 w-5 text-gray-900 dark:text-slate-300" />
-                    <span className="font-medium" data-i18n="nav.users">{t("nav.users")}</span>
+                    <Users className="h-5 w-5 text-gray-900" />
+                    <span className="font-medium text-gray-900" data-i18n="nav.users">{t("nav.users")}</span>
                   </Link>
                 )}
               </nav>
@@ -419,7 +419,7 @@ export default function Profile() {
 
               {user && (
                 <div className="mt-6 rounded-2xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-[#0b1220] p-6 shadow-sm hover:shadow-md transition duration-200 force-light-bg-gray-50">
-                  <div className="flex flex-wrap items-center justify-between gap-4 sm:gap-4 text-center sm:text-left md:justify-start md:gap-8">
+                  <div className="flex flex-wrap items-center mb-6 justify-between gap-4 sm:gap-4 text-center sm:text-left md:justify-start md:gap-8">
                     <div className="relative w-32 h-32 flex-shrink-0">
                       <img src="/avatars/default1.png" alt="Default Avatar" className="w-full h-full rounded-full object-cover border-2 border-gray-300" />
                     </div>
@@ -454,7 +454,7 @@ export default function Profile() {
                   ) : (
                     <form className="grid gap-4">
                       {[
-                        { name: "f_name", label: t("profile.username"), inputType: "text" },
+                        { name: "f_name", label: t("profile.fName"), inputType: "text" },
                         { name: "l_name", label: t("profile.lastName"), inputType: "text" },
                         { name: "username", label: t("profile.username"), readOnly: true },
                         { name: "email", label: t("profile.email"), inputType: "email" },

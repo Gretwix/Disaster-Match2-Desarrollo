@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-empty */
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
@@ -316,7 +318,7 @@ export default function Navigation() {
                           className={`flex-1 rounded-md border px-2 py-1 text-sm transition
                             border-gray-300 dark:border-slate-600
                             ${isDark
-                              ? "bg-[#1e293b] text-gray-100 hover:bg-[#334155]"
+                              ? "bg-[#1e293b] text-gray-100 hover:bg"
                               : "bg-white text-black hover:bg-gray-100"
                             }`}
                         >
@@ -333,7 +335,7 @@ export default function Navigation() {
                           onClick={() => setIsProfileOpen(false)}
                           className={`block w-full text-left px-3 py-2 text-sm rounded-md transition
                             ${isDark
-                              ? "text-gray-100 hover:bg-slate-800/60"
+                              ? "text-gray-100 hover:bg-slate-600/60"
                               : "text-black hover:bg-gray-200"
                             }`}
                         >
@@ -347,7 +349,7 @@ export default function Navigation() {
                         onClick={() => setIsProfileOpen(false)}
                         className={`block w-full text-left px-3 py-2 text-sm rounded-md transition
                           ${isDark
-                            ? "text-gray-100 hover:bg-slate-800/60"
+                            ? "text-gray-100 hover:bg-slate-600/60"
                             : "text-black hover:bg-gray-200"
                           }`}
                       >

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-empty */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 // Componente contenedor base para toda la aplicación.
 // Se encarga de envolver las páginas con un fondo y altura mínima,
 // garantizando una experiencia visual coherente y unificada.
