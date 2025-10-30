@@ -6,7 +6,7 @@ export default function TermsOfUsePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen bg-[#f9fafb] flex justify-center py-12 px-6">
+    <div className="min-h-screen bg-[#f9fafb] dark:bg-[#0b1220] force-light-bg-gray-100 flex justify-center py-12 px-6">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-md border border-gray-200 p-8">
         {/* Botón volver */}
         <button

@@ -157,6 +157,9 @@ export default function Profile() {
     const { name, value } = e.target;
     if (!formData) return;
     let newValue = value;
+    if (name === "f_name" || name === "l_name") {
+      newValue = newValue.replace(/[^a-zA-ZÀ-ÿ\s]/g, ""); // acepta acentos y espacios
+    }
     if (name === "phone") {
       newValue = formatPhone(newValue);
       setFormData({ ...formData, [name]: newValue });
@@ -171,6 +174,13 @@ export default function Profile() {
     if (!validatePhone(formData.phone)) {
       toast.error("Please enter a valid phone number (7–15 digits)");
       return;
+    }
+    if (
+      !/^[a-zA-ZÀ-ÿ\s]+$/.test(formData.f_name) ||
+      !/^[a-zA-ZÀ-ÿ\s]+$/.test(formData.l_name)
+    ) {
+      toast.error("Names and LastName can only contain letters, spaces and it cannot be empty");
+      return; // Detiene la función antes del fetch
     }
     const cleanPhone = formData.phone.startsWith("+")
       ? "+" + formData.phone.slice(1).replace(/[\s-]/g, "")
@@ -511,7 +521,7 @@ export default function Profile() {
                               <li
                                 key={item.id}
                                 onClick={() => { setSelectedIncident(item); setIsModalOpen(true); }}
-                                className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800/60 transition duration-200 cursor-pointer"
+                                className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-indigo-600/60 transition duration-200 cursor-pointer"
                               >
                                 <span className="font-medium block truncate">{item.title}</span>
                                 <span className="text-gray-500 sm:ml-1">{formatCurrency(item.price)}</span>

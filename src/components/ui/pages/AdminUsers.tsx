@@ -12,8 +12,8 @@ import { API_BASE } from "../../../utils/api";
 
 type UserRecord = {
   id: number;
-  f_name?: string;
-  l_name?: string;
+  f_name: string;
+  l_name: string;
   username: string;
   email: string;
   phone: string;
@@ -95,12 +95,16 @@ export default function AdminUsers() {
     const { name, value } = e.target;
     if (!formData) return;
     let newValue = value;
+    if (name === "f_name" || name === "l_name") {
+      newValue = newValue.replace(/[^a-zA-ZÀ-ÿ\s]/g, "");
+    }
     if (name === "phone") {
       // use external util for formatting
       newValue = formatPhone(newValue);
       setFormData({ ...formData, [name]: newValue });
       return;
     }
+    setFormData({ ...formData, [name]: newValue });
   };
 
   const handleSave = async () => {
@@ -108,6 +112,13 @@ export default function AdminUsers() {
     if (!validatePhone(formData.phone)) {
       toast.error("Please enter a valid phone number (7–15 digits)");
       return;
+    }
+    if (
+      !/^[a-zA-ZÀ-ÿ\s]+$/.test(formData.f_name) ||
+      !/^[a-zA-ZÀ-ÿ\s]+$/.test(formData.l_name)
+    ) {
+      toast.error("Names and LastName can only contain letters, spaces and it cannot be empty");
+      return; // Detiene la función antes del fetch
     }
     const cleanPhone = formData.phone.startsWith("+")
       ? "+" + formData.phone.slice(1).replace(/[\s-]/g, "")
@@ -218,8 +229,8 @@ export default function AdminUsers() {
                   <p className="text-gray-500 text-center" data-i18n="admin.loadingUsers">{t("admin.loadingUsers")}</p>
                 ) : !isEditing ? (
                   // Tabla responsive
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full text-left text-sm table-fixed bg-white">
+                  <div className="overflow-x-auto max-w-full">
+                    <table className="min-w-full text-left text-xs sm:text-sm bg-white border-collapse">
                       <thead>
                         <tr className="text-gray-700 bg-white">
                           <th className="px-4 py-3 w-24">ID</th>
@@ -265,7 +276,7 @@ export default function AdminUsers() {
                   </div>
                 ) : (
                   // Formulario
-                  <div className="p-6 bg-white dark:bg-[#0f172a] rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
+                  <div className="space-y-3 p-6 bg-white dark:bg-[#0f172a] rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
                     <h2 className="text-xl font-semibold mb-4">Edit User: {isEditing.username}</h2>
                     <form className="grid gap-4">
                       {[
@@ -287,8 +298,7 @@ export default function AdminUsers() {
                             placeholder={field.placeHolder}
                             value={(formData as any)?.[field.name] || ""}
                             onChange={handleChange}
-                            className="mt-1 border rounded-lg px-3 py-2 shadow-sm 
-                                       focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                            className="mt-1 border rounded-lg px-3 py-2 w-full shadow-sm transition duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
                           />
                         </label>
                       ))}
@@ -305,8 +315,7 @@ export default function AdminUsers() {
                               : ""
                           }
                           onChange={handleChange}
-                          className="mt-1 border rounded-lg px-3 py-2 shadow-sm 
-                                     focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                          className="mt-1 border rounded-lg px-3 py-2 w-full shadow-sm transition duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
                         />
                       </label>
                     </form>

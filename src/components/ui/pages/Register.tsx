@@ -6,6 +6,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Mail, Lock } from "react-feather";
 import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 
 // Tipo de usuario para el registro
 type User = {
@@ -198,6 +199,19 @@ export default function Register() {
 
     if (!validatePhone(phone)) {
       setPhoneError("Phone number must be between 7 and 15 digits");
+      setLoading(false);
+      return;
+    }
+
+    if (
+      !f_name.trim() ||
+      !l_name.trim() ||
+      !/^[a-zA-ZÀ-ÿ\s]+$/.test(f_name.trim()) ||
+      !/^[a-zA-ZÀ-ÿ\s]+$/.test(l_name.trim()) ||
+      f_name.trim().length < 2 ||
+      l_name.trim().length < 2
+    ) {
+      toast.error("Please enter valid first and last names (letters only, at least 2 characters).");
       setLoading(false);
       return;
     }
@@ -455,35 +469,58 @@ export default function Register() {
             <>
               {/* First name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.firstName">{t("register.firstName")}</label>
+                <label
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                  data-i18n="register.firstName"
+                >
+                  {t("register.firstName")}
+                </label>
                 <input
                   type="text"
                   required
                   className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full px-3 py-3 rounded-md"
                   placeholder={t("register.placeholderFirstName")}
                   value={f_name}
-                  onChange={(e) => setFName(e.target.value)}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    if (/^[a-zA-ZÀ-ÿ\s]*$/.test(raw)) {
+                      setFName(raw);
+                    } else {
+                      toast.error("Only letters and spaces are allowed");
+                    }
+                  }}
                 />
               </div>
 
               {/* Last name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.lastName">{t("register.lastName")}</label>
+                <label
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                  data-i18n="register.lastName"
+                >
+                  {t("register.lastName")}
+                </label>
                 <input
                   type="text"
                   required
                   className="bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 block w-full px-3 py-3 rounded-md"
                   placeholder={t("register.placeholderLastName")}
                   value={l_name}
-                  onChange={(e) => setLName(e.target.value)}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    if (/^[a-zA-ZÀ-ÿ\s]*$/.test(raw)) {
+                      setLName(raw);
+                    } else {
+                      toast.error("Only letters and spaces are allowed");
+                    }
+                  }}
                 />
               </div>
 
+
               {/* Phone Field */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1" data-i18n="register.phone">{t("register.phone")}</label>
                 <div>
                   <input
                     type="tel"

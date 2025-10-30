@@ -20,47 +20,56 @@ export default function IncidentDetailsModal({
   return (
     <Dialog open={open} onClose={onClose} className="fixed inset-0 z-50 flex items-center justify-center">
       {/* fondo oscuro */}
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" />
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" />
 
-      <Dialog.Panel className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg max-w-lg w-full mx-4 p-6 relative z-10 animate-fadeIn">
+      <Dialog.Panel className="bg-white dark:bg-slate-100 rounded-2xl shadow-lg max-w-lg w-full mx-4 p-6 relative z-10 animate-fadeIn">
         {/* título del modal */}
-        <Dialog.Title className="text-xl font-semibold text-gray-800 dark:text-slate-100 mb-3">
+        <Dialog.Title className="text-xl font-semibold text-gray-900 mb-3">
           Incident #{incident.id}
         </Dialog.Title>
 
         {/* contenido con los campos del incidente */}
-        <div className="space-y-2 text-gray-700 dark:text-slate-300 text-sm">
-          <p>
-            <strong>Type</strong>: {incident.type ?? incident.event_type ?? "N/A"}
+        <div className="space-y-2 text-gray-900 text-sm sm:text-base max-w-full break-words">
+          <p className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <strong className="shrink-0">Type:</strong>
+            <span className="truncate sm:whitespace-normal">{incident.type ?? incident.event_type ?? "N/A"}</span>
           </p>
-          <p>
-            <strong>Address</strong>: {incident.address ?? incident.full_address ?? "N/A"}
+          <p className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <strong className="shrink-0">Address:</strong>
+            <span className="break-words">{incident.address ?? incident.full_address ?? "N/A"}</span>
           </p>
-          <p>
-            <strong>City</strong>: {incident.city ?? "N/A"}
+          <p className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <strong className="shrink-0">City:</strong>
+            <span>{incident.city ?? "N/A"}</span>
           </p>
-          <p>
-            <strong>Date</strong>: {incident.date ?? incident.lead_date ?? "N/A"}
+          <p className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <strong className="shrink-0">Date:</strong>
+            <span>{incident.date ?? incident.lead_date ?? "N/A"}</span>
           </p>
-          <p>
-            <strong>Details</strong>: {incident.details ?? "N/A"}
+          <p className="flex flex-col sm:flex-row sm:items-start sm:gap-2">
+            <strong className="shrink-0">Details:</strong>
+            <span className="break-words">{incident.details ?? "N/A"}</span>
           </p>
-          <p>
-            <strong>Owner Name</strong>: {incident.owner_name ?? incident.home_owner_name ?? "N/A"}
+          <p className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <strong className="shrink-0">Owner Name:</strong>
+            <span>{incident.owner_name ?? incident.home_owner_name ?? "N/A"}</span>
           </p>
-          <p>
-            <strong>Email</strong>: {incident.email ?? incident.home_owner_email ?? "N/A"}
+          <p className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <strong className="shrink-0">Email:</strong>
+            <span className="break-words">{incident.email ?? incident.home_owner_email ?? "N/A"}</span>
           </p>
-          <p>
-            <strong>Phone</strong>: {incident.phone ?? incident.home_owner_phone ?? "N/A"}
+          <p className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <strong className="shrink-0">Phone:</strong>
+            <span>{incident.phone ?? incident.home_owner_phone ?? "N/A"}</span>
           </p>
-          <p>
-            <strong>Price</strong>: ${incident.price ?? "0"}
+          <p className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <strong className="shrink-0">Price:</strong>
+            <span>${incident.price ?? "0"}</span>
           </p>
         </div>
 
         {/* acciones: descargar PDF y cerrar */}
-        <div className="mt-5 flex justify-end gap-3">
+        <div className="mt-5 flex flex-col sm:flex-row justify-center sm:justify-end items-center gap-3 flex-wrap max-w-full">
           <button
             onClick={() => {
               const pdf = new jsPDF();
@@ -109,18 +118,19 @@ export default function IncidentDetailsModal({
               // guardar archivo
               pdf.save(`Incident_${incident.id}.pdf`);
             }}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
+            className="px-3 sm:px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition text-sm sm:text-base w-full sm:w-auto"
           >
             Download PDF
           </button>
 
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition"
+            className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition text-sm sm:text-base w-full sm:w-auto"
           >
             Close
           </button>
         </div>
+
       </Dialog.Panel>
     </Dialog>
   );
