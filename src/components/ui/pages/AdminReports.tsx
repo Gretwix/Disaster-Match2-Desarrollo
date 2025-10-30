@@ -409,18 +409,22 @@ export default function AdminReports() {
             </aside>
 
             {/* ========== MAIN CONTENT ========== */}
-            <section className="p-6 md:p-8" id="report-content">
+            <section className="p-4 sm:p-6 md:p-8 max-w-full overflow-x-hidden" id="report-content">
               {/* ======= HEADER ======= */}
               <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 force-light-text" data-i18n="reports.overview">{t("reports.overview")}</h1>
+                <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 mb-6 force-light-text" data-i18n="reports.overview">{t("reports.overview")}</h1>
               </div>
 
               {/* ======= FILTER TOOLBAR ======= */}
-              <div className="mt-6 bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm px-6 py-5 force-light-bg-white">
-                <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-3 mb-4 overflow-x-auto pb-2">
+              <div className="mt-6 md:p-8 bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm px-6 py-5 force-light-bg-white">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-4 overflow-x-auto pb-2 max-w-full">
                   <div className="flex gap-2">
                     {(["current", "all", "custom"] as FilterMode[]).map((mode) => (
-                      <button key={mode} onClick={() => setFilterMode(mode)} className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${filterMode === mode ? "bg-indigo-600 text-white border-indigo-600" : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"}`}>
+                      <button key={mode} onClick={() => setFilterMode(mode)} className={`px-3 sm:px-4 py-2 rounded-lg border text-xs sm:text-sm font-medium transition whitespace-nowrap ${
+    filterMode === mode
+      ? "bg-indigo-600 text-white border-indigo-600"
+      : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"
+  }`}>
                         {mode === "current" ? t("reports.currentMonth") : mode === "all" ? t("reports.allTime") : t("reports.customDate")}
                       </button>
                     ))}
@@ -466,7 +470,7 @@ export default function AdminReports() {
               </div>
 
               {/* ======= SUMMARY CARDS ======= */}
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="mt-6 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
                 <div className="rounded-xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm text-center force-light-bg-white">
                   <h2 className="text-lg font-semibold text-gray-800" data-i18n="reports.totalUsers">{t("reports.totalUsers")}</h2>
                   <p className="mt-2 text-3xl font-bold text-indigo-600">{totalUsers !== null ? totalUsers : "Loading..."}</p>
@@ -485,7 +489,7 @@ export default function AdminReports() {
               </div>
 
               {/* ======= CHARTS ======= */}
-              <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {/* Sales by Day */}
                 <div className="rounded-2xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm force-light-bg-white">
                   <h2 className="text-lg font-semibold text-gray-800 mb-4">
@@ -544,7 +548,7 @@ export default function AdminReports() {
                   <h2 className="text-lg font-semibold text-gray-800">
                     Recent Activity
                   </h2>
-                  <div className="flex flex-wrap gap-2 justify-center sm:justify-end overflow-x-auto pb-2">
+                  <div className="flex flex-wrap gap-2 justify-center sm:justify-end overflow-x-auto pb-2 max-w-full">
 
                     {(["all", "purchases", "users"] as const).map((type) => (
                       <button
@@ -565,8 +569,8 @@ export default function AdminReports() {
                     ))}
                   </div>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-left text-sm table-fixed bg-white">
+                <div className="overflow-x-auto max-w-full">
+                  <table className="min-w-full text-left text-xs sm:text-sm bg-white border-collapse">
                     <thead>
                       <tr className="text-gray-700">
                         <th className="px-4 py-3 w-32">Date</th>
@@ -629,7 +633,7 @@ export default function AdminReports() {
                   onPageChange={setPage}
                 />
               </div>
-              <div className="mt-6 flex justify-end">
+              <div className="mt-6 flex justify-center sm:justify-end">
                 <button
                   onClick={handleExportPDF}
                   className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"

@@ -150,7 +150,6 @@ export default function Profile() {
 
   useEffect(() => {
     fetchUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // manejar cambios en formulario
