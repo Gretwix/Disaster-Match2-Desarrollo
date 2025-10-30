@@ -381,7 +381,7 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100 overflow-x-hidden">
       <Toaster position="top-right" reverseOrder={false} />
-      <div className="mx-auto max-w-7xl px-3 sm:px-4 md:p-6 lg:p-8">
+      <div className="mx-auto max-w-7xl p-4 sm:px-4 md:p-6 lg:p-8">
         <div className="rounded-2xl bg-white dark:bg-[#0f172a] shadow-sm border border-gray-200 dark:border-slate-700 force-light-bg-white">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
             {/* aside con navegación */}

@@ -42,7 +42,7 @@ export default function Navigation() {
   useEffect(() => {
     try {
       setIsDark(document.documentElement.classList.contains("dark"));
-    } catch {}
+    } catch { }
   }, []);
 
   const toggleTheme = () => {
@@ -65,10 +65,10 @@ export default function Navigation() {
           document.querySelectorAll<HTMLElement>(".dark").forEach((el) => {
             if (el !== root && el !== body) el.classList.remove("dark");
           });
-        } catch {}
+        } catch { }
       }
       setIsDark(next);
-    } catch {}
+    } catch { }
   };
 
   const handleLogout = () => {
@@ -86,7 +86,7 @@ export default function Navigation() {
           });
           try {
             await doRequest(apiUrl("/Users/Logout"));
-          } catch {}
+          } catch { }
         }
       } catch (err) {
         // Ignore network errors on logout
@@ -159,7 +159,7 @@ export default function Navigation() {
   }, [isMobileOpen]);
 
   return (
-  <nav className="sticky top-0 inset-x-0 z-40 flex items-center justify-between bg-white/90 dark:bg-gray-900/95 text-gray-800 dark:text-gray-100 border-b border-gray-200/60 dark:border-gray-800/60 backdrop-blur-md px-3 sm:px-6 py-2.5 sm:py-3 shadow-md">
+    <nav className="fixed top-0 inset-x-0 z-40 flex items-center justify-between bg-white/90 dark:bg-gray-900/95 text-gray-800 dark:text-gray-100  border-b border-gray-200/60 dark:border-gray-800/60 backdrop-blur-md px-3 sm:px-6 py-2.5 sm:py-3 shadow-md sm:sticky">
       {/* Left: Brand or mobile menu */}
       <div className="flex items-center gap-2">
         {/* Mobile: Hamburger */}
@@ -205,7 +205,7 @@ export default function Navigation() {
           <img
             src="/Logo DM.png"
             alt={t("nav.disasterMatch")}
-            className="h-8 sm:h-12 md:h-16 lg:h-20 w-auto drop-shadow-sm hover:opacity-90 transition-opacity"
+            className="h-7 xs:h-8 sm:h-12 md:h-16 lg:h-20 w-auto drop-shadow-sm hover:opacity-90 transition-opacity"
             data-i18n="nav.disasterMatch"
           />
         </Link>
@@ -221,11 +221,10 @@ export default function Navigation() {
               onClick={toggleTheme}
               aria-label={isDark ? t("nav.themeLight") : t("nav.themeDark")}
               title={isDark ? t("nav.themeLight") : t("nav.themeDark")}
-              className={`inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-slate-600 ${
-                isDark
+              className={`inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-slate-600 ${isDark
                   ? "bg-[#1e293b] text-gray-100 hover:bg-[#334155]"
                   : "bg-white text-black hover:bg-gray-100"
-              } transition`}
+                } transition`}
             >
               {isDark ? <Sun size={16} /> : <Moon size={16} />}
             </button>
@@ -405,7 +404,7 @@ export default function Navigation() {
         {/* Backdrop */}
         <div className="fixed inset-0 bg-black/30" onClick={() => setIsMobileOpen(false)} />
         {/* Panel */}
-        <div ref={mobileMenuRef} className="fixed top-[56px] left-2 right-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-4 z-50">
+        <div ref={mobileMenuRef} className="fixed top-[60px] left-3 right-3 sm:hidden rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg p-4 z-50 max-h-[80vh] overflow-y-auto">
           {/* Show theme/language switchers only if NOT logged in */}
           {!loggedUser && (
             <div className="mb-2 flex items-center gap-2">
