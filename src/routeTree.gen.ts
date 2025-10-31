@@ -23,6 +23,7 @@ import { Route as HomePageRouteImport } from './routes/HomePage'
 import { Route as ForgotPasswordRouteImport } from './routes/ForgotPassword'
 import { Route as FaqRouteImport } from './routes/Faq'
 import { Route as ContactFormRouteImport } from './routes/ContactForm'
+import { Route as ChangePasswordRouteImport } from './routes/ChangePassword'
 import { Route as CartRouteImport } from './routes/Cart'
 import { Route as AdminUsersRouteImport } from './routes/AdminUsers'
 import { Route as AdminReportsRouteImport } from './routes/AdminReports'
@@ -100,6 +101,11 @@ const ContactFormRoute = ContactFormRouteImport.update({
   path: '/ContactForm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChangePasswordRoute = ChangePasswordRouteImport.update({
+  id: '/ChangePassword',
+  path: '/ChangePassword',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CartRoute = CartRouteImport.update({
   id: '/Cart',
   path: '/Cart',
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/AdminReports': typeof AdminReportsRoute
   '/AdminUsers': typeof AdminUsersRoute
   '/Cart': typeof CartRoute
+  '/ChangePassword': typeof ChangePasswordRoute
   '/ContactForm': typeof ContactFormRoute
   '/Faq': typeof FaqRoute
   '/ForgotPassword': typeof ForgotPasswordRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/AdminReports': typeof AdminReportsRoute
   '/AdminUsers': typeof AdminUsersRoute
   '/Cart': typeof CartRoute
+  '/ChangePassword': typeof ChangePasswordRoute
   '/ContactForm': typeof ContactFormRoute
   '/Faq': typeof FaqRoute
   '/ForgotPassword': typeof ForgotPasswordRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/AdminReports': typeof AdminReportsRoute
   '/AdminUsers': typeof AdminUsersRoute
   '/Cart': typeof CartRoute
+  '/ChangePassword': typeof ChangePasswordRoute
   '/ContactForm': typeof ContactFormRoute
   '/Faq': typeof FaqRoute
   '/ForgotPassword': typeof ForgotPasswordRoute
@@ -205,6 +214,7 @@ export interface FileRouteTypes {
     | '/AdminReports'
     | '/AdminUsers'
     | '/Cart'
+    | '/ChangePassword'
     | '/ContactForm'
     | '/Faq'
     | '/ForgotPassword'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/AdminReports'
     | '/AdminUsers'
     | '/Cart'
+    | '/ChangePassword'
     | '/ContactForm'
     | '/Faq'
     | '/ForgotPassword'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/AdminReports'
     | '/AdminUsers'
     | '/Cart'
+    | '/ChangePassword'
     | '/ContactForm'
     | '/Faq'
     | '/ForgotPassword'
@@ -272,6 +284,7 @@ export interface RootRouteChildren {
   AdminReportsRoute: typeof AdminReportsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   CartRoute: typeof CartRoute
+  ChangePasswordRoute: typeof ChangePasswordRoute
   ContactFormRoute: typeof ContactFormRoute
   FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -390,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactFormRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ChangePassword': {
+      id: '/ChangePassword'
+      path: '/ChangePassword'
+      fullPath: '/ChangePassword'
+      preLoaderRoute: typeof ChangePasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/Cart': {
       id: '/Cart'
       path: '/Cart'
@@ -440,6 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminReportsRoute: AdminReportsRoute,
   AdminUsersRoute: AdminUsersRoute,
   CartRoute: CartRoute,
+  ChangePasswordRoute: ChangePasswordRoute,
   ContactFormRoute: ContactFormRoute,
   FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,

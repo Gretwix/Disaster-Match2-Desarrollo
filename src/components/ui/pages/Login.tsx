@@ -58,9 +58,26 @@ export default function Login() {
         throw new Error("Server error");
       }
 
-  // Si el login es exitoso, guarda el token y usuario en localStorage
+  // Si el login es exitoso, verifica si requiere cambio de contraseña
   const data = await res.json();
-  // Asignar rol según el ID
+  // Flow: if backend indicates mustChangePassword, redirect to ChangePassword and do not create a session
+  if (data?.mustChangePassword) {
+    const userId = data.userId ?? data.ID ?? data.id;
+    const emailFromApi = data.email ?? email;
+    // Persist info for fallback in case query params are dropped
+    try {
+      sessionStorage.setItem(
+        'forcePwdChange',
+        JSON.stringify({ userId, email: emailFromApi })
+      );
+    } catch {}
+    // Redirigir a pantalla de cambio de contraseña forzado (ensure query string)
+    const qs = `userId=${encodeURIComponent(String(userId ?? ''))}&email=${encodeURIComponent(String(emailFromApi ?? ''))}`;
+    navigate({ to: `/ChangePassword?${qs}` });
+    return;
+  }
+
+  // Asignar rol según el ID y crear sesión
   const userId = data.ID ?? data.id;
   data.role = userId === 2 ? "admin" : "user";
   localStorage.setItem("authToken", data.token);

@@ -165,6 +165,78 @@ export default function AdminUsers() {
     }
   };
 
+  // Admin: reset a user's password to a temporary one
+  const handleAdminResetPassword = async (user: UserRecord) => {
+    try {
+      const { value: customTemp, isConfirmed } = await Swal.fire<{ value: string | undefined }>({
+        title: t("admin.resetTempTitle", { username: user.username }),
+        text: t("admin.resetTempHint"),
+        input: 'text',
+        inputAttributes: { autocapitalize: 'off' },
+        showCancelButton: true,
+        confirmButtonText: t("admin.resetTempConfirm"),
+        cancelButtonText: t("profile.cancel"),
+      }) as unknown as { value?: string; isConfirmed: boolean };
+      if (!isConfirmed) return;
+
+      const payload: Record<string, unknown> = { UserId: user.id };
+      if (customTemp && customTemp.trim().length > 0) {
+        payload.TemporaryPassword = customTemp.trim();
+      }
+
+      const res = await fetch(`${API_URL}/AdminResetPassword`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        toast.error(text || t('admin.resetTempFailed'));
+        return;
+      }
+
+      // Try to extract the temp password from response
+      let tempPassword = '';
+      try {
+        const data = await res.json();
+        tempPassword =
+          data?.TemporaryPassword ||
+          data?.temporaryPassword ||
+          data?.tempPassword ||
+          data?.password ||
+          data?.Password ||
+          '';
+      } catch {
+        // fallback to plain text
+        const text = await res.text().catch(() => '');
+        tempPassword = text;
+      }
+
+      if (!tempPassword) {
+        toast.success(t('admin.resetTempEmailed'));
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(String(tempPassword));
+        toast.success(t('admin.resetTempSuccessCopied'));
+      } catch {
+        toast.success(t('admin.resetTempSuccess'));
+      }
+
+      await Swal.fire({
+        icon: 'success',
+        title: t('admin.resetTempDialogTitle'),
+        html: `<div style=\"text-align:left\">${t('admin.resetTempDialogUser')}: <b>${user.email}</b><br/>${t('admin.resetTempDialogPassword')}: <code>${String(tempPassword)}</code><br/><small>${t('admin.resetTempDialogNote')}</small></div>`,
+        confirmButtonText: 'OK',
+      });
+    } catch (err) {
+      console.error('AdminResetPassword error', err);
+      toast.error(t('admin.resetTempServerError'));
+    }
+  };
+
   const loggedUser = getLoggedUser();
 
   if (loggedUser?.role !== "admin") {
@@ -260,6 +332,13 @@ export default function AdminUsers() {
                                   className="flex items-center gap-2 px-3 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600"
                                 >
                                   {t("admin.edit")}
+                                </button>
+                                <button
+                                  onClick={() => handleAdminResetPassword(u)}
+                                  className="flex items-center gap-2 px-3 py-1 rounded-md bg-amber-500 text-white hover:bg-amber-600"
+                                  title={t('admin.resetTempHint')}
+                                >
+                                  {t('admin.resetTempButton')}
                                 </button>
                                 <button
                                   onClick={() => handleDelete(u.id)}
