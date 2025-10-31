@@ -215,7 +215,8 @@ export default function Navigation() {
       <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
         {/* Show theme/language switchers only if NOT logged in */}
         {!loggedUser && (
-          <>
+          // Agrupa todo el bloque y ocúltalo en móvil
+          <div className="hidden sm:flex items-center gap-2 sm:gap-3 md:gap-4">
             <button
               type="button"
               onClick={toggleTheme}
@@ -242,7 +243,7 @@ export default function Navigation() {
               <option value="en">EN</option>
               <option value="es">ES</option>
             </select>
-          </>
+          </div>
         )}
         {(() => {
           const path = routerState.location.pathname.toLowerCase();
@@ -390,6 +391,7 @@ export default function Navigation() {
 
           // Not logged in
           return isLanding ? (
+            // Oculta login/register en móvil, muestra solo en sm+
             <div className="hidden sm:flex items-center gap-3 md:gap-4">
               <Link
                 to="/Login"
