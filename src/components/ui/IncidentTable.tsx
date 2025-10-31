@@ -156,7 +156,9 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
                       <td className="px-3 sm:px-4 py-3 text-center">
                         {/* Botón Add/Remove from Cart */}
                         <button
-                          className="text-indigo-600 hover:underline font-medium block mx-auto"
+                          className={`${incident.disabled ? "text-gray-400 cursor-not-allowed" : "text-indigo-600 hover:underline"} font-medium block mx-auto`}
+                          disabled={!!incident.disabled}
+                          title={incident.disabled ? (incident.disabledReason || "Selection disabled") : undefined}
                           onClick={
                             incident.checked
                               ? incident.onRemoveFromCart

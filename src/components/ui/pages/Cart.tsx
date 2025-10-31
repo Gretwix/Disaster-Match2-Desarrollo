@@ -12,6 +12,7 @@ import { formatCurrency } from "../../../utils/format";
 import { createCheckout } from "../../../utils/stripe";
 import { useTranslation } from "react-i18next";
 import apiUrl from "../../../utils/api";
+import { notifyError } from "../../../utils/notify";
 
 type CartItem = {
   id: number;
@@ -29,6 +30,7 @@ export default function CartPage() {
   });
   const navigate = useNavigate();
   const [isStripeRedirecting, setIsStripeRedirecting] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState(false);
 
   // 👇 estados para modales
   const [modalOpen, setModalOpen] = useState(false);
@@ -90,6 +92,31 @@ export default function CartPage() {
     };
     migrateTitlesAndMeta();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Check if the logged user already purchased any lead
+  useEffect(() => {
+    const checkUserPurchases = async () => {
+      try {
+        const loggedUser = getLoggedUserStorage();
+        const userId = (loggedUser as any)?.id ?? (loggedUser as any)?.ID;
+        if (!userId) return setHasPurchased(false);
+        const res = await fetch(apiUrl("/Purchase/List"));
+        const purchases = await res.json();
+        const already = Array.isArray(purchases)
+          ? purchases.some(
+              (p: any) =>
+                (p.user_id === userId || p.userId === userId) &&
+                Array.isArray(p.leads) &&
+                p.leads.length > 0
+            )
+          : false;
+        setHasPurchased(!!already);
+      } catch {
+        setHasPurchased(false);
+      }
+    };
+    checkUserPurchases();
   }, []);
 
   const total = useMemo(
@@ -160,6 +187,15 @@ export default function CartPage() {
                 navigate({ to: "/Login", search: { redirect: "/Cart" } });
                 return;
               }
+              // Enforce temporary one-lead limit per user and per checkout
+              if (hasPurchased) {
+                notifyError("You already purchased a lead. Limit is one per user for now.");
+                return;
+              }
+              if (cartItems.length > 1) {
+                notifyError("Only one lead can be purchased at a time. Please remove extra items.");
+                return;
+              }
               try {
                 setIsStripeRedirecting(true);
                 // Map your cart items to Stripe Price IDs.
@@ -216,7 +252,7 @@ export default function CartPage() {
               }
             }}
             type="button"
-            disabled={cartItems.length === 0 || isStripeRedirecting}
+            disabled={cartItems.length === 0 || cartItems.length > 1 || hasPurchased || isStripeRedirecting}
             data-i18n="cart.payWithStripe"
           >
             {isStripeRedirecting ? t("cart.redirectStripe") : t("cart.payWithStripe")}

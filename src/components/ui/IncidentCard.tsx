@@ -21,6 +21,8 @@ export type IncidentCardProps = {
   is_promo?: boolean;
   promo_percent?: number | null;
   onRemovePromotion?: (id: number) => void;
+  disabled?: boolean;
+  disabledReason?: string;
 };
 
 // Asignamos clases de color para los tags según el tipo de incidente.
@@ -48,8 +50,11 @@ export default function IncidentCard({
   onRemovePromotion,
   is_promo,
   promo_percent,
+  disabled,
+  disabledReason,
 }: IncidentCardProps) {
   const loggedUser = getLoggedUser();
+  const isDisabled = !!disabled;
   return (
     <div
       className={`relative bg-white rounded-lg shadow-sm overflow-hidden border transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg 
@@ -87,6 +92,8 @@ export default function IncidentCard({
             type="checkbox"
             className="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500"
             checked={checked}
+            disabled={isDisabled}
+            title={isDisabled ? disabledReason || "Selection disabled" : undefined}
             onChange={(e) =>
               e.target.checked ? onAddToCart() : onRemoveFromCart()
             }
@@ -188,7 +195,9 @@ export default function IncidentCard({
 
   {/* 🔹 Botón Add to Cart (derecha) */}
   <button
-    className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+    className={`text-sm font-medium ${isDisabled ? "text-gray-400 cursor-not-allowed" : "text-indigo-600 hover:text-indigo-500"}`}
+    disabled={isDisabled}
+    title={isDisabled ? disabledReason || "Selection disabled" : undefined}
     onClick={checked ? onRemoveFromCart : onAddToCart}
   >
     {checked ? "Remove" : "Add to cart"}

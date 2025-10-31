@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import apiUrl from "../../../utils/api";
 import { getLoggedUser, purchasedIncidentsKey } from "../../../utils/storage";
 import { formatCurrency } from "../../../utils/format";
+import { notifyError } from "../../../utils/notify";
 
 import Header from "../Header";
 import Footer from "../Footer";
@@ -69,6 +70,7 @@ export default function HomePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [eligible, setEligible] = useState<Lead[]>([]); // leads elegibles para promoción
   const [, setPurchasedLeadIds] = useState<number[]>([]);
+  const [hasPurchased, setHasPurchased] = useState<boolean>(false);
 
   // Estados de carga y paginación
   const [loading, setLoading] = useState(true);
@@ -97,6 +99,15 @@ export default function HomePage() {
 
   // Añadir al carrito
   const addToCart = (lead: Lead) => {
+    // Temporary rule: allow at most one lead per user overall and per cart
+    if (hasPurchased) {
+      notifyError("For now, each user can only purchase one lead.");
+      return;
+    }
+    if (cart.length >= 1) {
+      notifyError("Only one lead can be purchased at a time. Remove the other item first.");
+      return;
+    }
     const price = getPrice(lead);
     setCart((prev) => {
       if (prev.some((i) => i.id === lead.id)) return prev;
@@ -165,6 +176,18 @@ export default function HomePage() {
         setPurchasedLeadIds(
           Array.from(new Set(allLeadIds.filter((id) => typeof id === "number")))
         );
+
+        // Determine if current user has already purchased any lead
+        const currentUserId = (loggedUser as any)?.id ?? (loggedUser as any)?.ID;
+        const userHasPurchased = Array.isArray(purchases)
+          ? purchases.some(
+              (p: any) =>
+                (p.user_id === currentUserId || p.userId === currentUserId) &&
+                Array.isArray(p.leads) &&
+                p.leads.length > 0
+            )
+          : false;
+        setHasPurchased(!!userHasPurchased);
 
         // Si es admin, cargar leads elegibles para promoción
         if (loggedUser?.role === "admin") {
@@ -318,6 +341,15 @@ const removePromotion = async (id: number) => {
     sold: (lead.times_purchased ?? 0) > 0,
     is_promo: !!lead.is_promo,
     promo_percent: Number(lead.promo_percent ?? 0.4),
+    // Disable selection if user already purchased any lead,
+    // or if another different lead is already in cart
+    disabled:
+      hasPurchased || (!cart.some((i) => i.id === lead.id) && cart.length >= 1),
+    disabledReason: hasPurchased
+      ? "You already purchased a lead. Limit is one per user for now."
+      : cart.length >= 1 && !cart.some((i) => i.id === lead.id)
+      ? "Only one lead can be purchased at a time. Remove the current selection first."
+      : undefined,
   }));
 
   // Totales del carrito
@@ -340,6 +372,10 @@ const removePromotion = async (id: number) => {
                     {t("home.availableReports")}
                   </h2>
                   <p className="text-gray-600 leading-snug mt-0">{t("home.browse")}</p>
+                  {/* Temporary note about one-lead limit */}
+                  <div className="mt-2 text-xs sm:text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+                    {t("home.temporaryLimitNote")}
+                  </div>
                 </div>
 
                 <div className="w-full md:w-72 max-w-md bg-white border border-gray-300 rounded-lg shadow-sm p-1 text-sm text-gray-700 md:ml-2">
@@ -504,11 +540,19 @@ const removePromotion = async (id: number) => {
                     <button
                       type="button"
                       className="w-full sm:w-auto px-8 py-3 text-base sm:text-lg bg-indigo-600 text-white font-semibold rounded-xl shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={cart.length === 0}
+                      disabled={cart.length === 0 || cart.length > 1 || hasPurchased}
                       onClick={() => {
                         const user = getLoggedUser();
                         if (!user?.username) {
                           alert('No user logged in');
+                          return;
+                        }
+                        if (hasPurchased) {
+                          notifyError('You already purchased a lead. Limit is one per user for now.');
+                          return;
+                        }
+                        if (cart.length > 1) {
+                          notifyError('Only one lead can be purchased at a time. Remove extra items.');
                           return;
                         }
                         const key = purchasedIncidentsKey(user.username);
