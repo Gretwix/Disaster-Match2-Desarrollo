@@ -14,7 +14,9 @@ export default function Login() {
   const [error, setError] = useState(""); 
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(window.location.search);
-  const redirectTo = searchParams.get('redirect') || '/HomePage';
+  const redirectParam = searchParams.get('redirect') || '/HomePage';
+  // Only allow internal navigations to absolute app paths
+  const redirectTo = redirectParam.startsWith('/') ? redirectParam : '/HomePage';
   const { t } = useTranslation();
 
   /**

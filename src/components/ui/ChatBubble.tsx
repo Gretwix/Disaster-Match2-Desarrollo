@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import DOMPurify from "dompurify";
 import apiUrl from "../../utils/api";
 import { MessageCircle, X, Send } from "lucide-react";
 
@@ -97,6 +98,42 @@ export default function ChatBubble() {
     }
   };
 
+  // Escape and sanitize message content before rendering as HTML
+  const safeFormatMessage = (text: string) => {
+    // Basic HTML escaping to neutralize raw tags first
+    const escapeHtml = (s: string) =>
+      s
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    // 1) Escape everything
+    let escaped = escapeHtml(text || "");
+    // 2) Convert markdown-style links [label](url) to anchors (allow only safe schemes)
+    escaped = escaped.replace(/\[(.*?)\]\((.*?)\)/g, (_m, label, url) => {
+      const cleanLabel = String(label ?? "");
+      const rawUrl = String(url ?? "").trim();
+      const isAllowed = /^(https?:|mailto:|tel:)/i.test(rawUrl);
+      const safeHref = isAllowed ? rawUrl : "#";
+      return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">${cleanLabel}</a>`;
+    });
+    // 3) Newlines to <br>
+    const withBreaks = escaped.replace(/\n/g, "<br>");
+
+    // 4) Sanitize resulting HTML allowing only a/ br/ and class/rel/target/href attrs
+    const clean = DOMPurify.sanitize(withBreaks, {
+      ALLOWED_TAGS: ["a", "br"],
+      ALLOWED_ATTR: ["href", "target", "rel", "class"],
+      USE_PROFILES: { html: true },
+      // Forbid javascript: and data: protocol links explicitly (belt and suspenders)
+      FORBID_ATTR: ["onerror", "onload", "onclick"],
+      FORBID_TAGS: ["script", "style", "iframe"],
+    });
+    return clean;
+  };
+
   return (
     <>
       {/* Botón flotante */}
@@ -155,14 +192,7 @@ export default function ChatBubble() {
                 ? "bg-gradient-to-br from-[#5B3DFD] to-[#6E4BFF] text-white rounded-br-sm"
                 : "bg-gray-200 text-gray-800 rounded-bl-sm"
             }`}
-            dangerouslySetInnerHTML={{
-              __html: m.text
-                .replace(/\n/g, "<br>")
-                .replace(
-                  /\[(.*?)\]\((.*?)\)/g,
-                  '<a href="$2" target="_blank" class="text-blue-600 underline hover:text-blue-800">$1</a>'
-                ),
-            }}
+            dangerouslySetInnerHTML={{ __html: safeFormatMessage(m.text) }}
           />
         </div>
       ))}

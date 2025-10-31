@@ -22,6 +22,7 @@
     "aos": "^2.3.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dompurify": "^3.3.0",
     "feather-icons": "^4.29.2",
     "html2canvas": "^1.4.1",
     "html2canvas-oklch": "^1.5.0-alpha.0",
