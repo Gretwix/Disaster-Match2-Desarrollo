@@ -342,6 +342,18 @@ export default function Navigation() {
                           <span data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
                         </Link>
                       )}
+                      {/* Zones link */}
+                      <Link
+                        to="/Zones"
+                        onClick={() => setIsProfileOpen(false)}
+                        className={`block w-full text-left px-3 py-2 text-sm rounded-md transition
+                          ${isDark
+                            ? "text-gray-100 hover:bg-slate-600/60"
+                            : "text-black hover:bg-gray-200"
+                          }`}
+                      >
+                        <span data-i18n="nav.zones">{t("nav.zones", "Zones")}</span>
+                      </Link>
                       <div className={`h-px my-1 ${isDark ? "bg-slate-700" : "bg-gray-200"}`} />
 
                       <Link
@@ -441,6 +453,9 @@ export default function Navigation() {
                   {t("nav.adminPanel")}
                 </Link>
               )}
+              <Link to="/Zones" className="px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800" onClick={() => setIsMobileOpen(false)}>
+                {t("nav.zones", "Zones")}
+              </Link>
               <Link to="/HomePage" className="px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800" onClick={() => setIsMobileOpen(false)}>
                 {t("nav.disasterMatch")}
               </Link>

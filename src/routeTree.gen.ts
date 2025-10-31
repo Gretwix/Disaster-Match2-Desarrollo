@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as ZonesRouteImport } from './routes/Zones'
 import { Route as TermsOfUseRouteImport } from './routes/TermsOfUse'
 import { Route as ResetPasswordRouteImport } from './routes/ResetPassword'
 import { Route as RegisterRouteImport } from './routes/Register'
@@ -37,6 +38,11 @@ const VerifyEmailRoute = VerifyEmailRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ZonesRoute = ZonesRouteImport.update({
+  id: '/Zones',
+  path: '/Zones',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsOfUseRoute = TermsOfUseRouteImport.update({
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
   '/TermsOfUse': typeof TermsOfUseRoute
+  '/Zones': typeof ZonesRoute
   '/about': typeof AboutRoute
   '/verify-email': typeof VerifyEmailRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
   '/TermsOfUse': typeof TermsOfUseRoute
+  '/Zones': typeof ZonesRoute
   '/about': typeof AboutRoute
   '/verify-email': typeof VerifyEmailRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/Register': typeof RegisterRoute
   '/ResetPassword': typeof ResetPasswordRoute
   '/TermsOfUse': typeof TermsOfUseRoute
+  '/Zones': typeof ZonesRoute
   '/about': typeof AboutRoute
   '/verify-email': typeof VerifyEmailRoute
   '/checkout/cancel': typeof CheckoutCancelRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/Register'
     | '/ResetPassword'
     | '/TermsOfUse'
+    | '/Zones'
     | '/about'
     | '/verify-email'
     | '/checkout/cancel'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/Register'
     | '/ResetPassword'
     | '/TermsOfUse'
+    | '/Zones'
     | '/about'
     | '/verify-email'
     | '/checkout/cancel'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/Register'
     | '/ResetPassword'
     | '/TermsOfUse'
+    | '/Zones'
     | '/about'
     | '/verify-email'
     | '/checkout/cancel'
@@ -271,6 +283,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsOfUseRoute: typeof TermsOfUseRoute
+  ZonesRoute: typeof ZonesRoute
   AboutRoute: typeof AboutRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   CheckoutCancelRoute: typeof CheckoutCancelRoute
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/Zones': {
+      id: '/Zones'
+      path: '/Zones'
+      fullPath: '/Zones'
+      preLoaderRoute: typeof ZonesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/TermsOfUse': {
@@ -431,6 +451,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TermsOfUseRoute: TermsOfUseRoute,
+  ZonesRoute: ZonesRoute,
   AboutRoute: AboutRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   CheckoutCancelRoute: CheckoutCancelRoute,
