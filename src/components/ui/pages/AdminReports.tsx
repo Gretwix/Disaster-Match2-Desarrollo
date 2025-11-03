@@ -470,6 +470,19 @@ export default function AdminReports() {
               </div>
 
               {/* ======= SUMMARY CARDS ======= */}
+              {/* Optional hint when current month has no data */}
+              {filterMode === "current" && (totalUsers ?? 0) === 0 && (totalSales ?? 0) === 0 && history.length === 0 && (
+                <div className="mt-6 rounded-md border border-amber-200 bg-amber-50 text-amber-900 px-4 py-3 text-sm">
+                  No activity found for the current month yet. You can switch to "All Time" to see overall stats.
+                  <button
+                    className="ml-2 inline-flex items-center px-2 py-1 rounded-md bg-amber-200 hover:bg-amber-300 text-amber-900"
+                    onClick={() => setFilterMode("all")}
+                  >
+                    View All Time
+                  </button>
+                </div>
+              )}
+
               <div className="mt-6 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
                 <div className="rounded-xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm text-center force-light-bg-white">
                   <h2 className="text-lg font-semibold text-gray-800" data-i18n="reports.totalUsers">{t("reports.totalUsers")}</h2>
