@@ -159,13 +159,13 @@ export default function Navigation() {
   }, [isMobileOpen]);
 
   return (
-  <nav className="sticky top-0 inset-x-0 z-40 flex items-center justify-between bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 border-b border-gray-200/60 dark:border-gray-800/60 px-3 sm:px-6 py-2.5 sm:py-3 shadow-md">
+  <nav className="sticky top-0 inset-x-0 z-40 flex items-center justify-between bg-slate-900 text-gray-100 border-b border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3 shadow-md">
       {/* Left: Brand or mobile menu */}
       <div className="flex items-center gap-2">
         {/* Mobile: Hamburger */}
         <button
           type="button"
-          className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-300 dark:border-gray-700 bg-white/70 dark:bg-slate-800/60 text-gray-700 dark:text-gray-200 sm:hidden"
+          className="inline-flex items-center justify-center w-9 h-9 rounded-md border border-slate-700 bg-slate-800 text-gray-200 sm:hidden"
           aria-label={isMobileOpen ? t("nav.closeMenu") : t("nav.openMenu")}
           aria-expanded={isMobileOpen}
           aria-controls="mobile-menu"
@@ -254,7 +254,7 @@ export default function Navigation() {
               <>
                 <Link
                   to="/HomePage"
-                  className="hidden sm:inline-block text-gray-700 dark:text-gray-300 hover:text-lime-600 dark:hover:text-lime-400 transition-colors duration-200"
+                  className="hidden sm:inline-block text-gray-300 hover:text-lime-400 transition-colors duration-200"
                 >
                   <span data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
                 </Link>
