@@ -159,7 +159,7 @@ export default function Navigation() {
   }, [isMobileOpen]);
 
   return (
-  <nav className="sticky top-0 inset-x-0 z-40 flex items-center justify-between bg-white/90 dark:bg-gray-900/95 text-gray-800 dark:text-gray-100 border-b border-gray-200/60 dark:border-gray-800/60 backdrop-blur-md px-3 sm:px-6 py-2.5 sm:py-3 shadow-md">
+  <nav className="sticky top-0 inset-x-0 z-40 flex items-center justify-between bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 border-b border-gray-200/60 dark:border-gray-800/60 px-3 sm:px-6 py-2.5 sm:py-3 shadow-md">
       {/* Left: Brand or mobile menu */}
       <div className="flex items-center gap-2">
         {/* Mobile: Hamburger */}
