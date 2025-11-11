@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LayoutGrid, User, Users, BarChart } from "lucide-react";
+import { LayoutGrid, User, Users, BarChart, MapPin } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "react-feather";
@@ -422,6 +422,12 @@ export default function Profile() {
                 <Link to="/Profile" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <User className="h-5 w-5 text-gray-900" />
                   <span className="font-medium text-gray-900" data-i18n="nav.profile">{t("nav.profile")}</span>
+                </Link>
+
+                {/* Zones button under Leads and Profile */}
+                <Link to="/Zones" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
+                  <MapPin className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.zones">{t("nav.zones", "Zones")}</span>
                 </Link>
 
                 {loggedUser?.role === "admin" && (

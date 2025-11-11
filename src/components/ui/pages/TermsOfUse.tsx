@@ -1,10 +1,18 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "react-feather";
+import { useEffect } from "react";
 
 export default function TermsOfUsePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    } catch {
+      // noop
+    }
+  }, []);
   return (
     <div className="min-h-screen bg-[#f9fafb] dark:bg-[#0b1220] force-light-bg-gray-100 flex justify-center py-12 px-6">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-md border border-gray-200 p-8">

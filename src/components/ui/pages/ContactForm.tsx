@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Mail, User, MessageSquare, ArrowLeft } from "react-feather";
 import { useNavigate } from "@tanstack/react-router";
 import Swal from "sweetalert2";
@@ -12,6 +12,13 @@ export default function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    } catch {
+      // noop
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

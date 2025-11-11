@@ -5,6 +5,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import { getLoggedUser } from '../../../utils/storage'
 import { addZoneWithMeta, deleteZoneById, listMyZones, testEmail, type ZoneInterest } from '../../../utils/zones'
 import { ArrowLeft } from 'react-feather'
+import { LayoutGrid, User, MapPin } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 
 export default function ZonesPage() {
@@ -15,9 +16,9 @@ export default function ZonesPage() {
 
   const [loading, setLoading] = useState(true)
   const [zones, setZones] = useState<ZoneInterest[]>([])
-  const [form, setForm] = useState({ state: '', city: '', zip: '', address_contains: '', email_to: '' })
+  const [form, setForm] = useState({ state: '', city: '', zip: '', email_to: '' })
   const canSubmit = useMemo(() => {
-    return !!(form.state.trim() || form.city.trim() || form.zip.trim() || form.address_contains.trim())
+    return !!(form.state.trim() || form.city.trim() || form.zip.trim())
   }, [form])
 
   useEffect(() => {
@@ -67,19 +68,24 @@ export default function ZonesPage() {
                   href="/HomePage"
                   className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition"
                 >
+                  <LayoutGrid className="h-5 w-5 text-gray-900" />
                   <span className="font-medium text-gray-900" data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
                 </a>
-                <a
-                  href="/Zones"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition bg-indigo-600 text-white dark:bg-indigo-600/60"
-                >
-                  <span className="font-medium" data-i18n="nav.zones">{t("nav.zones", "Zones")}</span>
-                </a>
+                {/* Keep Profile above Zones to maintain consistent order */}
                 <a
                   href="/Profile"
                   className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition"
                 >
-                  <span className="font-medium" data-i18n="nav.profile">{t("nav.profile")}</span>
+                  <User className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.profile">{t("nav.profile")}</span>
+                </a>
+                {/* Zones remains active on this page */}
+                <a
+                  href="/Zones"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition bg-indigo-600 text-white dark:bg-indigo-600/60"
+                >
+                  <MapPin className="h-5 w-5 text-white dark:text-white" />
+                  <span className="font-medium text-white dark:text-white" data-i18n="nav.zones">{t("nav.zones", "Zones")}</span>
                 </a>
               </nav>
             </aside>
@@ -100,7 +106,6 @@ export default function ZonesPage() {
                     { key: 'state', label: t('zones.state', 'State'), ph: t('zones.statePlaceholder', 'AZ') },
                     { key: 'city', label: t('zones.city', 'City'), ph: t('zones.cityPlaceholder', 'Phoenix') },
                     { key: 'zip', label: t('zones.zip', 'ZIP'), ph: t('zones.zipPlaceholder', '85001') },
-                    { key: 'address_contains', label: t('zones.addressContains', 'Address contains'), ph: t('zones.addressContainsPlaceholder', 'Main St') },
                     { key: 'email_to', label: t('zones.emailTo', 'Email to (optional)'), ph: t('zones.emailToPlaceholder', 'leave empty to use your account email') },
                   ] as const).map((f) => (
                     <label key={f.key} className="flex flex-col text-sm font-medium text-gray-900 dark:text-slate-200 force-light-text">
@@ -109,7 +114,7 @@ export default function ZonesPage() {
                         value={(form as any)[f.key]}
                         onChange={(e) => setForm((prev) => ({ ...prev, [f.key]: e.target.value }))}
                         placeholder={String(f.ph)}
-                        className="mt-1 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-[#0b1220] text-gray-900 dark:text-slate-100"
+                        className="mt-1 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-[#0b1220] text-gray-900 dark:text-slate-100 force-light-bg-white force-light-text"
                       />
                     </label>
                   ))}
@@ -120,7 +125,7 @@ export default function ZonesPage() {
                     onClick={async () => {
                       try {
                         if (!canSubmit) {
-                          toast.error(t('zones.validation', 'Provide at least one filter (state, city, zip, or address)'))
+                          toast.error(t('zones.validation', 'Provide at least one filter (state, city, or zip)'))
                           return
                         }
                         const { zone: created, initialNotified } = await addZoneWithMeta({
@@ -128,11 +133,10 @@ export default function ZonesPage() {
                           state: form.state || undefined,
                           city: form.city || undefined,
                           zip: form.zip || undefined,
-                          address_contains: form.address_contains || undefined,
                           email_to: form.email_to?.trim() || undefined,
                         })
                         setZones((prev) => [created, ...prev])
-                        setForm({ state: '', city: '', zip: '', address_contains: '', email_to: '' })
+                        setForm({ state: '', city: '', zip: '', email_to: '' })
                         if (typeof initialNotified === 'number') {
                           toast.success(t('zones.addedWithCount', { defaultValue: 'Zone added. Initial digest emailed for {{count}} matching leads.', count: initialNotified }))
                         } else {
@@ -184,9 +188,6 @@ export default function ZonesPage() {
                           <div className="text-sm">
                             <p className="font-medium text-gray-900 dark:text-slate-100 force-light-text">
                               {[z.city, z.state, z.zip].filter(Boolean).join(', ') || t('zones.anywhere', 'Anywhere')}
-                            </p>
-                            <p className="text-gray-700 dark:text-slate-300 force-light-text-muted">
-                              {z.address_contains ? t('zones.contains', { text: z.address_contains, defaultValue: 'Contains: {{text}}' }) : ''}
                             </p>
                             {z.email_to && (
                               <p className="text-xs text-indigo-700 dark:text-indigo-200 bg-indigo-50 dark:bg-indigo-900 inline-block mt-1 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-700">
