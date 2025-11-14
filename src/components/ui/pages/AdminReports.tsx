@@ -507,56 +507,58 @@ export default function AdminReports() {
               </div>
 
               {/* ======= CHARTS ======= */}
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                {/* Sales by Day */}
-                <div className="rounded-2xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm force-light-bg-white">
-                  <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                    Purchase Progress
-                  </h2>
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={salesByDay}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                        <XAxis dataKey="day" stroke="#6b7280" />
-                        <YAxis stroke="#6b7280" />
-                        <Tooltip />
-                        <Legend />
-                        <Line
-                          type="monotone"
-                          dataKey="total"
-                          stroke="#4f46e5"
-                          strokeWidth={2}
-                          name="Purchase"
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+              {filterMode !== "all" && (
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  {/* Sales by Day */}
+                  <div className="rounded-2xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm force-light-bg-white">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                      Purchase Progress
+                    </h2>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={salesByDay}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                          <XAxis dataKey="day" stroke="#6b7280" />
+                          <YAxis stroke="#6b7280" />
+                          <Tooltip />
+                          <Legend />
+                          <Line
+                            type="monotone"
+                            dataKey="total"
+                            stroke="#4f46e5"
+                            strokeWidth={2}
+                            name="Purchase"
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                  {/* New Users by Day */}
+                  <div className="rounded-2xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm force-light-bg-white">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                      New Users Progress
+                    </h2>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={usersByDay}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                          <XAxis dataKey="day" stroke="#6b7280" />
+                          <YAxis stroke="#6b7280" />
+                          <Tooltip />
+                          <Legend />
+                          <Line
+                            type="monotone"
+                            dataKey="total"
+                            stroke="#10b981"
+                            strokeWidth={2}
+                            name="Users"
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 </div>
-                {/* New Users by Day */}
-                <div className="rounded-2xl bg-white dark:bg-[#0f172a] border border-gray-200 dark:border-slate-700 p-6 shadow-sm force-light-bg-white">
-                  <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                    New Users Progress
-                  </h2>
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={usersByDay}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                        <XAxis dataKey="day" stroke="#6b7280" />
-                        <YAxis stroke="#6b7280" />
-                        <Tooltip />
-                        <Legend />
-                        <Line
-                          type="monotone"
-                          dataKey="total"
-                          stroke="#10b981"
-                          strokeWidth={2}
-                          name="Users"
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
+              )}
 
 
 
