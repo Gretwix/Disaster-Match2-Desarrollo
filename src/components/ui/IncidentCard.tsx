@@ -1,7 +1,6 @@
 import Swal from "sweetalert2";
 import { getLoggedUser,} from "../../utils/storage";
 
-
 // Definimos tipos estrictos de incidente para mantener consistencia y evitar errores.
 export type IncidentType = 'ROBBERY' | 'FIRE' | 'CRIME' | 'OTHER';
 
