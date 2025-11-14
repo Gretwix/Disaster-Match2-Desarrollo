@@ -343,6 +343,18 @@ export default function Navigation() {
                           <span data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
                         </Link>
                       )}
+                      {/* Leads link */}
+                      <Link
+                        to="/HomePage"
+                        onClick={() => setIsProfileOpen(false)}
+                        className={`block w-full text-left px-3 py-2 text-sm rounded-md transition
+                          ${isDark
+                            ? "text-gray-100 hover:bg-slate-600/60"
+                            : "text-black hover:bg-gray-200"
+                          }`}
+                      >
+                        <span data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
+                      </Link>
                       {/* Zones link */}
                       <Link
                         to="/Zones"
