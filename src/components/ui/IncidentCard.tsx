@@ -1,3 +1,4 @@
+import Swal from "sweetalert2";
 import { getLoggedUser,} from "../../utils/storage";
 
 
@@ -175,23 +176,32 @@ export default function IncidentCard({
   </div>
 
   {/* 🔹 Botón Remove Promo (centrado) */}
-  {loggedUser?.role === "admin" && is_promo && (
-    <div className="flex justify-center flex-1">
-      <button
-        onClick={() => {
-          const confirmRemove = window.confirm(
-            "Are you sure you want to remove the 40% discount promotion?"
-          );
-          if (confirmRemove) {
-            onRemovePromotion?.(id);
-          }
-        }}
-        className="px-3 py-1.5 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition"
-      >
-        Remove Promo
-      </button>
-    </div>
-  )}
+{loggedUser?.role === "admin" && is_promo && (
+  <div className="flex justify-center flex-1">
+    <button
+      onClick={async () => {
+        const confirm = await Swal.fire({
+          title: "Remove Promotion?",
+          text: "Are you sure you want to remove the 40% discount promotion?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, remove",
+          cancelButtonText: "Cancel",
+          confirmButtonColor: "#d33",
+          background: "#ffffff",
+        });
+
+        if (confirm.isConfirmed) {
+          onRemovePromotion?.(id);
+        }
+      }}
+      className="px-3 py-1.5 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition"
+    >
+      Remove Promo
+    </button>
+  </div>
+)}
+
 
   {/* 🔹 Botón Add to Cart (derecha) */}
   <button
