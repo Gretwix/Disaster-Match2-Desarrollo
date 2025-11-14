@@ -121,8 +121,8 @@
   "admin": {
     "manageUsers": "Manage Users",
     "loadingUsers": "Loading users...",
-    "edit": "Edit",
-    "delete": "Delete",
+    "edit": "Edit User",
+    "delete": "Delete User",
     "saveSuccess": "User updated successfully",
     "deleteConfirmTitle": "Are you sure?",
     "deleteConfirmText": "You won't be able to revert this.",

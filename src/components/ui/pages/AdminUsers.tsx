@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LayoutGrid, User, Users, BarChart, MapPin } from "lucide-react";
+import { LayoutGrid, User, Users, BarChart, MapPin, Pencil, KeyRound, Trash2 } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
 import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
 import { ArrowLeft } from "react-feather";
@@ -258,9 +258,9 @@ export default function AdminUsers() {
 
   // clases reutilizables para el sidebar
   const sidebarLinkBase =
-    "flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition";
+    "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-900 dark:text-slate-200 border border-indigo-200/70 dark:border-indigo-500/40 bg-white/60 dark:bg-indigo-950/40 backdrop-blur-sm hover:shadow-md hover:bg-indigo-50 dark:hover:bg-indigo-700/40 transition-colors duration-200";
   const sidebarActiveClass =
-    "bg-indigo-600 text-indigo-600 ring-1 ring-indigo-600 dark:bg-indigo-600/60";
+    "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md border-indigo-600 dark:from-indigo-600 dark:to-indigo-500";
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[#0b1220] force-light-bg-gray-100 overflow-x-hidden">
@@ -348,23 +348,27 @@ export default function AdminUsers() {
                                     setIsEditing(u);
                                     setFormData(u);
                                   }}
-                                  className="px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-xs sm:text-sm"
-
+                                  className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium shadow-sm hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 focus-visible:ring-offset-1 transition whitespace-nowrap leading-none"
+                                  title={t("admin.edit")}
                                 >
-                                  {t("admin.edit")}
+                                  <Pencil className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                                  <span>{t("admin.edit")}</span>
                                 </button>
                                 <button
                                   onClick={() => handleAdminResetPassword(u)}
-                                  className="px-3 py-1 rounded-lg bg-amber-600 text-white hover:bg-amber-700 text-xs sm:text-sm"
+                                  className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-600 text-white text-xs sm:text-sm font-medium shadow-sm hover:bg-amber-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-1 transition whitespace-nowrap leading-none"
                                   title={t('admin.resetTempHint')}
                                 >
-                                  {t('admin.resetTempButton')}
+                                  <KeyRound className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                                  <span>{t('admin.resetTempShort', 'Reset Temp')}</span>
                                 </button>
                                 <button
                                   onClick={() => handleDelete(u.id)}
-                                  className="px-3 py-1 rounded-lg bg-red-600 text-white hover:bg-red-700 text-xs sm:text-sm"
+                                  className="group inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium shadow-sm hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/60 focus-visible:ring-offset-1 transition whitespace-nowrap leading-none"
+                                  title={t("admin.delete")}
                                 >
-                                  {t("admin.delete")}
+                                  <Trash2 className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                                  <span>{t("admin.delete")}</span>
                                 </button>
                               </div>
                             </td>
