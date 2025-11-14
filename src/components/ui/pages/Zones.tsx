@@ -5,14 +5,15 @@ import toast, { Toaster } from 'react-hot-toast'
 import { getLoggedUser } from '../../../utils/storage'
 import { addZoneWithMeta, deleteZoneById, listMyZones, testEmail, type ZoneInterest } from '../../../utils/zones'
 import { ArrowLeft } from 'react-feather'
-import { LayoutGrid, User, MapPin } from 'lucide-react'
-import { useNavigate } from '@tanstack/react-router'
+import { LayoutGrid, User, Users, BarChart, MapPin } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function ZonesPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const logged = getLoggedUser() as any
   const userId = (logged?.id ?? logged?.ID) as number | undefined
+  const isAdmin = userId === 2
 
   const [loading, setLoading] = useState(true)
   const [zones, setZones] = useState<ZoneInterest[]>([])
@@ -35,7 +36,7 @@ export default function ZonesPage() {
       }
     }
     run()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
 
   if (!userId) {
@@ -71,6 +72,15 @@ export default function ZonesPage() {
                   <LayoutGrid className="h-5 w-5 text-gray-900" />
                   <span className="font-medium text-gray-900" data-i18n="nav.disasterMatch">{t("nav.disasterMatch")}</span>
                 </a>
+                {isAdmin && (
+                  <a
+                    href="/AdminReports"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition"
+                  >
+                    <BarChart className="h-5 w-5 text-gray-900" />
+                    <span className="font-medium text-gray-900" data-i18n="nav.adminPanel">{t("nav.adminPanel")}</span>
+                  </a>
+                )}
                 {/* Keep Profile above Zones to maintain consistent order */}
                 <a
                   href="/Profile"
@@ -87,6 +97,15 @@ export default function ZonesPage() {
                   <MapPin className="h-5 w-5 text-white dark:text-white" />
                   <span className="font-medium text-white dark:text-white" data-i18n="nav.zones">{t("nav.zones", "Zones")}</span>
                 </a>
+                {isAdmin && (
+                  <a
+                    href="/AdminUsers"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition"
+                  >
+                    <Users className="h-5 w-5 text-gray-900" />
+                    <span className="font-medium text-gray-900" data-i18n="nav.users">{t("nav.users")}</span>
+                  </a>
+                )}
               </nav>
             </aside>
 

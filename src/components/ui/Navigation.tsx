@@ -368,6 +368,20 @@ export default function Navigation() {
                       >
                         <span data-i18n="nav.profile">{t("nav.profile")}</span>
                       </Link>
+                      {/* Admin Panel (if admin) */}
+                      {loggedUser?.role === "admin" && (
+                        <Link
+                          to="/AdminUsers"
+                          onClick={() => setIsProfileOpen(false)}
+                          className={`block w-full text-left px-3 py-2 text-sm rounded-md transition
+                            ${isDark
+                              ? "text-gray-100 hover:bg-slate-600/60"
+                              : "text-black hover:bg-gray-200"
+                            }`}
+                        >
+                          <span data-i18n="nav.users">{t("nav.users")}</span>
+                        </Link>
+                      )}
                       <button
                         type="button"
                         onClick={() => {

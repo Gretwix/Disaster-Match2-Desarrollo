@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LayoutGrid, User, Users, BarChart } from "lucide-react";
+import { LayoutGrid, User, Users, BarChart, MapPin } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
 import Pagination from "../Pagination";
 import toast, { Toaster } from "react-hot-toast";
@@ -400,6 +400,12 @@ export default function AdminReports() {
                   <span className="font-medium text-gray-900" data-i18n="nav.profile">{t("nav.profile")}</span>
                 </Link>
 
+                {/* Zones button under Leads and Profile */}
+                <Link to="/Zones" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
+                  <MapPin className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.zones">{t("nav.zones", "Zones")}</span>
+                </Link>
+
                 <Link to="/AdminUsers" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <Users className="h-5 w-5 text-gray-900" />
                   <span className="font-medium text-gray-900" data-i18n="nav.users">{t("nav.users")}</span>
@@ -420,11 +426,10 @@ export default function AdminReports() {
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4 overflow-x-auto pb-2 max-w-full">
                   <div className="flex gap-2">
                     {(["current", "all", "custom"] as FilterMode[]).map((mode) => (
-                      <button key={mode} onClick={() => setFilterMode(mode)} className={`px-3 sm:px-4 py-2 rounded-lg border text-xs sm:text-sm font-medium transition whitespace-nowrap ${
-    filterMode === mode
-      ? "bg-indigo-600 text-white border-indigo-600"
-      : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"
-  }`}>
+                      <button key={mode} onClick={() => setFilterMode(mode)} className={`px-3 sm:px-4 py-2 rounded-lg border text-xs sm:text-sm font-medium transition whitespace-nowrap ${filterMode === mode
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"
+                        }`}>
                         {mode === "current" ? t("reports.currentMonth") : mode === "all" ? t("reports.allTime") : t("reports.customDate")}
                       </button>
                     ))}

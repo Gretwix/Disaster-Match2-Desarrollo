@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-useless-escape */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LayoutGrid, User, Users, BarChart } from "lucide-react";
+import { LayoutGrid, User, Users, BarChart, MapPin } from "lucide-react";
 import { getLoggedUser } from "../../../utils/storage";
 import { formatPhone, validatePhone } from "../../../utils/phoneValidation";
 import { ArrowLeft } from "react-feather";
+import Pagination from "../Pagination";
 import Swal from "sweetalert2";
 import toast, { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -31,6 +34,12 @@ export default function AdminUsers() {
   const [isEditing, setIsEditing] = useState<UserRecord | null>(null);
   const [formData, setFormData] = useState<UserRecord | null>(null);
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
+  const filteredUsers = users;
+  const indexOfLastItem = page * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   const fetchUsers = async () => {
     try {
@@ -39,16 +48,20 @@ export default function AdminUsers() {
 
       const mapped: UserRecord[] = data.map((u: any) => ({
         id: u.ID ?? u.id,
-        f_name: u.f_name ?? u.F_Name ?? "",
-        l_name: u.l_name ?? u.L_Name ?? "",
-        username: u.username ?? u.Username ?? "",
-        email: u.email ?? u.Email ?? "",
-        phone: u.phone ?? u.formatPhone(String(data.phone || "")) ?? "",
-        company: u.company ?? u.Company ?? "",
+        f_name: u.F_Name ?? u.f_name ?? "",
+        l_name: u.L_Name ?? u.l_name ?? "",
+        username: u.Username ?? u.username ?? "",
+        email: u.Email ?? u.email ?? "",
+        phone: u.Phone ?? u.phone ?? "",
+        company: u.Company ?? u.company ?? "",
+        role: u.Role ?? u.role ?? "",
         user_password: "*******",
       }));
 
-      setUsers(mapped);
+      const filtered = mapped.filter(u => u.role?.toLowerCase() !== "admin");
+      setUsers(filtered);
+
+      setUsers(mapped.filter(u => u.id !== 2));
     } catch (err) {
       console.error("Error cargando usuarios:", err);
       toast.error("Error al cargar usuarios");
@@ -285,6 +298,12 @@ export default function AdminUsers() {
                   <span className="font-medium text-gray-900" data-i18n="nav.profile">{t("nav.profile")}</span>
                 </Link>
 
+                {/* Zones button under Leads and Profile */}
+                <Link to="/Zones" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
+                  <MapPin className="h-5 w-5 text-gray-900" />
+                  <span className="font-medium text-gray-900" data-i18n="nav.zones">{t("nav.zones", "Zones")}</span>
+                </Link>
+
                 <Link to="/AdminUsers" className={sidebarLinkBase} activeProps={{ className: sidebarActiveClass }}>
                   <Users className="h-5 w-5 text-gray-900" />
                   <span className="font-medium text-gray-900" data-i18n="nav.users">{t("nav.users")}</span>
@@ -302,7 +321,7 @@ export default function AdminUsers() {
                 ) : !isEditing ? (
                   // Tabla responsive
                   <div className="overflow-x-auto max-w-full">
-                    <table className="min-w-full text-left text-xs sm:text-sm bg-white border-collapse">
+                    <table className="min-w-full text-left text-sm bg-white border-collapse">
                       <thead>
                         <tr className="text-gray-700 bg-white">
                           <th className="px-4 py-3 w-24">ID</th>
@@ -313,7 +332,7 @@ export default function AdminUsers() {
                         </tr>
                       </thead>
                       <tbody className="bg-white rounded-xl overflow-hidden">
-                        {users.map((u, idx) => (
+                        {currentUsers.map((u, idx) => (
                           <tr
                             key={u.id ?? idx}
                             className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
@@ -329,20 +348,21 @@ export default function AdminUsers() {
                                     setIsEditing(u);
                                     setFormData(u);
                                   }}
-                                  className="flex items-center gap-2 px-3 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                                  className="px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-xs sm:text-sm"
+
                                 >
                                   {t("admin.edit")}
                                 </button>
                                 <button
                                   onClick={() => handleAdminResetPassword(u)}
-                                  className="flex items-center gap-2 px-3 py-1 rounded-md bg-amber-500 text-white hover:bg-amber-600"
+                                  className="px-3 py-1 rounded-lg bg-amber-600 text-white hover:bg-amber-700 text-xs sm:text-sm"
                                   title={t('admin.resetTempHint')}
                                 >
                                   {t('admin.resetTempButton')}
                                 </button>
                                 <button
                                   onClick={() => handleDelete(u.id)}
-                                  className="flex items-center gap-2 px-3 py-1 rounded-md bg-red-500 text-white hover:bg-red-600"
+                                  className="px-3 py-1 rounded-lg bg-red-600 text-white hover:bg-red-700 text-xs sm:text-sm"
                                 >
                                   {t("admin.delete")}
                                 </button>
@@ -352,6 +372,12 @@ export default function AdminUsers() {
                         ))}
                       </tbody>
                     </table>
+                    <Pagination
+                      currentPage={page}
+                      totalItems={filteredUsers.length}
+                      itemsPerPage={itemsPerPage}
+                      onPageChange={setPage}
+                    />
                   </div>
                 ) : (
                   // Formulario
