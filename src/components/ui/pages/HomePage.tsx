@@ -212,16 +212,26 @@ export default function HomePage() {
   }, []);
 
   // Aplicar promoción a un lead
- const applyPromotion = async (id: number) => {
+const applyPromotion = async (id: number) => {
   try {
     console.log("Applying promotion to lead ID:", id);
 
-const res = await fetch(apiUrl("/Leads/ApplyPromotionToLead"), {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id, promoPercent: 0.4 }),
-});
+    // Pedir porcentaje al admin
+    const input = prompt("Enter promotion percentage (example: 0.2 = 20%)");
 
+    const promoPercent = Number(input);
+
+    if (isNaN(promoPercent) || promoPercent <= 0 || promoPercent >= 1) {
+      alert("Invalid percentage. Use decimals, e.g., 0.2 = 20%");
+      return;
+    }
+
+    const res = await fetch(apiUrl("/Leads/ApplyPromotionToLead"), {
+
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, promoPercent }),
+    });
 
     const text = await res.text();
 
@@ -231,32 +241,29 @@ const res = await fetch(apiUrl("/Leads/ApplyPromotionToLead"), {
       return;
     }
 
-    //  Si el backend respondió correctamente
-    console.log("✅ Promotion applied:", text);
+    console.log(" Promotion applied:", text);
 
-    //  Actualiza el lead en la lista principal
     setLeads((prev) =>
       prev.map((l) =>
         l.id === id
           ? {
               ...l,
               is_promo: true,
-              promo_percent: 0.4,
+              promo_percent: promoPercent,
             }
           : l
       )
     );
 
-    //  Elimina el lead de la lista de elegibles
     setEligible((prev) => prev.filter((l) => l.id !== id));
 
-    //  Feedback visual
     alert("Promotion successfully applied!");
   } catch (e) {
     console.error(" Error applying promotion:", e);
     alert("Failed to apply the promotion.");
   }
 };
+
 
 //Eliminar promoción de un lead
 const removePromotion = async (id: number) => {
@@ -401,7 +408,7 @@ const removePromotion = async (id: number) => {
                 <div className="rounded-2xl border border-gray-200 bg-gray-50 p-3 sm:p-5">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-800">Eligible Leads for Promotion 40% OFF</h3>
+                      <h3 className="text-lg font-semibold text-gray-800">Eligible Leads for Promotion</h3>
                       <p className="text-sm text-gray-500 mt-1">Automatically generated list of leads that have been unsold for more than 7 days.</p>
                     </div>
                     <span className="text-sm text-gray-600 mt-2 sm:mt-0">Total: {eligible.length}</span>
@@ -442,14 +449,14 @@ const removePromotion = async (id: number) => {
                                     className="px-4 py-1.5 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition"
                                     onClick={() => {
                                       const confirmApply = window.confirm(
-                                        "Are you sure you want to apply a 40% discount promotion to this lead?"
+                                        "Are you sure you want to apply a promotion to this lead?"
                                       );
                                       if (confirmApply) {
                                         applyPromotion(lead.id);
                                       }
                                     }}
                                   >
-                                    Apply 40%
+                                     Apply Promotion
                                   </button>
 
                                 </td>
