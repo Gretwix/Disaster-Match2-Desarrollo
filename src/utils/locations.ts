@@ -1,0 +1,126 @@
+export type StateOption = { code: string; name: string }
+
+export const US_STATES: StateOption[] = [
+  { code: 'AL', name: 'Alabama' },
+  { code: 'AK', name: 'Alaska' },
+  { code: 'AZ', name: 'Arizona' },
+  { code: 'AR', name: 'Arkansas' },
+  { code: 'CA', name: 'California' },
+  { code: 'CO', name: 'Colorado' },
+  { code: 'CT', name: 'Connecticut' },
+  { code: 'DE', name: 'Delaware' },
+  { code: 'DC', name: 'District of Columbia' },
+  { code: 'FL', name: 'Florida' },
+  { code: 'GA', name: 'Georgia' },
+  { code: 'HI', name: 'Hawaii' },
+  { code: 'ID', name: 'Idaho' },
+  { code: 'IL', name: 'Illinois' },
+  { code: 'IN', name: 'Indiana' },
+  { code: 'IA', name: 'Iowa' },
+  { code: 'KS', name: 'Kansas' },
+  { code: 'KY', name: 'Kentucky' },
+  { code: 'LA', name: 'Louisiana' },
+  { code: 'ME', name: 'Maine' },
+  { code: 'MD', name: 'Maryland' },
+  { code: 'MA', name: 'Massachusetts' },
+  { code: 'MI', name: 'Michigan' },
+  { code: 'MN', name: 'Minnesota' },
+  { code: 'MS', name: 'Mississippi' },
+  { code: 'MO', name: 'Missouri' },
+  { code: 'MT', name: 'Montana' },
+  { code: 'NE', name: 'Nebraska' },
+  { code: 'NV', name: 'Nevada' },
+  { code: 'NH', name: 'New Hampshire' },
+  { code: 'NJ', name: 'New Jersey' },
+  { code: 'NM', name: 'New Mexico' },
+  { code: 'NY', name: 'New York' },
+  { code: 'NC', name: 'North Carolina' },
+  { code: 'ND', name: 'North Dakota' },
+  { code: 'OH', name: 'Ohio' },
+  { code: 'OK', name: 'Oklahoma' },
+  { code: 'OR', name: 'Oregon' },
+  { code: 'PA', name: 'Pennsylvania' },
+  { code: 'RI', name: 'Rhode Island' },
+  { code: 'SC', name: 'South Carolina' },
+  { code: 'SD', name: 'South Dakota' },
+  { code: 'TN', name: 'Tennessee' },
+  { code: 'TX', name: 'Texas' },
+  { code: 'UT', name: 'Utah' },
+  { code: 'VT', name: 'Vermont' },
+  { code: 'VA', name: 'Virginia' },
+  { code: 'WA', name: 'Washington' },
+  { code: 'WV', name: 'West Virginia' },
+  { code: 'WI', name: 'Wisconsin' },
+  { code: 'WY', name: 'Wyoming' },
+]
+
+// A concise list of popular cities per state. Extend as needed.
+export const CITIES_BY_STATE: Record<string, string[]> = {
+  AL: ['Birmingham', 'Montgomery', 'Mobile', 'Huntsville', 'Tuscaloosa'],
+  AK: ['Anchorage', 'Juneau', 'Fairbanks'],
+  AZ: ['Phoenix', 'Tucson', 'Mesa', 'Chandler', 'Scottsdale', 'Tempe', 'Glendale'],
+  AR: ['Little Rock', 'Fort Smith', 'Fayetteville', 'Springdale'],
+  CA: ['Los Angeles', 'San Diego', 'San Jose', 'San Francisco', 'Fresno', 'Sacramento', 'Long Beach', 'Oakland'],
+  CO: ['Denver', 'Colorado Springs', 'Aurora', 'Fort Collins', 'Boulder'],
+  CT: ['Bridgeport', 'New Haven', 'Stamford', 'Hartford'],
+  DE: ['Wilmington', 'Dover', 'Newark'],
+  DC: ['Washington'],
+  FL: ['Jacksonville', 'Miami', 'Tampa', 'Orlando', 'St. Petersburg'],
+  GA: ['Atlanta', 'Augusta', 'Savannah', 'Columbus', 'Athens'],
+  HI: ['Honolulu', 'Hilo'],
+  ID: ['Boise', 'Idaho Falls', 'Meridian', 'Nampa'],
+  IL: ['Chicago', 'Aurora', 'Naperville', 'Joliet', 'Rockford'],
+  IN: ['Indianapolis', 'Fort Wayne', 'Evansville', 'South Bend'],
+  IA: ['Des Moines', 'Cedar Rapids', 'Davenport'],
+  KS: ['Wichita', 'Overland Park', 'Kansas City', 'Topeka'],
+  KY: ['Louisville', 'Lexington', 'Bowling Green'],
+  LA: ['New Orleans', 'Baton Rouge', 'Shreveport', 'Lafayette'],
+  ME: ['Portland', 'Lewiston', 'Bangor'],
+  MD: ['Baltimore', 'Rockville', 'Frederick', 'Gaithersburg'],
+  MA: ['Boston', 'Worcester', 'Springfield', 'Cambridge'],
+  MI: ['Detroit', 'Grand Rapids', 'Warren', 'Sterling Heights', 'Ann Arbor'],
+  MN: ['Minneapolis', 'St. Paul', 'Rochester', 'Duluth'],
+  MS: ['Jackson', 'Gulfport', 'Hattiesburg'],
+  MO: ['Kansas City', 'St. Louis', 'Springfield', 'Columbia'],
+  MT: ['Billings', 'Missoula', 'Great Falls'],
+  NE: ['Omaha', 'Lincoln', 'Bellevue'],
+  NV: ['Las Vegas', 'Henderson', 'Reno', 'North Las Vegas'],
+  NH: ['Manchester', 'Nashua', 'Concord'],
+  NJ: ['Newark', 'Jersey City', 'Paterson', 'Elizabeth'],
+  NM: ['Albuquerque', 'Las Cruces', 'Rio Rancho', 'Santa Fe'],
+  NY: ['New York', 'Buffalo', 'Rochester', 'Yonkers', 'Syracuse'],
+  NC: ['Charlotte', 'Raleigh', 'Greensboro', 'Durham'],
+  ND: ['Fargo', 'Bismarck', 'Grand Forks'],
+  OH: ['Columbus', 'Cleveland', 'Cincinnati', 'Toledo'],
+  OK: ['Oklahoma City', 'Tulsa', 'Norman'],
+  OR: ['Portland', 'Salem', 'Eugene', 'Gresham'],
+  PA: ['Philadelphia', 'Pittsburgh', 'Allentown', 'Erie'],
+  RI: ['Providence', 'Warwick', 'Cranston'],
+  SC: ['Columbia', 'Charleston', 'North Charleston'],
+  SD: ['Sioux Falls', 'Rapid City'],
+  TN: ['Nashville', 'Memphis', 'Knoxville', 'Chattanooga'],
+  TX: ['Houston', 'San Antonio', 'Dallas', 'Austin', 'Fort Worth', 'El Paso'],
+  UT: ['Salt Lake City', 'West Valley City', 'Provo', 'West Jordan'],
+  VT: ['Burlington', 'South Burlington', 'Rutland'],
+  VA: ['Virginia Beach', 'Norfolk', 'Chesapeake', 'Richmond'],
+  WA: ['Seattle', 'Spokane', 'Tacoma', 'Vancouver'],
+  WV: ['Charleston', 'Huntington', 'Morgantown'],
+  WI: ['Milwaukee', 'Madison', 'Green Bay', 'Kenosha'],
+  WY: ['Cheyenne', 'Casper', 'Laramie'],
+}
+
+export async function fetchPrimaryZip(stateCode: string, city: string): Promise<string | undefined> {
+  if (!stateCode || !city) return undefined
+  try {
+    // Public API: https://api.zippopotam.us/us/{state}/{city}
+    const url = `https://api.zippopotam.us/us/${encodeURIComponent(stateCode)}/${encodeURIComponent(city)}`
+    const res = await fetch(url)
+    if (!res.ok) return undefined
+    const data = await res.json() as any
+    const first = Array.isArray(data?.places) ? data.places[0] : undefined
+    const zip = first?.['post code'] || first?.['post_code'] || first?.postCode
+    return typeof zip === 'string' ? zip : undefined
+  } catch {
+    return undefined
+  }
+}

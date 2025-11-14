@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import toast, { Toaster } from 'react-hot-toast'
 import { getLoggedUser } from '../../../utils/storage'
 import { addZoneWithMeta, deleteZoneById, listMyZones, testEmail, type ZoneInterest } from '../../../utils/zones'
+import { US_STATES, CITIES_BY_STATE, fetchPrimaryZip } from '../../../utils/locations'
 import { ArrowLeft } from 'react-feather'
 import { LayoutGrid, User, Users, BarChart, MapPin } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
@@ -18,6 +19,7 @@ export default function ZonesPage() {
   const [loading, setLoading] = useState(true)
   const [zones, setZones] = useState<ZoneInterest[]>([])
   const [form, setForm] = useState({ state: '', city: '', zip: '', email_to: '' })
+  const [zipLoading, setZipLoading] = useState(false)
   const canSubmit = useMemo(() => {
     return !!(form.state.trim() || form.city.trim() || form.zip.trim())
   }, [form])
@@ -38,6 +40,26 @@ export default function ZonesPage() {
     run()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
+
+  // Auto-generate ZIP when state and city are selected
+  useEffect(() => {
+    let cancelled = false
+    const genZip = async () => {
+      if (!form.state || !form.city) {
+        setForm(prev => ({ ...prev, zip: '' }))
+        return
+      }
+      setZipLoading(true)
+      const zip = await fetchPrimaryZip(form.state, form.city)
+      if (!cancelled) {
+        setForm(prev => ({ ...prev, zip: zip || '' }))
+        setZipLoading(false)
+      }
+    }
+    genZip()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.state, form.city])
 
   if (!userId) {
     return (
@@ -121,22 +143,66 @@ export default function ZonesPage() {
                 </p>
 
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {([
-                    { key: 'state', label: t('zones.state', 'State'), ph: t('zones.statePlaceholder', 'AZ') },
-                    { key: 'city', label: t('zones.city', 'City'), ph: t('zones.cityPlaceholder', 'Phoenix') },
-                    { key: 'zip', label: t('zones.zip', 'ZIP'), ph: t('zones.zipPlaceholder', '85001') },
-                    { key: 'email_to', label: t('zones.emailTo', 'Email to (optional)'), ph: t('zones.emailToPlaceholder', 'leave empty to use your account email') },
-                  ] as const).map((f) => (
-                    <label key={f.key} className="flex flex-col text-sm font-medium text-gray-900 dark:text-slate-200 force-light-text">
-                      {f.label}
+                  {/* State select */}
+                  <label className="flex flex-col text-sm font-medium text-gray-900 dark:text-slate-200 force-light-text">
+                    {t('zones.state', 'State')}
+                    <select
+                      value={form.state}
+                      onChange={(e) => {
+                        const next = e.target.value
+                        setForm(prev => ({ ...prev, state: next, city: '', zip: '' }))
+                      }}
+                      className="mt-1 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-[#0b1220] text-gray-900 dark:text-slate-100 force-light-bg-white force-light-text"
+                    >
+                      <option value="">{t('zones.statePlaceholder', 'Select a state')}</option>
+                      {US_STATES.map(s => (
+                        <option key={s.code} value={s.code}>{s.name} ({s.code})</option>
+                      ))}
+                    </select>
+                  </label>
+
+                  {/* City select */}
+                  <label className="flex flex-col text-sm font-medium text-gray-900 dark:text-slate-200 force-light-text">
+                    {t('zones.city', 'City')}
+                    <select
+                      value={form.city}
+                      onChange={(e) => setForm(prev => ({ ...prev, city: e.target.value }))}
+                      disabled={!form.state}
+                      className="mt-1 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-[#0b1220] text-gray-900 dark:text-slate-100 force-light-bg-white force-light-text disabled:opacity-50"
+                    >
+                      <option value="">{form.state ? t('zones.cityPlaceholder', 'Select a city') : t('zones.selectStateFirst', 'Select a state first')}</option>
+                      {(CITIES_BY_STATE[form.state] ?? []).map(city => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
+                    </select>
+                  </label>
+
+                  {/* ZIP auto-generated */}
+                  <label className="flex flex-col text-sm font-medium text-gray-900 dark:text-slate-200 force-light-text">
+                    {t('zones.zip', 'ZIP')}
+                    <div className="relative">
                       <input
-                        value={(form as any)[f.key]}
-                        onChange={(e) => setForm((prev) => ({ ...prev, [f.key]: e.target.value }))}
-                        placeholder={String(f.ph)}
-                        className="mt-1 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-[#0b1220] text-gray-900 dark:text-slate-100 force-light-bg-white force-light-text"
+                        value={form.zip}
+                        readOnly
+                        placeholder={t('zones.zipPlaceholder', 'Auto-generated')}
+                        className="mt-1 w-full border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 shadow-sm bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-slate-100 force-light-bg-white force-light-text"
                       />
-                    </label>
-                  ))}
+                      {zipLoading && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">{t('common.loading', 'Loading...')}</span>
+                      )}
+                    </div>
+                  </label>
+
+                  {/* Email to (optional) */}
+                  <label className="flex flex-col text-sm font-medium text-gray-900 dark:text-slate-200 force-light-text">
+                    {t('zones.emailTo', 'Email to (optional)')}
+                    <input
+                      value={form.email_to}
+                      onChange={(e) => setForm((prev) => ({ ...prev, email_to: e.target.value }))}
+                      placeholder={t('zones.emailToPlaceholder', 'leave empty to use your account email')}
+                      className="mt-1 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-[#0b1220] text-gray-900 dark:text-slate-100 force-light-bg-white force-light-text"
+                    />
+                  </label>
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-2">
