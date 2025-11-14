@@ -92,7 +92,7 @@ export default function ZonesPage() {
                 {/* Zones remains active on this page */}
                 <a
                   href="/Zones"
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition bg-indigo-600 text-white dark:bg-indigo-600/60"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-gray-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-indigo-600/60 ring-1 ring-indigo-600 transition bg-indigo-600 dark:bg-indigo-600/60"
                 >
                   <MapPin className="h-5 w-5 text-white dark:text-white" />
                   <span className="font-medium text-white dark:text-white" data-i18n="nav.zones">{t("nav.zones", "Zones")}</span>
