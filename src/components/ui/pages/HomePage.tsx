@@ -69,7 +69,6 @@ export default function HomePage() {
   // Datos principales
   const [leads, setLeads] = useState<Lead[]>([]);
   const [eligible, setEligible] = useState<Lead[]>([]); // leads elegibles para promoción
-  const [, setPurchasedLeadIds] = useState<number[]>([]);
   const [hasPurchased, setHasPurchased] = useState<boolean>(false);
 
   // Estados de carga y paginación
@@ -162,22 +161,10 @@ export default function HomePage() {
         const dataLeads: Lead[] = await resLeads.json();
         setLeads(Array.isArray(dataLeads) ? dataLeads : []);
 
-        // Cargar compras globales para marcar ids comprados
+        // Cargar compras para determinar si el usuario ya compró algún lead
         const resPurchases = await fetch(apiUrl("/Purchase/List"));
         const purchases = await resPurchases.json();
-        let allLeadIds: number[] = [];
-        for (const purchase of purchases || []) {
-          if (purchase.leads && Array.isArray(purchase.leads)) {
-            allLeadIds = allLeadIds.concat(
-              purchase.leads.map((l: any) => l.lead_id ?? l.leadId)
-            );
-          }
-        }
-        setPurchasedLeadIds(
-          Array.from(new Set(allLeadIds.filter((id) => typeof id === "number")))
-        );
-
-        // Determine if current user has already purchased any lead
+        // Determinar si el usuario actual ya realizó alguna compra con leads
         const currentUserId = (loggedUser as any)?.id ?? (loggedUser as any)?.ID;
         const userHasPurchased = Array.isArray(purchases)
           ? purchases.some(
